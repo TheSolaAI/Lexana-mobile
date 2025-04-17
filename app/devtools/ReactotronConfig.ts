@@ -3,41 +3,41 @@
  * free desktop app for inspecting and debugging your React Native app.
  * @see https://github.com/infinitered/reactotron
  */
-import { Platform, NativeModules } from "react-native"
+import { Platform, NativeModules } from 'react-native';
 
-import { ArgType } from "reactotron-core-client"
-import { mst } from "reactotron-mst"
-import mmkvPlugin from "reactotron-react-native-mmkv"
+import { ArgType } from 'reactotron-core-client';
+import { mst } from 'reactotron-mst';
+import mmkvPlugin from 'reactotron-react-native-mmkv';
 
-import { storage, clear } from "@/utils/storage"
-import { goBack, resetRoot, navigate } from "@/navigators/navigationUtilities"
+import { storage, clear } from '@/utils/storage';
+import { goBack, resetRoot, navigate } from '@/navigators/navigationUtilities';
 
-import { Reactotron } from "./ReactotronClient"
-import { ReactotronReactNative } from "reactotron-react-native"
+import { Reactotron } from './ReactotronClient';
+import { ReactotronReactNative } from 'reactotron-react-native';
 
 const reactotron = Reactotron.configure({
-  name: require("../../package.json").name,
+  name: require('../../package.json').name,
   onConnect: () => {
     /** since this file gets hot reloaded, let's clear the past logs every time we connect */
-    Reactotron.clear()
+    Reactotron.clear();
   },
-})
+});
 
 reactotron.use(
   mst({
     /* ignore some chatty `mobx-state-tree` actions */
-    filter: (event) => /postProcessSnapshot|@APPLY_SNAPSHOT/.test(event.name) === false,
-  }),
-)
+    filter: event => /postProcessSnapshot|@APPLY_SNAPSHOT/.test(event.name) === false,
+  })
+);
 
-reactotron.use(mmkvPlugin<ReactotronReactNative>({ storage }))
+reactotron.use(mmkvPlugin<ReactotronReactNative>({ storage }));
 
-if (Platform.OS !== "web") {
+if (Platform.OS !== 'web') {
   reactotron.useReactNative({
     networking: {
       ignoreUrls: /symbolicate/,
     },
-  })
+  });
 }
 
 /**
@@ -52,60 +52,60 @@ if (Platform.OS !== "web") {
  * or else your custom commands won't be registered correctly.
  */
 reactotron.onCustomCommand({
-  title: "Show Dev Menu",
-  description: "Opens the React Native dev menu",
-  command: "showDevMenu",
+  title: 'Show Dev Menu',
+  description: 'Opens the React Native dev menu',
+  command: 'showDevMenu',
   handler: () => {
-    Reactotron.log("Showing React Native dev menu")
-    NativeModules.DevMenu.show()
+    Reactotron.log('Showing React Native dev menu');
+    NativeModules.DevMenu.show();
   },
-})
+});
 
 reactotron.onCustomCommand({
-  title: "Reset Root Store",
-  description: "Resets the MST store",
-  command: "resetStore",
+  title: 'Reset Root Store',
+  description: 'Resets the MST store',
+  command: 'resetStore',
   handler: () => {
-    Reactotron.log("resetting store")
-    clear()
+    Reactotron.log('resetting store');
+    clear();
   },
-})
+});
 
 reactotron.onCustomCommand({
-  title: "Reset Navigation State",
-  description: "Resets the navigation state",
-  command: "resetNavigation",
+  title: 'Reset Navigation State',
+  description: 'Resets the navigation state',
+  command: 'resetNavigation',
   handler: () => {
-    Reactotron.log("resetting navigation state")
-    resetRoot({ index: 0, routes: [] })
+    Reactotron.log('resetting navigation state');
+    resetRoot({ index: 0, routes: [] });
   },
-})
+});
 
-reactotron.onCustomCommand<[{ name: "route"; type: ArgType.String }]>({
-  command: "navigateTo",
-  handler: (args) => {
-    const { route } = args ?? {}
+reactotron.onCustomCommand<[{ name: 'route'; type: ArgType.String }]>({
+  command: 'navigateTo',
+  handler: args => {
+    const { route } = args ?? {};
     if (route) {
-      Reactotron.log(`Navigating to: ${route}`)
-      navigate(route as any) // this should be tied to the navigator, but since this is for debugging, we can navigate to illegal routes
+      Reactotron.log(`Navigating to: ${route}`);
+      navigate(route as any); // this should be tied to the navigator, but since this is for debugging, we can navigate to illegal routes
     } else {
-      Reactotron.log("Could not navigate. No route provided.")
+      Reactotron.log('Could not navigate. No route provided.');
     }
   },
-  title: "Navigate To Screen",
-  description: "Navigates to a screen by name.",
-  args: [{ name: "route", type: ArgType.String }],
-})
+  title: 'Navigate To Screen',
+  description: 'Navigates to a screen by name.',
+  args: [{ name: 'route', type: ArgType.String }],
+});
 
 reactotron.onCustomCommand({
-  title: "Go Back",
-  description: "Goes back",
-  command: "goBack",
+  title: 'Go Back',
+  description: 'Goes back',
+  command: 'goBack',
   handler: () => {
-    Reactotron.log("Going back")
-    goBack()
+    Reactotron.log('Going back');
+    goBack();
   },
-})
+});
 
 /**
  * We're going to add `console.tron` to the Reactotron object.
@@ -124,7 +124,7 @@ reactotron.onCustomCommand({
  *
  * Use this power responsibly! :)
  */
-console.tron = reactotron
+console.tron = reactotron;
 
 /**
  * We tell typescript about our dark magic
@@ -147,11 +147,11 @@ declare global {
      *  })
      * }
      */
-    tron: typeof reactotron
+    tron: typeof reactotron;
   }
 }
 
 /**
  * Now that we've setup all our Reactotron configuration, let's connect!
  */
-reactotron.connect()
+reactotron.connect();
