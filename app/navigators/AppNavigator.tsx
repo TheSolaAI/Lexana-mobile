@@ -1,9 +1,5 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
-import * as Screens from '@/screens';
-import { navigationRef } from './navigationUtilities';
-import { useAppTheme, useThemeProvider } from '@/utils/useAppTheme';
-import { ComponentProps } from 'react';
+import { useAppTheme } from '@/utils/useAppTheme';
+import { NativeStackScreenProps, createNativeStackNavigator } from '@react-navigation/native-stack';
 
 export type AppStackParamList = {
   Welcome: undefined;
@@ -16,7 +12,7 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
-const AppStack = function AppStack() {
+export const AppStackNavigator = function AppStack() {
   const {
     theme: { colors },
   } = useAppTheme();
@@ -33,21 +29,5 @@ const AppStack = function AppStack() {
     >
       <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
     </Stack.Navigator>
-  );
-};
-
-export interface NavigationProps
-  extends Partial<ComponentProps<typeof NavigationContainer<AppStackParamList>>> {}
-
-export const AppNavigator = function AppNavigator(props: NavigationProps) {
-  const { themeScheme, navigationTheme, setThemeContextOverride, ThemeProvider } =
-    useThemeProvider();
-
-  return (
-    <ThemeProvider value={{ themeScheme, setThemeContextOverride }}>
-      <NavigationContainer ref={navigationRef} theme={navigationTheme} {...props}>
-        <AppStack />
-      </NavigationContainer>
-    </ThemeProvider>
   );
 };

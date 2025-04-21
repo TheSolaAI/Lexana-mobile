@@ -1,2 +1,2 @@
-export * from './AppNavigator';
+export * from './MasterNavigator';
 export * from './navigationUtilities';
