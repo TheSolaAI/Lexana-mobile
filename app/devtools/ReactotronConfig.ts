@@ -6,7 +6,6 @@
 import { Platform, NativeModules } from 'react-native';
 
 import { ArgType } from 'reactotron-core-client';
-import { mst } from 'reactotron-mst';
 import mmkvPlugin from 'reactotron-react-native-mmkv';
 
 import { storage, clear } from '@/utils/storage';
@@ -22,13 +21,6 @@ const reactotron = Reactotron.configure({
     Reactotron.clear();
   },
 });
-
-reactotron.use(
-  mst({
-    /* ignore some chatty `mobx-state-tree` actions */
-    filter: event => /postProcessSnapshot|@APPLY_SNAPSHOT/.test(event.name) === false,
-  })
-);
 
 reactotron.use(mmkvPlugin<ReactotronReactNative>({ storage }));
 
