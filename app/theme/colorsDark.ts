@@ -1,17 +1,17 @@
 const palette = {
-  backgroundFirst: '#000000',
-  backgroundSecond: '#434343',
-  secondaryBg: '#1E1E1E',
-  text: '#FAFAFA',
-  textDim: '#B0B0B0',
+  background: '#050505',
+  secondaryBg: '#1B1B1B',
+  text: '#D9D9D9',
+  textDim: '#838383',
+  primary: '#5677F3',
 } as const;
 
 export const colors = {
   palette,
   transparent: 'rgba(0, 0, 0, 0)',
-  backgroundFirst: palette.backgroundFirst,
-  backgroundSecond: palette.backgroundSecond,
+  background: palette.background,
   secondaryBg: palette.secondaryBg,
   text: palette.text,
   textDim: palette.textDim,
+  primary: palette.primary,
 } as const;

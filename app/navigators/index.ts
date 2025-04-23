@@ -1,2 +1,2 @@
-export * from './MasterNavigator';
+export * from './RootNavigationContainer';
 export * from './navigationUtilities';

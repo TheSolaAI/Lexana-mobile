@@ -20,9 +20,9 @@ export const OnboardingStackNavigator = function OnboardingStackNavigator() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        navigationBarColor: colors.backgroundFirst,
+        navigationBarColor: colors.background,
         contentStyle: {
-          backgroundColor: colors.backgroundFirst,
+          backgroundColor: colors.background,
         },
       }}
     >

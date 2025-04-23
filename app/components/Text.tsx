@@ -3,12 +3,9 @@ import { StyleProp, Text as RNText, TextProps as RNTextProps, TextStyle } from '
 import { isRTL, translate, TxKeyPath } from '@/i18n';
 import type { ThemedStyle, ThemedStyleArray } from '@/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
-import { typography } from '@/theme/typography';
 import { ReactNode, forwardRef, ForwardedRef } from 'react';
 
-type Sizes = keyof typeof $sizeStyles;
-type Weights = keyof typeof typography.primary;
-type Presets = 'default' | 'bold' | 'heading' | 'subheading' | 'formLabel' | 'formHelper';
+type Presets = 'default' | 'secondary' | 'pageHeading' | 'pageSubHeading' | 'heading';
 
 export interface TextProps extends RNTextProps {
   /**
@@ -33,41 +30,19 @@ export interface TextProps extends RNTextProps {
    */
   preset?: Presets;
   /**
-   * Text weight modifier.
-   */
-  weight?: Weights;
-  /**
-   * Text size modifier.
-   */
-  size?: Sizes;
-  /**
    * Children components.
    */
   children?: ReactNode;
 }
-
-/**
- * For your text displaying needs.
- * This component is a HOC over the built-in React Native one.
- * @see [Documentation and Examples]{@link https://docs.infinite.red/ignite-cli/boilerplate/app/components/Text/}
- * @param {TextProps} props - The props for the `Text` component.
- * @returns {JSX.Element} The rendered `Text` component.
- */
 export const Text = forwardRef(function Text(props: TextProps, ref: ForwardedRef<RNText>) {
-  const { weight, size, tx, txOptions, text, children, style: $styleOverride, ...rest } = props;
+  const { tx, txOptions, text, children, style: $styleOverride, ...rest } = props;
   const { themed } = useAppTheme();
 
   const i18nText = tx && translate(tx, txOptions);
   const content = i18nText || text || children;
 
   const preset: Presets = props.preset ?? 'default';
-  const $styles: StyleProp<TextStyle> = [
-    $rtlStyle,
-    themed($presets[preset]),
-    weight && $fontWeightStyles[weight],
-    size && $sizeStyles[size],
-    $styleOverride,
-  ];
+  const $styles: StyleProp<TextStyle> = [$rtlStyle, themed($presets[preset]), $styleOverride];
 
   return (
     <RNText {...rest} style={$styles} ref={ref}>
@@ -76,38 +51,22 @@ export const Text = forwardRef(function Text(props: TextProps, ref: ForwardedRef
   );
 });
 
-const $sizeStyles = {
-  xxl: { fontSize: 36, lineHeight: 44 } satisfies TextStyle,
-  xl: { fontSize: 24, lineHeight: 34 } satisfies TextStyle,
-  lg: { fontSize: 20, lineHeight: 32 } satisfies TextStyle,
-  md: { fontSize: 18, lineHeight: 26 } satisfies TextStyle,
-  sm: { fontSize: 16, lineHeight: 24 } satisfies TextStyle,
-  xs: { fontSize: 14, lineHeight: 21 } satisfies TextStyle,
-  xxs: { fontSize: 12, lineHeight: 18 } satisfies TextStyle,
-};
-
-const $fontWeightStyles = Object.entries(typography.primary).reduce((acc, [weight, fontFamily]) => {
-  return { ...acc, [weight]: { fontFamily } };
-}, {}) as Record<Weights, TextStyle>;
-
 const $baseStyle: ThemedStyle<TextStyle> = theme => ({
-  ...$sizeStyles.sm,
-  ...$fontWeightStyles.normal,
   color: theme.colors.text,
+  fontFamily: 'regular',
+  fontSize: 14,
+});
+
+const $secondaryTextBaseStyle: ThemedStyle<TextStyle> = theme => ({
+  color: theme.colors.textDim,
+  fontSize: 12,
 });
 
 const $presets: Record<Presets, ThemedStyleArray<TextStyle>> = {
   default: [$baseStyle],
-  bold: [$baseStyle, { ...$fontWeightStyles.bold }],
-  heading: [
-    $baseStyle,
-    {
-      ...$sizeStyles.xxl,
-      ...$fontWeightStyles.bold,
-    },
-  ],
-  subheading: [$baseStyle, { ...$sizeStyles.lg, ...$fontWeightStyles.medium }],
-  formLabel: [$baseStyle, { ...$fontWeightStyles.medium }],
-  formHelper: [$baseStyle, { ...$sizeStyles.sm, ...$fontWeightStyles.normal }],
+  secondary: [$secondaryTextBaseStyle],
+  pageHeading: [$baseStyle, { fontSize: 32, fontFamily: 'bold' }],
+  pageSubHeading: [$secondaryTextBaseStyle, { fontSize: 14, fontWeight: '400' }],
+  heading: [$baseStyle, { fontSize: 18, fontFamily: 'bold' }],
 };
 const $rtlStyle: TextStyle = isRTL ? { writingDirection: 'rtl' } : {};

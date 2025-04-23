@@ -1,5 +1,5 @@
 import { createNavigationContainerRef } from '@react-navigation/native';
-import type { AppStackParamList } from './MasterNavigator';
+import type { AppStackParamList } from './RootNavigationContainer';
 
 /**
  * Reference to the root App Navigator.
