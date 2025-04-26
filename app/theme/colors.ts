@@ -5,6 +5,7 @@ const palette = {
   textDim: '#777777',
   primary: '#5677F3',
 } as const;
+
 export const colors = {
   palette,
   transparent: 'rgba(0, 0, 0, 0)',
@@ -12,4 +13,5 @@ export const colors = {
   secondaryBg: palette.secondaryBg,
   text: palette.text,
   textDim: palette.textDim,
+  primary: palette.primary,
 } as const;

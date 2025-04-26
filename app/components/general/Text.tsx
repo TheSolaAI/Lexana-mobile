@@ -65,8 +65,8 @@ const $secondaryTextBaseStyle: ThemedStyle<TextStyle> = theme => ({
 const $presets: Record<Presets, ThemedStyleArray<TextStyle>> = {
   default: [$baseStyle],
   secondary: [$secondaryTextBaseStyle],
-  pageHeading: [$baseStyle, { fontSize: 32, fontFamily: 'bold' }],
-  pageSubHeading: [$secondaryTextBaseStyle, { fontSize: 14, fontWeight: '400' }],
+  pageHeading: [$baseStyle, { fontSize: 48, fontFamily: 'bold' }],
+  pageSubHeading: [$secondaryTextBaseStyle, { fontSize: 15, fontFamily: 'regular' }],
   heading: [$baseStyle, { fontSize: 18, fontFamily: 'bold' }],
 };
 const $rtlStyle: TextStyle = isRTL ? { writingDirection: 'rtl' } : {};

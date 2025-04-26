@@ -27,7 +27,7 @@ export const $styles = {
 
   // Themed styles
   screenContainer: ((theme: Theme): ViewStyle => ({
-    backgroundColor: theme.colors.backgroundFirst,
+    backgroundColor: theme.colors.background,
     width: '100%',
     paddingHorizontal: 15,
   })) as ThemedStyle<ViewStyle>,
