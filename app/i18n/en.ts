@@ -13,6 +13,11 @@ const en = {
     privacy: 'and',
     privacyLink: 'Privacy Policy',
   },
+  chatScreen: {
+    voiceMode: {
+      title: 'Sola AI Voice Mode',
+    },
+  },
 };
 
 export default en;

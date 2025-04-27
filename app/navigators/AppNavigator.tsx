@@ -1,7 +1,6 @@
 import { useAppTheme } from '@/utils/useAppTheme';
 import { NativeStackScreenProps, createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Screens from '@/screens/AppScreens';
-
 export type AppStackParamList = {
   ChatScreen: undefined;
 };
