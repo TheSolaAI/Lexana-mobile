@@ -6,11 +6,14 @@ import { $styles, ThemedStyle } from '@/theme';
 import { TextStyle, View, ViewStyle, ImageStyle } from 'react-native';
 import { translate } from '@/i18n';
 import { WebView } from 'react-native-webview';
+import { useLogin } from '@privy-io/expo/ui';
+import { useLoginWithEmail } from '@privy-io/expo';
 
 interface WelcomeScreenProps extends OnboardingStackScreenProps<'WelcomeScreen'> {}
 
 export const WelcomeScreen: FC<WelcomeScreenProps> = function WelcomeScreen() {
   const { themed } = useAppTheme();
+  const { login } = useLogin();
 
   return (
     <View style={{ flex: 1 }}>
@@ -50,7 +53,24 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = function WelcomeScreen() {
       </Screen>
       {/* Footer */}
       <View style={themed($footerStyle)} pointerEvents="auto">
-        <Button tx="welcomeScreen:button" preset="primary" onPress={() => {}} />
+        <Button
+          tx="welcomeScreen:button"
+          preset="primary"
+          onPress={() => {
+            login({
+              loginMethods: ['email', 'discord', 'twitter'],
+              appearance: {
+                logo: 'https://beta.solaai.xyz/#https://beta.solaai.xyz/icon.png',
+              },
+            })
+              .then(session => {
+                console.log('User logged in', session.user);
+              })
+              .catch(err => {
+                console.log('Error logging in', err);
+              });
+          }}
+        />
         <Text>
           <Text
             text={translate('welcomeScreen:terms') + '\n'}

@@ -1,8 +1,9 @@
 import { useAppTheme } from '@/utils/useAppTheme';
 import { NativeStackScreenProps, createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as Screens from '@/screens/AppScreens';
 
 export type AppStackParamList = {
-  Welcome: undefined;
+  ChatScreen: undefined;
 };
 
 export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStackScreenProps<
@@ -27,7 +28,7 @@ export const AppStackNavigator = function AppStack() {
         },
       }}
     >
-      <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
+      <Stack.Screen name="ChatScreen" component={Screens.ChatScreen} />
     </Stack.Navigator>
   );
 };
