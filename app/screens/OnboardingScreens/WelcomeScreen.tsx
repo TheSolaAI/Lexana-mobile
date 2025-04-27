@@ -7,7 +7,6 @@ import { TextStyle, View, ViewStyle, ImageStyle } from 'react-native';
 import { translate } from '@/i18n';
 import { WebView } from 'react-native-webview';
 import { useLogin } from '@privy-io/expo/ui';
-import { useLoginWithEmail } from '@privy-io/expo';
 
 interface WelcomeScreenProps extends OnboardingStackScreenProps<'WelcomeScreen'> {}
 
