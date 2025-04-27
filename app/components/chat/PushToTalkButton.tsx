@@ -85,7 +85,7 @@ export const PushToTalkButton: React.FC<PushToTalkButtonProps> = ({
       });
 
       const { recording: newRecording, status } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY_LOW_LATENCY,
+        Audio.RecordingOptionsPresets.HIGH_QUALITY,
         onRecordingStatusUpdate,
         100
       );
@@ -200,7 +200,6 @@ export const PushToTalkButton: React.FC<PushToTalkButtonProps> = ({
 
   // --- Dynamic Styles ---
 
-  const rippleSize = size * 1.5; // Make initial ripple a bit smaller
   const iconSize = size * 0.45; // Slightly smaller mic icon
 
   // Enhanced Audio level scaling for mic icon (more pronounced)
@@ -208,12 +207,6 @@ export const PushToTalkButton: React.FC<PushToTalkButtonProps> = ({
     inputRange: [0, 0.5, 1],
     outputRange: [1, 1.3, 1.6], // Scale up more significantly
     extrapolate: 'clamp', // Prevent scaling beyond 1.6
-  });
-
-  // Pulse animation scale (subtle background pulse)
-  const rippleScale = pulseAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 1.15], // Less intense base pulse
   });
 
   const primaryColor = theme?.colors?.primary;
@@ -314,14 +307,12 @@ const $containerStyle: ViewStyle = {
   paddingBottom: 0,
 };
 
-const $buttonStyle =
-  (size: number): ThemedStyle<ViewStyle> =>
-  theme => ({
-    width: size,
-    height: size,
-    alignItems: 'center',
-    justifyContent: 'center',
-  });
+const $buttonStyle = (size: number): ViewStyle => ({
+  width: size,
+  height: size,
+  alignItems: 'center',
+  justifyContent: 'center',
+});
 
 const $audioLevelRingStyle: ThemedStyle<ViewStyle> = theme => ({
   position: 'absolute',

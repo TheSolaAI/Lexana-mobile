@@ -1,3 +1,3 @@
 export default {
-  API_URL: 'https://api.rss2json.com/v1/',
+  CORE_SERVER: 'http://192.168.1.6:3000',
 };

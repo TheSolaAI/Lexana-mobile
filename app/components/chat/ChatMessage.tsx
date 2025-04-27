@@ -4,6 +4,7 @@ import { FC } from 'react';
 import { TextStyle, View, ViewStyle } from 'react-native';
 import { Text } from '@/components/general';
 import { ThemedStyle } from '@/theme';
+import Markdown from 'react-native-markdown-display';
 
 // ChatMessage Component
 interface ChatMessageProps {
@@ -17,15 +18,15 @@ export const ChatMessage: FC<ChatMessageProps> = ({ message }) => {
   // Render different message content based on parts
   const renderMessageContent = () => {
     if (!message.parts || message.parts.length === 0) {
-      return <Text style={themed($messageTextStyle)}>{message.content}</Text>;
+      return <Markdown style={themed($markdownStyles)}>{message.content}</Markdown>;
     }
 
     return message.parts.map((part, index) => {
       if (part.type === 'text') {
         return (
-          <Text key={index} style={themed($messageTextStyle)}>
+          <Markdown key={index} style={themed($markdownStyles)}>
             {part.text}
-          </Text>
+          </Markdown>
         );
       } else if (part.type === 'reasoning') {
         return (
@@ -70,10 +71,11 @@ export const ChatMessage: FC<ChatMessageProps> = ({ message }) => {
   );
 };
 
+// Styles
 const $messageContainerStyle: ViewStyle = {
   padding: 12,
   borderRadius: 16,
-  maxWidth: '80%',
+  maxWidth: '100%',
 };
 
 const $stepSeparatorStyle: ViewStyle = {
@@ -118,5 +120,67 @@ const $reasoningTextStyle: ThemedStyle<TextStyle> = theme => {
     color: theme.colors.textDim,
     fontFamily: 'light',
     fontSize: 14,
+  };
+};
+
+const $markdownStyles: ThemedStyle<Record<string, TextStyle | ViewStyle>> = theme => {
+  return {
+    body: {
+      color: theme.colors.text,
+      fontFamily: 'regular',
+    },
+    heading1: {
+      color: theme.colors.text,
+      fontFamily: 'bold',
+      fontSize: 24,
+      marginBottom: 8,
+    },
+    heading2: {
+      color: theme.colors.text,
+      fontFamily: 'bold',
+      fontSize: 20,
+      marginBottom: 6,
+    },
+    heading3: {
+      color: theme.colors.text,
+      fontFamily: 'semiBold',
+      fontSize: 18,
+      marginBottom: 4,
+    },
+    paragraph: {
+      color: theme.colors.text,
+      fontFamily: 'regular',
+      marginBottom: 2,
+    },
+    link: {
+      color: theme.colors.primary,
+      textDecorationLine: 'underline',
+    },
+    strong: {
+      fontFamily: 'bold',
+    },
+    em: {
+      fontFamily: 'italic',
+    },
+    code_block: {
+      backgroundColor: theme.colors.backgroundDim,
+      padding: 8,
+      borderRadius: 4,
+      fontFamily: 'monospace',
+      fontSize: 14,
+    },
+    code_inline: {
+      backgroundColor: theme.colors.backgroundDim,
+      fontFamily: 'monospace',
+      fontSize: 14,
+      padding: 2,
+      borderRadius: 2,
+    },
+    bullet_list: {
+      marginLeft: 8,
+    },
+    ordered_list: {
+      marginLeft: 8,
+    },
   };
 };

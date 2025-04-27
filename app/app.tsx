@@ -6,6 +6,7 @@ import 'react-native-get-random-values';
 import { Buffer } from 'buffer';
 global.Buffer = Buffer;
 import '@ethersproject/shims';
+import '@/pollyfill';
 
 if (__DEV__) {
   require('./devtools/ReactotronConfig.ts');
@@ -44,6 +45,13 @@ export function App() {
           <PrivyProvider
             appId="cm9zmtd2y01r3la0ltm7xp0o2"
             clientId="client-WY5ixynnepnt5NGRbRNdz7LJRNaxZcJq1ongcB4ugYoLc"
+            config={{
+              embedded: {
+                solana: {
+                  createOnLogin: 'users-without-wallets',
+                },
+              },
+            }}
           >
             <PrivyElements
               config={{

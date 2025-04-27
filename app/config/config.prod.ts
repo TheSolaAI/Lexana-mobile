@@ -1,3 +1,3 @@
 export default {
-  API_URL: 'CHANGEME',
+  CORE_SERVER: 'CHANGEME',
 };
