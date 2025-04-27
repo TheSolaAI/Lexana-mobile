@@ -4,6 +4,7 @@ const palette = {
   text: '#D9D9D9',
   textDim: '#838383',
   primary: '#5677F3',
+  secondary: '#FF4081',
 } as const;
 
 export const colors = {
@@ -14,4 +15,5 @@ export const colors = {
   text: palette.text,
   textDim: palette.textDim,
   primary: palette.primary,
+  secondary: palette.secondary,
 } as const;

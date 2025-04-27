@@ -9,6 +9,7 @@ import { ViewStyle } from 'react-native';
 import { useChat } from '@ai-sdk/react';
 import { Chat } from '@/components/chat/Chat';
 import { testMessages } from '@/components/chat/test';
+import { PushToTalkButton } from '@/components/chat/PushToTalkButton';
 
 interface ChatScreenProps extends AppStackScreenProps<'ChatScreen'> {}
 
@@ -28,6 +29,7 @@ export const ChatScreen: FC<ChatScreenProps> = () => {
         <Screenheader titleTx="chatScreen:voiceMode.title" subtitle="nothing" />
         <Chat messages={testMessages} />
       </Screen>
+      <PushToTalkButton size={100} />
     </>
   );
 };
