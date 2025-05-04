@@ -41,6 +41,7 @@ export function App() {
     setTimeout(SplashScreen.hideAsync, 500);
     return null;
   }
+
   // otherwise, we're ready to render the app
   return (
     <Provider store={store}>

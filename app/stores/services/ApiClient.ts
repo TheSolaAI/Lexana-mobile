@@ -19,7 +19,7 @@ export class ApiClient {
   private options: ApiClientOptions;
 
   constructor(options: ApiClientOptions = {}) {
-    const authServiceUrl = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL;
+    const authServiceUrl = process.env.EXPO_PUBLIC_AUTH_SERVICE_URL;
 
     if (!authServiceUrl) {
       throw new Error('AUTH_SERVICE_URL environment variable is not defined');

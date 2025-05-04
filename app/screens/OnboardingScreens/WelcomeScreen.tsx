@@ -7,6 +7,7 @@ import { TextStyle, View, ViewStyle, ImageStyle } from 'react-native';
 import { translate } from '@/i18n';
 import { WebView } from 'react-native-webview';
 import { useLogin } from '@privy-io/expo/ui';
+import { toast } from 'sonner-native';
 
 interface WelcomeScreenProps extends OnboardingStackScreenProps<'WelcomeScreen'> {}
 
@@ -61,13 +62,10 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = function WelcomeScreen() {
               appearance: {
                 logo: 'https://beta.solaai.xyz/#https://beta.solaai.xyz/icon.png',
               },
-            })
-              .then(session => {
-                console.log('User logged in', session.user);
-              })
-              .catch(err => {
-                console.log('Error logging in', err);
-              });
+            }).catch(err => {
+              toast.error(err.message);
+              console.error('Login error:', err);
+            });
           }}
         />
         <Text>
