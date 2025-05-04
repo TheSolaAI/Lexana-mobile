@@ -1,81 +1,87 @@
 import { MMKV } from 'react-native-mmkv';
-export const storage = new MMKV();
 
-/**
- * Loads a string from storage.
- *
- * @param key The key to fetch.
- */
-export function loadString(key: string): string | null {
-  try {
-    return storage.getString(key) ?? null;
-  } catch {
-    // not sure why this would fail... even reading the RN docs I'm unclear
-    return null;
+export class StorageAdapter {
+  private storage: MMKV;
+
+  constructor() {
+    this.storage = new MMKV();
+  }
+
+  /**
+   * Gets an item from storage
+   *
+   * @param key The key to fetch
+   * @returns Promise resolving to the value or null if not found
+   */
+  async getItem(key: string): Promise<string | null> {
+    try {
+      return this.storage.getString(key) ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Sets an item in storage
+   *
+   * @param key The key to store under
+   * @param value The string value to store
+   * @returns Promise resolving to true on success, false on failure
+   */
+  async setItem(key: string, value: string): Promise<boolean> {
+    try {
+      this.storage.set(key, value);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Removes an item from storage
+   *
+   * @param key The key to remove
+   * @returns Promise resolving to true on success, false on failure
+   */
+  async removeItem(key: string): Promise<boolean> {
+    try {
+      this.storage.delete(key);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Helper method to store JSON objects
+   *
+   * @param key The key to store under
+   * @param value The value to store
+   * @returns Promise resolving to true on success, false on failure
+   */
+  async setObject<T>(key: string, value: T): Promise<boolean> {
+    try {
+      return this.setItem(key, JSON.stringify(value));
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Helper method to retrieve and parse JSON objects
+   *
+   * @param key The key to fetch
+   * @returns Promise resolving to the parsed object or null if not found
+   */
+  async getObject<T>(key: string): Promise<T | null> {
+    try {
+      const value = await this.getItem(key);
+      if (value === null) return null;
+      return JSON.parse(value) as T;
+    } catch {
+      return null;
+    }
   }
 }
 
-/**
- * Saves a string to storage.
- *
- * @param key The key to fetch.
- * @param value The value to store.
- */
-export function saveString(key: string, value: string): boolean {
-  try {
-    storage.set(key, value);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Loads something from storage and runs it thru JSON.parse.
- *
- * @param key The key to fetch.
- */
-export function load<T>(key: string): T | null {
-  let almostThere: string | null = null;
-  try {
-    almostThere = loadString(key);
-    return JSON.parse(almostThere ?? '') as T;
-  } catch {
-    return (almostThere as T) ?? null;
-  }
-}
-
-/**
- * Saves an object to storage.
- *
- * @param key The key to fetch.
- * @param value The value to store.
- */
-export function save(key: string, value: unknown): boolean {
-  try {
-    saveString(key, JSON.stringify(value));
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Removes something from storage.
- *
- * @param key The key to kill.
- */
-export function remove(key: string): void {
-  try {
-    storage.delete(key);
-  } catch {}
-}
-
-/**
- * Burn it all to the ground.
- */
-export function clear(): void {
-  try {
-    storage.clearAll();
-  } catch {}
-}
+export const storage = new StorageAdapter();
