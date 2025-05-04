@@ -24,6 +24,11 @@ import { customFontsToLoad, darkTheme } from './theme';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { PrivyProvider } from '@privy-io/expo';
 import { PrivyElements } from '@privy-io/expo/ui';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { PersistGate } from 'redux-persist/integration/react';
+import { Provider } from 'react-redux';
+import { persistor, store } from './stores/rootStore';
+import { Toaster } from 'sonner-native';
 
 export function App() {
   const [areFontsLoaded, fontLoadError] = useFonts(customFontsToLoad);
@@ -39,29 +44,36 @@ export function App() {
 
   // otherwise, we're ready to render the app
   return (
-    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <ErrorBoundary catchErrors={'dev'}>
-        <KeyboardProvider>
-          <PrivyProvider
-            appId="cm5lc4euv00c5kmrbpu9oj0u4"
-            clientId="client-WY5fNz4s4Zk72BvJbQoKagZPN9v6RP3bkFLVxXacMZ9Mr"
-            config={{
-              embedded: {
-                solana: {
-                  createOnLogin: 'users-without-wallets',
-                },
-              },
-            }}
-          >
-            <PrivyElements
-              config={{
-                appearance: { colorScheme: 'dark', accentColor: darkTheme.colors.primary },
-              }}
-            />
-            <AppNavigator />
-          </PrivyProvider>
-        </KeyboardProvider>
-      </ErrorBoundary>
-    </SafeAreaProvider>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+          <ErrorBoundary catchErrors={'dev'}>
+            <GestureHandlerRootView>
+              <KeyboardProvider>
+                <PrivyProvider
+                  appId="cm5lc4euv00c5kmrbpu9oj0u4"
+                  clientId="client-WY5fNz4s4Zk72BvJbQoKagZPN9v6RP3bkFLVxXacMZ9Mr"
+                  config={{
+                    embedded: {
+                      solana: {
+                        createOnLogin: 'users-without-wallets',
+                      },
+                    },
+                  }}
+                >
+                  <PrivyElements
+                    config={{
+                      appearance: { colorScheme: 'dark', accentColor: darkTheme.colors.primary },
+                    }}
+                  />
+                  <AppNavigator />
+                </PrivyProvider>
+              </KeyboardProvider>
+              <Toaster richColors theme="system" />
+            </GestureHandlerRootView>
+          </ErrorBoundary>
+        </SafeAreaProvider>
+      </PersistGate>
+    </Provider>
   );
 }
