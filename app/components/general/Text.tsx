@@ -5,7 +5,15 @@ import type { ThemedStyle, ThemedStyleArray } from '@/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { ReactNode, forwardRef, ForwardedRef } from 'react';
 
-type Presets = 'default' | 'secondary' | 'pageHeading' | 'pageSubHeading' | 'heading';
+type Presets =
+  | 'default'
+  | 'secondary'
+  | 'pageHeading'
+  | 'pageSubHeading'
+  | 'heading'
+  | 'small'
+  | 'bold'
+  | 'monospace';
 
 export interface TextProps extends RNTextProps {
   /**
@@ -64,9 +72,12 @@ const $secondaryTextBaseStyle: ThemedStyle<TextStyle> = theme => ({
 
 const $presets: Record<Presets, ThemedStyleArray<TextStyle>> = {
   default: [$baseStyle],
+  bold: [$baseStyle, { fontFamily: 'bold' }],
+  small: [$baseStyle, { fontSize: 12 }],
   secondary: [$secondaryTextBaseStyle],
   pageHeading: [$baseStyle, { fontSize: 48, fontFamily: 'bold' }],
   pageSubHeading: [$secondaryTextBaseStyle, { fontSize: 15, fontFamily: 'regular' }],
   heading: [$baseStyle, { fontSize: 18, fontFamily: 'bold' }],
+  monospace: [$baseStyle, { fontFamily: 'monospace' }],
 };
 const $rtlStyle: TextStyle = isRTL ? { writingDirection: 'rtl' } : {};
