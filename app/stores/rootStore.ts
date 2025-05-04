@@ -1,6 +1,7 @@
 import { persistStore, persistReducer, createTransform } from 'redux-persist';
 import { configureStore } from '@reduxjs/toolkit';
 import { storage } from '@/utils/storage';
+import { rootReducer } from './rootReducer';
 
 const loadingTransform = createTransform(
   inboundState => {

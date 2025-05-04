@@ -41,7 +41,6 @@ export function App() {
     setTimeout(SplashScreen.hideAsync, 500);
     return null;
   }
-
   // otherwise, we're ready to render the app
   return (
     <Provider store={store}>
@@ -51,8 +50,8 @@ export function App() {
             <GestureHandlerRootView>
               <KeyboardProvider>
                 <PrivyProvider
-                  appId="cm5lc4euv00c5kmrbpu9oj0u4"
-                  clientId="client-WY5fNz4s4Zk72BvJbQoKagZPN9v6RP3bkFLVxXacMZ9Mr"
+                  appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID!}
+                  clientId={process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID}
                   config={{
                     embedded: {
                       solana: {

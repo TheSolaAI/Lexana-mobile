@@ -88,6 +88,7 @@
     "react-native-svg": "15.8.0",
     "react-native-web": "~0.19.6",
     "react-native-webview": "13.12.5",
+    "react-redux": "^9.2.0",
     "redux-persist": "^6.0.0",
     "sonner-native": "^0.19.0",
     "viem": "^2.28.0",
@@ -117,6 +118,7 @@
     "reactotron-react-js": "^3.3.11",
     "reactotron-react-native": "^5.0.5",
     "reactotron-react-native-mmkv": "^0.2.6",
+    "reactotron-redux": "^3.2.0",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
     "typescript": "~5.3.3"

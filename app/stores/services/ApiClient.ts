@@ -2,11 +2,17 @@ import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import axiosRetry from 'axios-retry';
 import { toast } from 'sonner-native';
 import { ApiError, ApiErrorDetail, ApiResponse } from '@/types/api';
+import { createPrivyClient, getAccessToken } from '@privy-io/expo';
 
 interface ApiClientOptions {
   authToken?: string | null;
   enableLogging?: boolean;
 }
+
+export const privyClient = createPrivyClient({
+  appId: process.env.EXPO_PUBLIC_PRIVY_APP_ID!,
+  clientId: process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID,
+});
 
 export class ApiClient {
   private authClient: AxiosInstance;
@@ -43,8 +49,8 @@ export class ApiClient {
 
     // Add auth token to requests
     client.interceptors.request.use(
-      config => {
-        const token = authToken || useUserHandler.getState().authToken;
+      async config => {
+        const token = authToken || (await getAccessToken());
         if (token) {
           config.headers = config.headers || {};
           config.headers.Authorization = `Bearer ${token}`;
@@ -181,7 +187,7 @@ export class ApiClient {
 
         if (!retryAttempted && this.isTokenExpiredError(error)) {
           retryAttempted = true;
-          const updatedToken = await this.refreshToken();
+          const updatedToken = await getAccessToken();
 
           // Retry with new token if refresh was successful
           if (updatedToken) {

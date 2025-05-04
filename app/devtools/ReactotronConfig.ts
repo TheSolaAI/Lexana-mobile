@@ -6,23 +6,22 @@
 import { Platform, NativeModules } from 'react-native';
 
 import { ArgType } from 'reactotron-core-client';
-import mmkvPlugin from 'reactotron-react-native-mmkv';
-
-import { storage, clear } from '@/utils/storage';
 import { goBack, resetRoot, navigate } from '@/navigators/navigationUtilities';
 
+import { reactotronRedux } from 'reactotron-redux';
+
 import { Reactotron } from './ReactotronClient';
-import { ReactotronReactNative } from 'reactotron-react-native';
 
 const reactotron = Reactotron.configure({
   name: require('../../package.json').name,
   onConnect: () => {
-    /** since this file gets hot reloaded, let's clear the past logs every time we connect */
     Reactotron.clear();
   },
 });
 
-reactotron.use(mmkvPlugin<ReactotronReactNative>({ storage }));
+reactotron.use(reactotronRedux());
+
+// reactotron.use(mmkvPlugin<ReactotronReactNative>({ storage }));
 
 if (Platform.OS !== 'web') {
   reactotron.useReactNative({
@@ -32,17 +31,6 @@ if (Platform.OS !== 'web') {
   });
 }
 
-/**
- * Reactotron allows you to define custom commands that you can run
- * from Reactotron itself, and they will run in your app.
- *
- * Define them in the section below with `onCustomCommand`. Use your
- * creativity -- this is great for development to quickly and easily
- * get your app into the state you want.
- *
- * NOTE: If you edit this file while running the app, you will need to do a full refresh
- * or else your custom commands won't be registered correctly.
- */
 reactotron.onCustomCommand({
   title: 'Show Dev Menu',
   description: 'Opens the React Native dev menu',
@@ -50,16 +38,6 @@ reactotron.onCustomCommand({
   handler: () => {
     Reactotron.log('Showing React Native dev menu');
     NativeModules.DevMenu.show();
-  },
-});
-
-reactotron.onCustomCommand({
-  title: 'Reset Root Store',
-  description: 'Resets the MST store',
-  command: 'resetStore',
-  handler: () => {
-    Reactotron.log('resetting store');
-    clear();
   },
 });
 
@@ -99,31 +77,8 @@ reactotron.onCustomCommand({
   },
 });
 
-/**
- * We're going to add `console.tron` to the Reactotron object.
- * Now, anywhere in our app in development, we can use Reactotron like so:
- *
- * ```
- * if (__DEV__) {
- *  console.tron.display({
- *    name: 'JOKE',
- *    preview: 'What's the best thing about Switzerland?',
- *    value: 'I don't know, but the flag is a big plus!',
- *    important: true
- *  })
- * }
- * ```
- *
- * Use this power responsibly! :)
- */
 console.tron = reactotron;
 
-/**
- * We tell typescript about our dark magic
- *
- * You can also import Reactotron yourself from ./reactotronClient
- * and use it directly, like Reactotron.log('hello world')
- */
 declare global {
   interface Console {
     /**
@@ -143,7 +98,6 @@ declare global {
   }
 }
 
-/**
- * Now that we've setup all our Reactotron configuration, let's connect!
- */
 reactotron.connect();
+
+export default reactotron;
