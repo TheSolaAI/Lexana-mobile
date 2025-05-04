@@ -43,8 +43,8 @@ export function App() {
       <ErrorBoundary catchErrors={'dev'}>
         <KeyboardProvider>
           <PrivyProvider
-            appId="cm9zmtd2y01r3la0ltm7xp0o2"
-            clientId="client-WY5ixynnepnt5NGRbRNdz7LJRNaxZcJq1ongcB4ugYoLc"
+            appId="cm5lc4euv00c5kmrbpu9oj0u4"
+            clientId="client-WY5fNz4s4Zk72BvJbQoKagZPN9v6RP3bkFLVxXacMZ9Mr"
             config={{
               embedded: {
                 solana: {
