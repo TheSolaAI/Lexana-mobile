@@ -10,14 +10,28 @@ interface ScreenHeaderProps {
   subtitleTx?: TxKeyPath;
   title?: string;
   subtitle?: string;
+  onButtonPress: () => void;
 }
 
-export const Screenheader: FC<ScreenHeaderProps> = ({ titleTx, subtitleTx, title, subtitle }) => {
+export const Screenheader: FC<ScreenHeaderProps> = ({
+  titleTx,
+  subtitleTx,
+  title,
+  subtitle,
+  onButtonPress,
+}) => {
   const { theme } = useAppTheme();
 
   return (
     <View style={$containerStyle}>
-      <Feather name="menu" size={28} color={theme.colors.text} />
+      <Feather
+        name="menu"
+        size={28}
+        color={theme.colors.text}
+        onPress={() => {
+          onButtonPress();
+        }}
+      />
       <View style={$headerStyle}>
         <Text preset="heading" tx={titleTx} text={title} />
         <Text preset="secondary" tx={subtitleTx} text={subtitle} />

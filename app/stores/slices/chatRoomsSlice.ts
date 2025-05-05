@@ -21,14 +21,14 @@ export interface ChatRoomResponse {
 
 interface ChatRoomsState {
   rooms: ChatRoom[];
-  currentRoomId: number | null;
+  currentRoom: ChatRoom | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: ChatRoomsState = {
   rooms: [],
-  currentRoomId: null,
+  currentRoom: null,
   loading: false,
   error: null,
 };
@@ -61,7 +61,7 @@ export const deleteChatRoom = createAsyncThunk(
       return rejectWithValue('Room not found');
     }
 
-    const response = await apiClient.delete(`API_URLS.CHAT_ROOMS${roomId}/`);
+    const response = await apiClient.delete(API_URLS.CHAT_ROOMS + roomId);
 
     if (ApiClient.isApiResponse(response)) {
       return roomId;
@@ -82,7 +82,7 @@ export const updateChatRoom = createAsyncThunk(
       return rejectWithValue('Room not found');
     }
 
-    const response = await apiClient.patch(`API_URLS.CHAT_ROOMS${room.id}/`, room);
+    const response = await apiClient.patch(API_URLS.CHAT_ROOMS + room.id, room);
 
     if (ApiClient.isApiResponse<ChatRoomResponse>(response)) {
       return room;
@@ -96,7 +96,7 @@ export const updateChatRoom = createAsyncThunk(
 export const createChatRoom = createAsyncThunk(
   'chatRooms/create',
   async (room: ChatRoom, { rejectWithValue }) => {
-    const response = await apiClient.post<ChatRoomResponse>('API_URLS.CHAT_ROOMS', {
+    const response = await apiClient.post<ChatRoomResponse>(API_URLS.CHAT_ROOMS, {
       name: room.name,
       session_id: 123,
     });
@@ -117,8 +117,8 @@ export const chatRoomsSlice = createSlice({
   name: 'chatRooms',
   initialState,
   reducers: {
-    setCurrentRoom: (state, action: PayloadAction<number | null>) => {
-      state.currentRoomId = action.payload;
+    setCurrentRoom: (state, action: PayloadAction<ChatRoom | null>) => {
+      state.currentRoom = action.payload;
     },
   },
   extraReducers: builder => {
@@ -147,8 +147,8 @@ export const chatRoomsSlice = createSlice({
         state.loading = false;
 
         // Reset current room if it was deleted
-        if (state.currentRoomId === action.payload) {
-          state.currentRoomId = null;
+        if (state.currentRoom?.id === action.payload) {
+          state.currentRoom = null;
         }
       })
       .addCase(deleteChatRoom.rejected, (state, action) => {
@@ -180,7 +180,7 @@ export const chatRoomsSlice = createSlice({
       .addCase(createChatRoom.fulfilled, (state, action) => {
         state.rooms = [action.payload, ...state.rooms];
         state.loading = false;
-        state.currentRoomId = action.payload.id || null;
+        state.currentRoom = action.payload;
       })
       .addCase(createChatRoom.rejected, (state, action) => {
         state.loading = false;

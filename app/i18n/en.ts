@@ -4,6 +4,7 @@ const en = {
     cancel: 'Cancel',
     back: 'Back',
     appName: 'Sola AI',
+    beta: 'Beta',
   },
   welcomeScreen: {
     catchLine: 'Just speak! Your voice interface to the Solana blockchain.',
