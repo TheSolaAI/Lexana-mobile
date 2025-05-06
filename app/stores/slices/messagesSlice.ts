@@ -22,7 +22,7 @@ export const fetchMessages = createAsyncThunk(
   async (roomId: number, { rejectWithValue }) => {
     const response = await apiClient.get<ChatMessagesResponse>(
       'auth',
-      API_URLS.CHAT_ROOMS + `/${roomId}/messages/?limit=40`
+      API_URLS.CHAT_ROOMS + `${roomId}/messages/?limit=40`
     );
     if (ApiClient.isApiResponse<ChatMessagesResponse>(response)) {
       const messages = response.data.results

@@ -12,6 +12,7 @@ import { SimpleMessageItem } from '@/components/messages/SimpleMessageItem';
 
 import { UserInput } from '../messages/UserInput';
 import { ToolResult } from '@/types/tool';
+import { TokenAddressResultMessageItem } from '../messages/TokenAddressResultMessageItem';
 
 interface ChatProps {
   messages: UIMessage[];
@@ -75,8 +76,8 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
     }
 
     switch (toolName) {
-      // case 'tokenAddressTool':
-      //   return <TokenAddressResultMessageItem props={args.data} />;
+      case 'tokenAddressTool':
+        return <TokenAddressResultMessageItem props={args.data} />;
       default:
         return <SimpleMessageItem text={JSON.stringify(args.data)} />;
     }
@@ -179,5 +180,5 @@ const $assistantWrapperStyle: ViewStyle = {
 
 const $chatContainerStyle: ViewStyle = {
   flex: 1,
-  padding: 16,
+  paddingVertical: 16,
 };

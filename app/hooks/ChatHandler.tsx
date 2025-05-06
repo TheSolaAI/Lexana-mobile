@@ -5,10 +5,11 @@ import { useChat } from '@ai-sdk/react';
 import { fetch as expoFetch } from 'expo/fetch';
 import { useEmbeddedSolanaWallet } from '@privy-io/expo';
 import { ApiResponse } from '@/types/api';
-import { useAppSelector } from '@/stores/hooks';
+import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { useEffect, useState } from 'react';
 import { ToolSetResponse } from '@/types/response';
 import { toast } from 'sonner-native';
+import { fetchMessages } from '@/stores/slices/messagesSlice';
 
 export const useChatFunctions = () => {
   /**
@@ -16,6 +17,8 @@ export const useChatFunctions = () => {
    */
   const { wallets } = useEmbeddedSolanaWallet();
   const { currentRoom } = useAppSelector(state => state.chatRooms);
+  const prevMessages = useAppSelector(state => state.messages);
+  const dispatch = useAppDispatch();
   const [bearerToken, setBearerToken] = useState<string | null>(null);
 
   useEffect(() => {
@@ -31,9 +34,30 @@ export const useChatFunctions = () => {
     fetchToken();
   }, []);
 
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const token = await privyClient.getAccessToken();
+        setBearerToken(token);
+      } catch (error) {
+        console.error('Error fetching auth token:', error);
+      }
+    };
+
+    fetchToken();
+  }, []);
+
+  useEffect(() => {
+    if (currentRoom?.id) {
+      dispatch(fetchMessages(currentRoom.id));
+    }
+  }, [currentRoom?.id, dispatch]);
+
   const { messages, setMessages, append } = useChat({
-    api: `http://192.168.1.13:5173/api/chat`,
+    api: `${process.env.EXPO_PUBLIC_MAIN_SERVICE_URL}/api/chat`,
+    id: `chat-${currentRoom?.id}`,
     fetch: expoFetch as unknown as typeof globalThis.fetch,
+    initialMessages: prevMessages.messages,
     headers: {
       'Content-Type': 'application/json',
       'x-mobile-client-id': process.env.EXPO_PUBLIC_CLIENT_ID!,

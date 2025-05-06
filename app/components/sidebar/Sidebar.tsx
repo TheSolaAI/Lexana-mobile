@@ -240,7 +240,7 @@ export const Sidebar: FC<SidebarProps> = ({ isOpen, setIsOpen, swipeProgress }) 
             {rooms.map(room => {
               if (!room.id) return null;
               const isActive = currentRoom?.id === room.id;
-
+              console.log('isActive', isActive);
               return (
                 <View key={room.id} style={$roomItemWrapper}>
                   <TouchableOpacity
@@ -259,7 +259,9 @@ export const Sidebar: FC<SidebarProps> = ({ isOpen, setIsOpen, swipeProgress }) 
 
         {/* Bottom Section - Profile Button */}
         <View style={$bottomSection}>
-          <Animated.View style={{ opacity: fadeAnimation }}></Animated.View>
+          <Animated.View style={{ opacity: fadeAnimation }}>
+            <Text>sadf</Text>
+          </Animated.View>
         </View>
       </Animated.View>
     </View>
@@ -375,7 +377,14 @@ const $roomItem: ViewStyle = {
 };
 
 const $activeRoomItem: ThemedStyle<ViewStyle> = theme => ({
-  backgroundColor: theme.colors.surface,
+  backgroundColor: theme.colors.primaryDark,
+  borderWidth: 1,
+  borderColor: theme.colors.primary + '40',
+  shadowColor: theme.colors.primary,
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.2,
+  shadowRadius: 1.5,
+  elevation: 2,
 });
 
 const $bottomSection: ViewStyle = {
