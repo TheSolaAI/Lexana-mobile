@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef } from 'react';
+import { FC, Fragment, useEffect, useRef } from 'react';
 import {
   FlatList,
   View,
@@ -7,17 +7,17 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
 } from 'react-native';
-import { useAppTheme } from '@/utils/useAppTheme';
-import { ThemedStyle } from '@/theme';
 import { UIMessage } from '@ai-sdk/ui-utils';
-import { ChatMessage } from './ChatMessage';
+import { SimpleMessageItem } from '@/components/messages/SimpleMessageItem';
+
+import { UserInput } from '../messages/UserInput';
+import { ToolResult } from '@/types/tool';
 
 interface ChatProps {
   messages: UIMessage[];
 }
 
 export const Chat: FC<ChatProps> = ({ messages }) => {
-  const { themed } = useAppTheme();
   const flatListRef = useRef<FlatList>(null);
   const animatedValues = useRef<{ [key: string]: Animated.Value }>({});
   const scrollToBottomOnNextUpdate = useRef<boolean>(true);
@@ -64,6 +64,56 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
     }
   };
 
+  const renderToolResult = (toolName: string, args: ToolResult | undefined): React.ReactNode => {
+    // In case we have a caught error in the tool and propagated it to the frontend
+    if (args === undefined) {
+      return null;
+    }
+
+    if (!args.success) {
+      return <SimpleMessageItem text={`Error: ${args.error}`} />;
+    }
+
+    switch (toolName) {
+      // case 'tokenAddressTool':
+      //   return <TokenAddressResultMessageItem props={args.data} />;
+      default:
+        return <SimpleMessageItem text={JSON.stringify(args.data)} />;
+    }
+  };
+
+  const renderMessageContent = (message: UIMessage) => {
+    const role = message.role;
+    if (message.role === 'user') {
+      return <UserInput text={message.content} transcript={true} />;
+    }
+
+    if (message.parts) {
+      return message.parts.map((part, partIndex) => {
+        if (part.type === 'text') {
+          return role === 'user' ? (
+            <UserInput key={`text-${partIndex}`} text={message.content} transcript={true} />
+          ) : (
+            <SimpleMessageItem key={`text-${partIndex}`} text={part.text} />
+          );
+        } else if (part.type === 'tool-invocation' && part.toolInvocation.state === 'result') {
+          return (
+            <Fragment key={`tool-${message.id}-${partIndex}`}>
+              {renderToolResult(part.toolInvocation.toolName, part.toolInvocation.result)}
+            </Fragment>
+          );
+        } else if (part.type === 'step-start') {
+          // Skip step-start since this is used in web but may not be needed in mobile
+          return null;
+        }
+        return null;
+      });
+    }
+
+    // Handle simple text messages
+    return <SimpleMessageItem text={message.content} />;
+  };
+
   const renderItem = ({ item }: { item: UIMessage }) => {
     // Get the animation value for this item or create one if it doesn't exist
     if (!animatedValues.current[item.id]) {
@@ -78,13 +128,13 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
           { transform: [{ translateY: animatedValues.current[item.id] }] },
         ]}
       >
-        <ChatMessage message={item} />
+        {renderMessageContent(item)}
       </Animated.View>
     );
   };
 
   return (
-    <View style={themed($chatContainerStyle)}>
+    <View style={$chatContainerStyle}>
       <FlatList
         ref={flatListRef}
         data={messages}
@@ -127,9 +177,7 @@ const $assistantWrapperStyle: ViewStyle = {
   justifyContent: 'flex-start',
 };
 
-const $chatContainerStyle: ThemedStyle<ViewStyle> = theme => {
-  return {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  };
+const $chatContainerStyle: ViewStyle = {
+  flex: 1,
+  padding: 16,
 };

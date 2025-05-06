@@ -17,3 +17,16 @@ export interface ChatMessageResponseWrapper {
   message: string; // this is JSON string of our ChatContent
   created_at: string;
 }
+
+export interface ToolSetResponse {
+  selectedToolset: string[];
+  fallbackResponse: string;
+  audioData?: string;
+  needsToolset: boolean;
+  usageLimit: {
+    active: boolean;
+    tier: number;
+    usageLimitUSD: number;
+    percentageUsed: number;
+  };
+}

@@ -21,6 +21,7 @@ export const fetchMessages = createAsyncThunk(
   'messages/fetchAll',
   async (roomId: number, { rejectWithValue }) => {
     const response = await apiClient.get<ChatMessagesResponse>(
+      'auth',
       API_URLS.CHAT_ROOMS + `/${roomId}/messages/?limit=40`
     );
     if (ApiClient.isApiResponse<ChatMessagesResponse>(response)) {
@@ -47,7 +48,7 @@ export const fetchMessages = createAsyncThunk(
 export const fetchMoreMessages = createAsyncThunk(
   'messages/fetchMore',
   async (nextPageUrl: string, { rejectWithValue }) => {
-    const response = await apiClient.get<ChatMessagesResponse>(nextPageUrl);
+    const response = await apiClient.get<ChatMessagesResponse>('auth', nextPageUrl);
     if (ApiClient.isApiResponse<ChatMessagesResponse>(response)) {
       const messages = response.data.results
         .reduce((acc: Message[], message: ChatMessageResponseWrapper) => {
@@ -116,3 +117,6 @@ export const messagesSlice = createSlice({
       });
   },
 });
+
+export const { setLoading } = messagesSlice.actions;
+export default messagesSlice.reducer;

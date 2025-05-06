@@ -36,7 +36,7 @@ const initialState: ChatRoomsState = {
 export const fetchChatRooms = createAsyncThunk(
   'chatRooms/fetchAll',
   async (_, { rejectWithValue }) => {
-    const response = await apiClient.get<ChatRoomResponse>(API_URLS.CHAT_ROOMS, undefined);
+    const response = await apiClient.get<ChatRoomResponse>('auth', API_URLS.CHAT_ROOMS, undefined);
     if (ApiClient.isApiResponse<ChatRoomResponse[]>(response)) {
       return response.data.map(
         (room: ChatRoomResponse): ChatRoom => ({
@@ -61,7 +61,7 @@ export const deleteChatRoom = createAsyncThunk(
       return rejectWithValue('Room not found');
     }
 
-    const response = await apiClient.delete(API_URLS.CHAT_ROOMS + roomId);
+    const response = await apiClient.delete('auth', API_URLS.CHAT_ROOMS + roomId);
 
     if (ApiClient.isApiResponse(response)) {
       return roomId;
@@ -82,7 +82,7 @@ export const updateChatRoom = createAsyncThunk(
       return rejectWithValue('Room not found');
     }
 
-    const response = await apiClient.patch(API_URLS.CHAT_ROOMS + room.id, room);
+    const response = await apiClient.patch('auth', API_URLS.CHAT_ROOMS + room.id, room);
 
     if (ApiClient.isApiResponse<ChatRoomResponse>(response)) {
       return room;
@@ -96,7 +96,7 @@ export const updateChatRoom = createAsyncThunk(
 export const createChatRoom = createAsyncThunk(
   'chatRooms/create',
   async (room: ChatRoom, { rejectWithValue }) => {
-    const response = await apiClient.post<ChatRoomResponse>(API_URLS.CHAT_ROOMS, {
+    const response = await apiClient.post<ChatRoomResponse>('auth', API_URLS.CHAT_ROOMS, {
       name: room.name,
       session_id: 123,
     });

@@ -102,7 +102,7 @@ export const LuloAssetsMessageItem: FC<LuloAssetsMessageItemProps> = ({ props })
         title="Lulo Finance"
         status="default"
         statusText="Portfolio Overview"
-        icon={<Image source={require('@/assets/images/lulo.png')} style={$iconStyle} />}
+        // icon={<Image source={require('@/assets/images/lulo.png')} style={$iconStyle} />}
         footer={footer}
       >
         <View style={$loadingContainer}>
@@ -117,7 +117,7 @@ export const LuloAssetsMessageItem: FC<LuloAssetsMessageItemProps> = ({ props })
       title="Lulo Finance"
       status="default"
       statusText="Portfolio Overview"
-      icon={<Image source={require('@/assets/images/lulo.png')} style={$iconStyle} />}
+      // icon={<Image source={require('@/assets/images/lulo.png')} style={$iconStyle} />}
       footer={footer}
     >
       {/* Stats Section */}
@@ -177,7 +177,7 @@ export const LuloAssetsMessageItem: FC<LuloAssetsMessageItemProps> = ({ props })
                       uri: `https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/${item.mint}/logo.png`,
                     }}
                     style={$tokenIconStyle}
-                    defaultSource={require('@/assets/images/placeholder.png')}
+                    // defaultSource={require('@/assets/images/placeholder.png')}
                   />
                   {activeIndex === index && (
                     <Animated.View

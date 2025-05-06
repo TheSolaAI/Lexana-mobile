@@ -20,20 +20,9 @@ export const PushToTalkButton: React.FC<PushToTalkButtonProps> = ({
   const [audioLevel, setAudioLevel] = useState(0); // Normalized 0-1 audio level
   const [permissionResponse, requestPermission] = Audio.usePermissions();
 
-  // Animation values
   const scaleAnim = useRef(new Animated.Value(1)).current; // Button press scale
   const pulseAnim = useRef(new Animated.Value(0)).current; // Continuous pulse when pressed
   const audioLevelAnimated = useRef(new Animated.Value(0)).current; // Smoothed audio level for animation
-
-  // --- Recording Logic ---
-
-  //   useEffect(() => {
-  //     return () => {
-  //       recording
-  //         ?.stopAndUnloadAsync()
-  //         .catch(error => console.error('Error stopping/unloading recording on unmount:', error));
-  //     };
-  //   }, [recording]);
 
   useEffect(() => {
     Animated.timing(audioLevelAnimated, {
@@ -60,7 +49,6 @@ export const PushToTalkButton: React.FC<PushToTalkButtonProps> = ({
   const startRecording = async () => {
     const hasPermission = await checkAndRequestPermissions();
     if (!hasPermission) {
-      console.log('Audio recording permission denied.');
       setIsPressed(false);
       scaleAnim.setValue(1);
       pulseAnim.setValue(0);
@@ -138,16 +126,13 @@ export const PushToTalkButton: React.FC<PushToTalkButtonProps> = ({
   const stopRecording = async () => {
     // Ensure there is a recording object to stop
     if (!recording) {
-      console.log('No active recording to stop.');
       return;
     }
-    console.log('Stopping recording..');
 
     try {
       // Stop and unload the recording resources
       await recording.stopAndUnloadAsync();
       const uri = recording.getURI();
-      console.log('Recording stopped, URI:', uri);
       setRecording(null);
       setAudioLevel(0);
       if (uri && onAudioRecorded) {
@@ -183,7 +168,6 @@ export const PushToTalkButton: React.FC<PushToTalkButtonProps> = ({
   const handlePressOut = () => {
     // Prevent multiple triggers if not currently pressed
     if (!isPressed) return;
-    console.log('Press Out');
     setIsPressed(false);
     stopRecording(); // Stop recording process
 
@@ -210,8 +194,8 @@ export const PushToTalkButton: React.FC<PushToTalkButtonProps> = ({
   });
 
   const primaryColor = theme?.colors?.primary;
-  const secondaryColor = theme?.colors?.secondary || primaryColor; // Default to primary if secondary missing
-  const accentColor = theme?.colors?.accent || secondaryColor; // Default to secondary if accent missing
+  const secondaryColor = theme?.colors?.primaryDark;
+  const accentColor = theme?.colors.success;
 
   const buttonBackgroundColor = isPressed
     ? audioLevelAnimated.interpolate({
@@ -278,7 +262,6 @@ export const PushToTalkButton: React.FC<PushToTalkButtonProps> = ({
               },
             ]}
           >
-            {/* Mic icon container */}
             <Animated.View
               style={{
                 width: iconSize,
@@ -295,11 +278,8 @@ export const PushToTalkButton: React.FC<PushToTalkButtonProps> = ({
   );
 };
 
-// --- Styles ---
-
-// Non-themed styles
 const $containerStyle: ViewStyle = {
-  position: 'absolute', // Position at the bottom
+  position: 'absolute',
   left: 0,
   right: 0,
   bottom: 20,

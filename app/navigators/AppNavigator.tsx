@@ -2,7 +2,7 @@ import { useAppTheme } from '@/utils/useAppTheme';
 import { NativeStackScreenProps, createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as Screens from '@/screens/AppScreens';
 import { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '@/stores/hooks';
+import { useAppDispatch } from '@/stores/hooks';
 import { fetchChatRooms } from '@/stores/slices/chatRoomsSlice';
 export type AppStackParamList = {
   ChatScreen: undefined;
@@ -23,7 +23,6 @@ export const AppStackNavigator = function AppStack() {
   /**
    * Global State
    */
-  const { rooms } = useAppSelector(state => state.chatRooms);
   const dispatch = useAppDispatch();
 
   /**
@@ -33,7 +32,6 @@ export const AppStackNavigator = function AppStack() {
   useEffect(() => {
     const fetchRooms = async () => {
       await dispatch(fetchChatRooms()).unwrap();
-      console.log('Chat rooms fetched:', rooms);
     };
 
     fetchRooms();
