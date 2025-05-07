@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { ToolSetResponse } from '@/types/response';
 import { toast } from 'sonner-native';
 import { fetchMessages } from '@/stores/slices/messagesSlice';
+import { Audio } from 'expo-av';
 
 export const useChatFunctions = () => {
   /**
@@ -171,6 +172,35 @@ export const useChatFunctions = () => {
     }
   };
 
+  // Function to play audio from base64 data
+  const playAudio = async (base64AudioData: string) => {
+    try {
+      // Convert base64 to URI that Audio can play
+      const audioUri = `data:audio/mp3;base64,${base64AudioData}`;
+
+      // Create a new Sound object from the URI
+      const { sound } = await Audio.Sound.createAsync({ uri: audioUri }, { shouldPlay: true });
+
+      // Set up audio playback
+      await Audio.setAudioModeAsync({
+        playsInSilentModeIOS: true,
+        staysActiveInBackground: false,
+      });
+
+      // Play audio
+      await sound.playAsync();
+
+      // Clean up when sound finishes playing
+      sound.setOnPlaybackStatusUpdate(status => {
+        if (status.isLoaded && status.didJustFinish) {
+          sound.unloadAsync();
+        }
+      });
+    } catch (error) {
+      console.error('Error playing audio:', error);
+    }
+  };
+
   const onAudioMessage = async (audioURI: string) => {
     try {
       // First we convert the audio to text
@@ -190,13 +220,13 @@ export const useChatFunctions = () => {
         handleAddAIResponse(toolsetResponse.fallbackResponse);
 
         if (toolsetResponse.audioData) {
-          // playAudio(toolsetResponse.audioData);
+          // Play audio response
+          playAudio(toolsetResponse.audioData);
         }
         return;
       }
 
       // Handle case with toolsets
-      handleAddUserMessage(newMessage);
       await handleSendMessage(newMessage.content, toolsetResponse.selectedToolset);
     } catch (error) {
       console.error('Error processing audio message:', error);
