@@ -6,6 +6,7 @@ import { useAppDispatch } from '@/stores/hooks';
 import { fetchChatRooms } from '@/stores/slices/chatRoomsSlice';
 export type AppStackParamList = {
   ChatScreen: undefined;
+  SettingsScreen: undefined;
 };
 
 export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStackScreenProps<
@@ -48,6 +49,7 @@ export const AppStackNavigator = function AppStack() {
       }}
     >
       <Stack.Screen name="ChatScreen" component={Screens.ChatScreen} />
+      <Stack.Screen name="SettingsScreen" component={Screens.SettingsScreen} />
     </Stack.Navigator>
   );
 };

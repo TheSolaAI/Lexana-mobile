@@ -1,4 +1,3 @@
-// Modified Sidebar.tsx
 import { FC, useRef, useEffect } from 'react';
 import {
   View,
@@ -16,7 +15,7 @@ import { Feather } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { ThemedStyle } from '@/theme';
 import { setCurrentRoom, createChatRoom } from '@/stores/slices/chatRoomsSlice';
-import { Text, ThemeToggleButton } from '@/components/general';
+import { Text } from '@/components/general';
 import { ProfileSection } from './ProfileSection';
 
 interface SidebarProps {
@@ -207,7 +206,6 @@ export const Sidebar: FC<SidebarProps> = ({ isOpen, setIsOpen, swipeProgress }) 
             <View style={themed($betaTag)}>
               <Text preset="default" tx="common:beta" />
             </View>
-            <ThemeToggleButton />
           </Animated.View>
         </View>
 

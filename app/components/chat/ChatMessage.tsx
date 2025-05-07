@@ -163,14 +163,14 @@ const $markdownStyles: ThemedStyle<Record<string, TextStyle | ViewStyle>> = them
       fontFamily: 'italic',
     },
     code_block: {
-      backgroundColor: theme.colors.backgroundDim,
+      backgroundColor: theme.colors.surface,
       padding: 8,
       borderRadius: 4,
       fontFamily: 'monospace',
       fontSize: 14,
     },
     code_inline: {
-      backgroundColor: theme.colors.backgroundDim,
+      backgroundColor: theme.colors.surface,
       fontFamily: 'monospace',
       fontSize: 14,
       padding: 2,

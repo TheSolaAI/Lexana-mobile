@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { UIMessage } from '@ai-sdk/ui-utils';
 import { SimpleMessageItem } from '@/components/messages/SimpleMessageItem';
-
 import { UserInput } from '../messages/UserInput';
 import { ToolResult } from '@/types/tool';
 import { TokenAddressResultMessageItem } from '../messages/TokenAddressResultMessageItem';

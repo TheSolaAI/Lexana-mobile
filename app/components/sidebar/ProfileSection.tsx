@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, Animated, ViewStyle, TextStyle, Modal } from 'react-native';
+import { useRef } from 'react';
+import { View, Text, TouchableOpacity, Animated, ViewStyle, TextStyle } from 'react-native';
 import { useAppTheme } from '@/utils/useAppTheme';
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { usePrivy } from '@privy-io/expo';
 import { ThemedStyle } from '@/theme';
 import { navigate } from '@/navigators/navigationUtilities';
@@ -16,8 +16,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
   onClose,
 }) => {
   const { themed, theme } = useAppTheme();
-  const [modalVisible, setModalVisible] = useState(false);
-  const { user, logout } = usePrivy();
+  const { user } = usePrivy();
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
@@ -37,108 +36,40 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
     }).start();
   };
 
-  const handleLogout = async () => {
-    setModalVisible(false);
-    if (onClose) onClose();
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
-
-  const handleNavigate = (screen: string) => {
-    setModalVisible(false);
-    if (onClose) onClose();
-    navigate(screen);
+  const handleNavigateToSettings = () => {
+    if (onClose) onClose(); // Close sidebar if needed
+    navigate('SettingsScreen');
   };
 
   return (
-    <>
-      <Animated.View
-        style={{
-          opacity,
-          transform: [{ scale: scaleAnim }],
-        }}
+    <Animated.View
+      style={{
+        opacity,
+        transform: [{ scale: scaleAnim }],
+      }}
+    >
+      <TouchableOpacity
+        style={themed($profileButton)}
+        activeOpacity={0.8}
+        onPress={handleNavigateToSettings}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
       >
-        <TouchableOpacity
-          style={themed($profileButton)}
-          activeOpacity={0.8}
-          onPress={() => setModalVisible(true)}
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-        >
-          <View style={themed($avatarContainer)}>
-            <View style={themed($avatarFallback)}>
-              <Feather name="user" size={20} color={theme.colors.background} />
-            </View>
+        <View style={themed($avatarContainer)}>
+          <View style={themed($avatarFallback)}>
+            <Feather name="user" size={20} color={theme.colors.background} />
           </View>
+        </View>
 
-          <View style={$profileTextContainer}>
-            <Text style={themed($nameText)} numberOfLines={1}>
-              {user?.id ? `${user.id.slice(12, 16)}...${user.id.slice(-4)}` : 'User'}
-            </Text>
-          </View>
+        <View style={$profileTextContainer}>
+          <Text style={themed($nameText)} numberOfLines={1}>
+            {user?.id ? `${user.id.slice(12, 16)}...${user.id.slice(-4)}` : 'User'}
+          </Text>
+        </View>
 
-          <Feather name="settings" size={18} color={theme.colors.textDim} />
-        </TouchableOpacity>
-      </Animated.View>
-
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <TouchableOpacity
-          style={$modalOverlay}
-          activeOpacity={1}
-          onPress={() => setModalVisible(false)}
-        >
-          <View style={themed($modalContainer)}>
-            <View style={themed($modalHeader)}>
-              <Text style={themed($modalTitle)}>Account</Text>
-              <TouchableOpacity
-                onPress={() => setModalVisible(false)}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <Ionicons name="close" size={24} color={theme.colors.text} />
-              </TouchableOpacity>
-            </View>
-
-            <View style={themed($menuItems)}>
-              <TouchableOpacity
-                style={themed($menuItem)}
-                onPress={() => handleNavigate('SettingsScreen')}
-              >
-                <Feather name="settings" size={20} color={theme.colors.text} />
-                <Text style={themed($menuItemText)}>Settings</Text>
-              </TouchableOpacity>
-
-              <View style={themed($divider)} />
-
-              <TouchableOpacity
-                style={{
-                  ...themed($menuItem),
-                  ...themed($logoutButton),
-                }}
-                onPress={handleLogout}
-              >
-                <Feather name="log-out" size={20} color={theme.colors.error} />
-                <Text
-                  style={{
-                    ...themed($menuItemText),
-                    ...themed($logoutText),
-                  }}
-                >
-                  Logout
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </TouchableOpacity>
-      </Modal>
-    </>
+        <Feather name="settings" size={18} color={theme.colors.textDim} />
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
@@ -179,66 +110,4 @@ const $nameText: ThemedStyle<TextStyle> = theme => ({
   color: theme.colors.text,
   fontSize: 14,
   fontWeight: '500',
-});
-
-const $modalOverlay: ViewStyle = {
-  flex: 1,
-  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  justifyContent: 'flex-end',
-};
-
-const $modalContainer: ThemedStyle<ViewStyle> = theme => ({
-  backgroundColor: theme.colors.secondaryBg,
-  borderTopLeftRadius: 16,
-  borderTopRightRadius: 16,
-  paddingBottom: 24,
-  elevation: 5,
-});
-
-const $modalHeader: ThemedStyle<ViewStyle> = theme => ({
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  paddingHorizontal: 16,
-  paddingVertical: 14,
-  borderBottomWidth: 1,
-  borderBottomColor: theme.colors.border,
-});
-
-const $modalTitle: ThemedStyle<TextStyle> = theme => ({
-  fontSize: 18,
-  fontWeight: 'bold',
-  color: theme.colors.text,
-});
-
-const $menuItems: ThemedStyle<ViewStyle> = theme => ({
-  padding: 16,
-});
-
-const $menuItem: ThemedStyle<ViewStyle> = theme => ({
-  flexDirection: 'row',
-  alignItems: 'center',
-  paddingVertical: 12,
-  borderRadius: 8,
-  paddingHorizontal: 8,
-  gap: 12,
-});
-
-const $menuItemText: ThemedStyle<TextStyle> = theme => ({
-  fontSize: 16,
-  color: theme.colors.text,
-});
-
-const $divider: ThemedStyle<ViewStyle> = theme => ({
-  height: 1,
-  backgroundColor: theme.colors.border,
-  marginVertical: 12,
-});
-
-const $logoutButton: ThemedStyle<ViewStyle> = theme => ({
-  marginTop: 4,
-});
-
-const $logoutText: ThemedStyle<TextStyle> = theme => ({
-  color: theme.colors.error,
 });
