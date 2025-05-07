@@ -240,7 +240,6 @@ export const Sidebar: FC<SidebarProps> = ({ isOpen, setIsOpen, swipeProgress }) 
             {rooms.map(room => {
               if (!room.id) return null;
               const isActive = currentRoom?.id === room.id;
-              console.log('isActive', isActive);
               return (
                 <View key={room.id} style={$roomItemWrapper}>
                   <TouchableOpacity

@@ -12,6 +12,7 @@ import { SimpleMessageItem } from '@/components/messages/SimpleMessageItem';
 import { UserInput } from '../messages/UserInput';
 import { ToolResult } from '@/types/tool';
 import { TokenAddressResultMessageItem } from '../messages/TokenAddressResultMessageItem';
+import { TokenDataResultMessageItem } from '../messages/TokenDataResultMessageItem';
 
 interface ChatProps {
   messages: UIMessage[];
@@ -77,6 +78,8 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
     switch (toolName) {
       case 'tokenAddressTool':
         return <TokenAddressResultMessageItem props={args.data} />;
+      case 'getTokenDataTool':
+        return <TokenDataResultMessageItem props={args.data} />;
       default:
         return <SimpleMessageItem text={JSON.stringify(args.data)} />;
     }
