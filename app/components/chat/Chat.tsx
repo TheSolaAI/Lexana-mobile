@@ -15,6 +15,11 @@ import { TokenAddressResultMessageItem } from '../messages/TokenAddressResultMes
 import { TokenDataResultMessageItem } from '../messages/TokenDataResultMessageItem';
 import { BubbleMapMessageItem } from '../messages/BubbleMapMessageItem';
 import { TopHoldersMessageItem } from '../messages/TopHoldersMessageItem';
+import { AiProjectsMessageItem } from '../messages/AiProjectsMessageItem';
+import { ShowLimitOrderMessageItem } from '../messages/ShowLimitOrderMessageItem';
+import { LuloAssetsMessageItem } from '../messages/LuloAssetsMessageItem';
+import { NFTCollectionMessageItem } from '../messages/NFTCollectionMessageItem';
+import { SNSResolverMessageItem } from '../messages/SNSResolverMessageItem';
 
 interface ChatProps {
   messages: UIMessage[];
@@ -86,6 +91,18 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
         return <BubbleMapMessageItem props={args.data} />;
       case 'topHoldersTool':
         return <TopHoldersMessageItem props={args.data} />;
+      case 'trendingAiProjects':
+        return <AiProjectsMessageItem props={args.data} />;
+      case 'getLimitOrderTool':
+        return <ShowLimitOrderMessageItem props={args.data} />;
+      case 'getLuloAssetsTool':
+        return <LuloAssetsMessageItem props={args.data} />;
+      case 'getNFTPrice':
+        return <NFTCollectionMessageItem props={args.data} />;
+      case 'getTrendingNFTs':
+        return <NFTCollectionMessageItem props={args.data} />;
+      case 'resolveSnsNameTool':
+        return <SNSResolverMessageItem props={args.data} />;
       default:
         return <SimpleMessageItem text={JSON.stringify(args.data)} />;
     }
