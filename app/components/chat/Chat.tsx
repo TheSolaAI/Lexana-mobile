@@ -20,6 +20,9 @@ import { ShowLimitOrderMessageItem } from '../messages/ShowLimitOrderMessageItem
 import { LuloAssetsMessageItem } from '../messages/LuloAssetsMessageItem';
 import { NFTCollectionMessageItem } from '../messages/NFTCollectionMessageItem';
 import { SNSResolverMessageItem } from '../messages/SNSResolverMessageItem';
+import { SwapTokenMessageItem } from '../messages/SwapTokenMessageItem';
+import { SignedTransactionsMessageItem } from '../messages/SignedTransactionsMessageItem';
+import { TransferTokenMessageItem } from '../messages/TransferTokenMessageItem';
 
 interface ChatProps {
   messages: UIMessage[];
@@ -103,6 +106,14 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
         return <NFTCollectionMessageItem props={args.data} />;
       case 'resolveSnsNameTool':
         return <SNSResolverMessageItem props={args.data} />;
+      case 'swapTokens':
+        return <SwapTokenMessageItem props={args.data} />;
+      case 'sign_and_send_tx':
+        return <SignedTransactionsMessageItem props={args.data} />;
+      case 'transferSol':
+        return <TransferTokenMessageItem props={args.data} />;
+      case 'transferSpl':
+        return <TransferTokenMessageItem props={args.data} />;
       default:
         return <SimpleMessageItem text={JSON.stringify(args.data)} />;
     }

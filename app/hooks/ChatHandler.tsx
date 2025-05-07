@@ -11,6 +11,13 @@ import { ToolSetResponse } from '@/types/response';
 import { toast } from 'sonner-native';
 import { fetchMessages } from '@/stores/slices/messagesSlice';
 import { Audio } from 'expo-av';
+import { ToolResult } from '@/types/tool';
+import { Connection, Transaction } from '@solana/web3.js';
+import base58 from 'bs58';
+
+interface TransactionArgs {
+  transactionHash: string;
+}
 
 export const useChatFunctions = () => {
   /**
@@ -54,6 +61,60 @@ export const useChatFunctions = () => {
     }
   }, [currentRoom?.id, dispatch]);
 
+  /**
+   * Handles signing and sending a transaction using the Privy embedded wallet
+   * @param args The transaction arguments containing the transaction hash
+   * @returns A ToolResult object with the transaction status
+   */
+  const handleSignTransaction = async (args: TransactionArgs): Promise<ToolResult> => {
+    try {
+      if (!wallets || wallets.length === 0) {
+        return {
+          success: false,
+          error: 'No wallet available. Please connect a wallet first.',
+        };
+      }
+
+      const wallet = wallets[0];
+      const provider = await wallet.getProvider();
+      const connection = new Connection('https://api.mainnet-beta.solana.com');
+
+      // Decode the transaction from base58 string
+      const transactionBuffer = base58.decode(args.transactionHash);
+      const transaction = Transaction.from(transactionBuffer);
+
+      const { signature } = await provider.request({
+        method: 'signAndSendTransaction',
+        params: {
+          transaction: transaction,
+          connection: connection,
+        },
+      });
+
+      console.log('Transaction sent with signature:', signature);
+
+      toast.success('Transaction signed and sent successfully');
+
+      return {
+        success: true,
+        data: {
+          signature,
+          message: 'Transaction signed and sent successfully',
+        },
+      };
+    } catch (error: any) {
+      console.error('Error signing transaction:', error);
+
+      const errorMessage = error.message || 'Failed to sign and send transaction';
+      toast.error(errorMessage);
+
+      return {
+        success: false,
+        error: errorMessage,
+      };
+    }
+  };
+
   const { messages, setMessages, append } = useChat({
     api: `${process.env.EXPO_PUBLIC_MAIN_SERVICE_URL}/api/chat`,
     id: `chat-${currentRoom?.id}`,
@@ -68,6 +129,14 @@ export const useChatFunctions = () => {
     body: {
       walletPublicKey: wallets?.[0].publicKey,
       currentRoomID: currentRoom?.id,
+    },
+    onToolCall: async ({ toolCall }) => {
+      let result: ToolResult | undefined;
+      if (toolCall.toolName === 'sign_and_send_tx') {
+        result = await handleSignTransaction(toolCall.args as TransactionArgs);
+        console.log('Transaction result:', result);
+        return result;
+      }
     },
     onError: error => {
       console.error('Error in chat:', error);
