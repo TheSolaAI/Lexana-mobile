@@ -1,15 +1,5 @@
 import { useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Animated,
-  ViewStyle,
-  TextStyle,
-  Modal,
-  Image,
-  ImageStyle,
-} from 'react-native';
+import { View, Text, TouchableOpacity, Animated, ViewStyle, TextStyle, Modal } from 'react-native';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { usePrivy } from '@privy-io/expo';
@@ -90,7 +80,7 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({
             </Text>
           </View>
 
-          <Feather name="chevron-right" size={18} color={theme.colors.textDim} />
+          <Feather name="settings" size={18} color={theme.colors.textDim} />
         </TouchableOpacity>
       </Animated.View>
 
