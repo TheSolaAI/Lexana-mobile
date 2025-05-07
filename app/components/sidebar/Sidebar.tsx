@@ -17,6 +17,7 @@ import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { ThemedStyle } from '@/theme';
 import { setCurrentRoom, createChatRoom } from '@/stores/slices/chatRoomsSlice';
 import { Text } from '@/components/general';
+import { ProfileSection } from './ProfileSection';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -259,9 +260,7 @@ export const Sidebar: FC<SidebarProps> = ({ isOpen, setIsOpen, swipeProgress }) 
 
         {/* Bottom Section - Profile Button */}
         <View style={$bottomSection}>
-          <Animated.View style={{ opacity: fadeAnimation }}>
-            <Text>sadf</Text>
-          </Animated.View>
+          <ProfileSection opacity={fadeAnimation} onClose={() => setIsOpen(false)} />
         </View>
       </Animated.View>
     </View>
@@ -388,8 +387,7 @@ const $activeRoomItem: ThemedStyle<ViewStyle> = theme => ({
 });
 
 const $bottomSection: ViewStyle = {
-  height: 50,
-  justifyContent: 'center',
   marginBottom: 16,
   position: 'relative',
+  paddingHorizontal: 4,
 };
