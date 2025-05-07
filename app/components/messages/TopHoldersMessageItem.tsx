@@ -20,12 +20,17 @@ interface Holder {
   address: string;
   amount: number;
   percentage: number;
+  insider?: boolean;
 }
 
 interface TopHoldersProps {
-  data: Holder[];
-  name: string;
-  address: string;
+  details: {
+    owner: string;
+    amount: number;
+    insider?: boolean;
+  }[];
+  name?: string;
+  address?: string;
 }
 
 interface TopHoldersMessageItemProps {
@@ -34,6 +39,26 @@ interface TopHoldersMessageItemProps {
 
 export const TopHoldersMessageItem: FC<TopHoldersMessageItemProps> = ({ props }) => {
   const { themed, theme } = useAppTheme();
+
+  // Process and transform the data to match our component needs
+  const processData = () => {
+    if (!props.details || !Array.isArray(props.details)) {
+      return [];
+    }
+
+    // Calculate total supply for percentage calculation
+    const totalSupply = props.details.reduce((sum, holder) => sum + holder.amount, 0);
+
+    // Transform the data to match our component's expected structure
+    return props.details.map(holder => ({
+      address: holder.owner,
+      amount: holder.amount,
+      percentage: totalSupply > 0 ? holder.amount / totalSupply : 0,
+      insider: holder.insider,
+    }));
+  };
+
+  const processedData = processData();
 
   // Format percentage
   const formatPercentage = (percentage: number) => {
@@ -139,7 +164,7 @@ export const TopHoldersMessageItem: FC<TopHoldersMessageItemProps> = ({ props })
         </View>
 
         <FlatList
-          data={props.data}
+          data={processedData}
           renderItem={renderHolderItem}
           keyExtractor={item => item.address}
           scrollEnabled={false}

@@ -1,4 +1,4 @@
-import { FC, Fragment, useEffect, useRef } from 'react';
+import { FC, Fragment, useEffect, useRef, useCallback } from 'react';
 import {
   FlatList,
   View,
@@ -13,6 +13,8 @@ import { UserInput } from '../messages/UserInput';
 import { ToolResult } from '@/types/tool';
 import { TokenAddressResultMessageItem } from '../messages/TokenAddressResultMessageItem';
 import { TokenDataResultMessageItem } from '../messages/TokenDataResultMessageItem';
+import { BubbleMapMessageItem } from '../messages/BubbleMapMessageItem';
+import { TopHoldersMessageItem } from '../messages/TopHoldersMessageItem';
 
 interface ChatProps {
   messages: UIMessage[];
@@ -22,6 +24,14 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
   const flatListRef = useRef<FlatList>(null);
   const animatedValues = useRef<{ [key: string]: Animated.Value }>({});
   const scrollToBottomOnNextUpdate = useRef<boolean>(true);
+
+  const scrollToBottom = useCallback(() => {
+    if (flatListRef.current && messages.length > 0) {
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [messages.length]);
 
   // Auto-scroll to bottom when new messages are added
   useEffect(() => {
@@ -41,15 +51,7 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
         }
       });
     }
-  }, [messages]);
-
-  const scrollToBottom = () => {
-    if (flatListRef.current && messages.length > 0) {
-      setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    }
-  };
+  }, [messages, scrollToBottom]);
 
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     // When user scrolls manually, disable auto-scrolling
@@ -80,6 +82,10 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
         return <TokenAddressResultMessageItem props={args.data} />;
       case 'getTokenDataTool':
         return <TokenDataResultMessageItem props={args.data} />;
+      case 'bubblemapTool':
+        return <BubbleMapMessageItem props={args.data} />;
+      case 'topHoldersTool':
+        return <TopHoldersMessageItem props={args.data} />;
       default:
         return <SimpleMessageItem text={JSON.stringify(args.data)} />;
     }
@@ -92,25 +98,28 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
     }
 
     if (message.parts) {
-      return message.parts.map((part, partIndex) => {
-        if (part.type === 'text') {
-          return role === 'user' ? (
-            <UserInput key={`text-${partIndex}`} text={message.content} transcript={true} />
-          ) : (
-            <SimpleMessageItem key={`text-${partIndex}`} text={part.text} />
-          );
-        } else if (part.type === 'tool-invocation' && part.toolInvocation.state === 'result') {
-          return (
-            <Fragment key={`tool-${message.id}-${partIndex}`}>
-              {renderToolResult(part.toolInvocation.toolName, part.toolInvocation.result)}
-            </Fragment>
-          );
-        } else if (part.type === 'step-start') {
-          // Skip step-start since this is used in web but may not be needed in mobile
+      // If we have multiple parts, wrap them in a View with column layout
+      const messageParts = message.parts
+        .map((part, partIndex) => {
+          if (part.type === 'text') {
+            return role === 'user' ? (
+              <UserInput key={`text-${partIndex}`} text={message.content} transcript={true} />
+            ) : (
+              <SimpleMessageItem key={`text-${partIndex}`} text={part.text} />
+            );
+          } else if (part.type === 'tool-invocation' && part.toolInvocation.state === 'result') {
+            return (
+              <Fragment key={`tool-${message.id}-${partIndex}`}>
+                {renderToolResult(part.toolInvocation.toolName, part.toolInvocation.result)}
+              </Fragment>
+            );
+          }
           return null;
-        }
-        return null;
-      });
+        })
+        .filter(Boolean);
+
+      // Wrap in column container if there are multiple parts
+      return <View style={$messagePartsContainer}>{messageParts}</View>;
     }
 
     // Handle simple text messages
@@ -183,4 +192,8 @@ const $assistantWrapperStyle: ViewStyle = {
 const $chatContainerStyle: ViewStyle = {
   flex: 1,
   paddingVertical: 16,
+};
+
+const $messagePartsContainer: ViewStyle = {
+  flexDirection: 'column',
 };
