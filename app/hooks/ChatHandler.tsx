@@ -5,15 +5,17 @@ import { useChat } from '@ai-sdk/react';
 import { fetch as expoFetch } from 'expo/fetch';
 import { useEmbeddedSolanaWallet } from '@privy-io/expo';
 import { ApiResponse } from '@/types/api';
-import { useAppDispatch, useAppSelector } from '@/stores/hooks';
 import { useEffect, useState } from 'react';
 import { ToolSetResponse } from '@/types/response';
 import { toast } from 'sonner-native';
-import { fetchMessages } from '@/stores/slices/messagesSlice';
 import { Audio } from 'expo-av';
 import { ToolResult } from '@/types/tool';
 import { Connection, Transaction } from '@solana/web3.js';
 import base58 from 'bs58';
+import { useFetchMessagesQuery } from '@/stores/services/messages.service';
+import { useFetchChatRoomsQuery } from '@/stores/services/chatRooms.service';
+import { useAppSelector, useAppDispatch } from '@/stores/hooks';
+import { setSelectedRoomId } from '@/stores/slices/selectedRoomSlice';
 
 interface TransactionArgs {
   transactionHash: string;
@@ -24,23 +26,24 @@ export const useChatFunctions = () => {
    * Global State
    */
   const { wallets } = useEmbeddedSolanaWallet();
-  const { currentRoom } = useAppSelector(state => state.chatRooms);
-  const prevMessages = useAppSelector(state => state.messages);
+  const { data: chatRooms = [] } = useFetchChatRoomsQuery(undefined);
   const dispatch = useAppDispatch();
+  const selectedRoomId = useAppSelector(state => state.selectedRoom.selectedRoomId);
+  // Update selectedRoomId if chatRooms changes and selectedRoomId is not valid
+  useEffect(() => {
+    if (
+      chatRooms.length > 0 &&
+      (!selectedRoomId || !chatRooms.some((room: any) => room.id === selectedRoomId))
+    ) {
+      dispatch(setSelectedRoomId(chatRooms[0].id));
+    }
+  }, [chatRooms, selectedRoomId, dispatch]);
+  const currentRoom = chatRooms.find((room: any) => room.id === selectedRoomId) || chatRooms[0];
   const [bearerToken, setBearerToken] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchToken = async () => {
-      try {
-        const token = await privyClient.getAccessToken();
-        setBearerToken(token);
-      } catch (error) {
-        console.error('Error fetching auth token:', error);
-      }
-    };
-
-    fetchToken();
-  }, []);
+  // Fetch messages for the current room using RTK Query
+  const roomId = currentRoom?.id;
+  const { data: messagesData } = useFetchMessagesQuery(roomId, { skip: !roomId });
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -51,15 +54,8 @@ export const useChatFunctions = () => {
         console.error('Error fetching auth token:', error);
       }
     };
-
     fetchToken();
   }, []);
-
-  useEffect(() => {
-    if (currentRoom?.id) {
-      dispatch(fetchMessages(currentRoom.id));
-    }
-  }, [currentRoom?.id, dispatch]);
 
   /**
    * Handles signing and sending a transaction using the Privy embedded wallet
@@ -117,9 +113,9 @@ export const useChatFunctions = () => {
 
   const { messages, setMessages, append } = useChat({
     api: `${process.env.EXPO_PUBLIC_MAIN_SERVICE_URL}/api/chat`,
-    id: `chat-${currentRoom?.id}`,
+    id: `chat-${roomId}`,
     fetch: expoFetch as unknown as typeof globalThis.fetch,
-    initialMessages: prevMessages.messages,
+    initialMessages: messagesData?.messages || [],
     headers: {
       'Content-Type': 'application/json',
       'x-mobile-client-id': process.env.EXPO_PUBLIC_CLIENT_ID!,
@@ -128,7 +124,7 @@ export const useChatFunctions = () => {
     },
     body: {
       walletPublicKey: wallets?.[0].publicKey,
-      currentRoomID: currentRoom?.id,
+      currentRoomID: roomId,
     },
     onToolCall: async ({ toolCall }) => {
       let result: ToolResult | undefined;
@@ -176,7 +172,7 @@ export const useChatFunctions = () => {
         walletPublicKey: wallets?.[0].publicKey,
         message: newMessage,
         previousMessages: history,
-        currentRoomID: currentRoom?.id,
+        currentRoomID: roomId,
       }
     );
 
@@ -306,5 +302,8 @@ export const useChatFunctions = () => {
     messages,
     onAudioMessage,
     handleSendMessage,
+    selectedRoomId,
+    setSelectedRoomId: (id: string) => dispatch(setSelectedRoomId(id)),
+    chatRooms,
   };
 };

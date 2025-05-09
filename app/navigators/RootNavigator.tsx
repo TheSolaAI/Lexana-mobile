@@ -2,31 +2,37 @@ import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navig
 import { OnboardingStackNavigator } from './OnboardingNavigator';
 import { AppStackNavigator } from './AppNavigator';
 import { usePrivy } from '@privy-io/expo';
+import { SplashScreen } from '@/screens/AppScreens/SplashScreen';
 
 export type RootStackNavigatorParamList = {
   Onboarding: undefined;
   App: undefined;
+  Splash: undefined;
 };
 
-export type OnboardingStackScreenProps<T extends keyof RootStackNavigatorParamList> =
+export type RootStackScreenProps<T extends keyof RootStackNavigatorParamList> =
   NativeStackScreenProps<RootStackNavigatorParamList, T>;
 
 const RootStack = createNativeStackNavigator<RootStackNavigatorParamList>();
 
 export const RootNavigator = function RootNavigator() {
-  const { user } = usePrivy();
+  const { user, isReady } = usePrivy();
 
   return (
     <RootStack.Navigator
       screenOptions={{
         headerShown: false,
-        animation: 'slide_from_right',
+        animation: 'fade_from_bottom',
       }}
     >
-      {user ? (
-        <RootStack.Screen name="App" component={AppStackNavigator} />
+      {isReady ? (
+        user ? (
+          <RootStack.Screen name="App" component={AppStackNavigator} />
+        ) : (
+          <RootStack.Screen name="Onboarding" component={OnboardingStackNavigator} />
+        )
       ) : (
-        <RootStack.Screen name="Onboarding" component={OnboardingStackNavigator} />
+        <RootStack.Screen name="Splash" component={SplashScreen} />
       )}
     </RootStack.Navigator>
   );

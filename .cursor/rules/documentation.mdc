@@ -1,0 +1,6 @@
+---
+description: 
+globs: *.tsx,*ts
+alwaysApply: false
+---
+For every function defined in the code add proper TypeDocs above each function definition
