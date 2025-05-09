@@ -5,6 +5,7 @@ const en = {
     back: 'Back',
     appName: 'Sola AI',
     beta: 'Beta',
+    save: 'Save',
   },
   welcomeScreen: {
     catchLine: 'Just speak! Your voice interface to the Solana blockchain.',
@@ -18,6 +19,12 @@ const en = {
     voiceMode: {
       title: 'Sola AI Voice Mode',
     },
+  },
+  menuScreen: {
+    recentSearches: 'Recent Searches',
+    recentChats: 'Recent Chats',
+    editChatName: 'Edit Chat Name',
+    deleteChat: 'Delete Chat',
   },
 };
 

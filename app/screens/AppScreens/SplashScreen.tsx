@@ -7,17 +7,19 @@ import { Screen, AutoImage, Text } from '@/components/general';
 import { translate } from '@/i18n';
 import type { Theme } from '@/theme';
 import { RootStackScreenProps } from '@/navigators/RootNavigator';
+import { usePrivy } from '@privy-io/expo';
 
 interface SplashScreenProps extends RootStackScreenProps<'Splash'> {}
 
 export const SplashScreen: FC<SplashScreenProps> = function SplashScreen() {
+  const { user } = usePrivy();
+
   // Animation setup
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
   const { themed, theme } = useAppTheme();
 
-  // start fetching the chatrooms
-  useFetchChatRoomsQuery(undefined);
+  useFetchChatRoomsQuery(undefined, { skip: !user });
 
   useEffect(() => {
     Animated.parallel([

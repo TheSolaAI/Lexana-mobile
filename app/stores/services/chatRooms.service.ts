@@ -1,14 +1,33 @@
-import { chatApi } from '../rootApi';
+import { API_URLS } from '@/config/constants';
+import { authApi } from '../api/authApi';
+import type { ChatRoomResponse } from '@/types/response';
 
-export const chatRoomsService = chatApi.injectEndpoints({
+export const chatRoomsService = authApi.injectEndpoints({
   endpoints: builder => ({
     /**
      * Fetch all chat rooms.
      */
-    fetchChatRooms: builder.query({
-      query: () => '',
-      transformResponse: response =>
-        response.map((room: any) => ({ id: room.id, name: room.name })),
+    fetchChatRooms: builder.query<ChatRoomResponse[], void>({
+      query: () => API_URLS.CHAT_ROOMS,
+      transformResponse: (response: any): ChatRoomResponse[] => {
+        if (Array.isArray(response)) {
+          return response.map((room: ChatRoomResponse) => ({
+            id: room.id,
+            name: room.name,
+            agent_id: room.agent_id,
+            user: room.user,
+          }));
+        }
+        if (response && Array.isArray(response.results)) {
+          return response.results.map((room: ChatRoomResponse) => ({
+            id: room.id,
+            name: room.name,
+            agent_id: room.agent_id,
+            user: room.user,
+          }));
+        }
+        return [];
+      },
       providesTags: ['ChatRoom'],
     }),
     /**
@@ -16,7 +35,7 @@ export const chatRoomsService = chatApi.injectEndpoints({
      */
     createChatRoom: builder.mutation({
       query: room => ({
-        url: '',
+        url: API_URLS.CHAT_ROOMS,
         method: 'POST',
         body: { name: room.name, session_id: 123 },
       }),
@@ -27,7 +46,7 @@ export const chatRoomsService = chatApi.injectEndpoints({
      */
     updateChatRoom: builder.mutation({
       query: room => ({
-        url: `${room.id}`,
+        url: `${API_URLS.CHAT_ROOMS}${room.id}/`,
         method: 'PATCH',
         body: room,
       }),
@@ -38,13 +57,13 @@ export const chatRoomsService = chatApi.injectEndpoints({
      */
     deleteChatRoom: builder.mutation({
       query: roomId => ({
-        url: `${roomId}`,
+        url: `${API_URLS.CHAT_ROOMS}${roomId}/`,
         method: 'DELETE',
       }),
       invalidatesTags: ['ChatRoom'],
     }),
   }),
-  overrideExisting: false,
+  overrideExisting: true,
 });
 
 export const {

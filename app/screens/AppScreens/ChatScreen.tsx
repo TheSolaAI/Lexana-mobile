@@ -40,7 +40,7 @@ export const ChatScreen: FC<ChatScreenProps> = () => {
       <View style={$menuButtonContainer}>
         <TouchableOpacity
           style={$menuButton}
-          onPress={() => navigation.navigate('SidebarScreen')}
+          onPress={() => navigation.navigate('MenuScreen')}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <Feather name="menu" size={28} color={themed({ color: 'white' }).color} />

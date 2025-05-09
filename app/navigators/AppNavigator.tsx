@@ -5,7 +5,7 @@ import * as Screens from '@/screens/AppScreens';
 export type AppStackParamList = {
   ChatScreen: undefined;
   SettingsScreen: undefined;
-  SidebarScreen: undefined;
+  MenuScreen: undefined;
 };
 
 export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStackScreenProps<
@@ -32,7 +32,13 @@ export const AppStackNavigator = function AppStack() {
     >
       <Stack.Screen name="ChatScreen" component={Screens.ChatScreen} />
       <Stack.Screen name="SettingsScreen" component={Screens.SettingsScreen} />
-      <Stack.Screen name="SidebarScreen" component={Screens.SidebarScreen} />
+      <Stack.Screen
+        name="MenuScreen"
+        component={Screens.MenuScreen}
+        options={{
+          animation: 'fade_from_bottom',
+        }}
+      />
     </Stack.Navigator>
   );
 };

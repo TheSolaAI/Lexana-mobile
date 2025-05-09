@@ -69,7 +69,13 @@ export function App() {
                   <AppNavigator />
                 </PrivyProvider>
               </KeyboardProvider>
-              <Toaster richColors theme="system" />
+              <Toaster
+                richColors
+                theme="system"
+                swipeToDismissDirection="left"
+                gap={40}
+                offset={40}
+              />
             </GestureHandlerRootView>
           </ErrorBoundary>
         </SafeAreaProvider>

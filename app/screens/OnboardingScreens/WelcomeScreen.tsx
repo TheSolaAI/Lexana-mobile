@@ -30,9 +30,9 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = function WelcomeScreen() {
               source={require('assets/images/transparent-logo.png')}
               style={themed($logoStyle)}
             />
-            <Text text={translate('common:appName').toUpperCase()} preset="pageHeading" />
+            <Text text={translate('common:appName').toUpperCase()} preset="onboardingHeading" />
           </View>
-          <Text tx="welcomeScreen:catchLine" preset="pageSubHeading" />
+          <Text tx="welcomeScreen:catchLine" preset="onboardingSubHeading" />
         </View>
 
         {/* Spacer to push footer to bottom */}

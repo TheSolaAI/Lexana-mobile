@@ -4,7 +4,7 @@ import { $styles, type ThemedStyle, type ThemedStyleArray } from '@/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { TextProps, Text } from './Text';
 
-type Presets = 'primary' | 'secondary';
+type Presets = 'primary' | 'secondary' | 'tertiary';
 
 export interface ButtonProps extends PressableProps {
   /**
@@ -199,7 +199,7 @@ export function Button(props: ButtonProps) {
 
 const $baseViewStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   minHeight: 60,
-  width: '100%',
+
   borderRadius: 15,
   justifyContent: 'center',
   alignItems: 'center',
@@ -245,9 +245,19 @@ const $viewPresets: Record<Presets, ThemedStyleArray<ViewStyle>> = {
       borderColor: colors.palette.primary,
     }),
   ],
+  tertiary: [
+    $baseViewStyle,
+    ({ colors }) => ({
+      backgroundColor: colors.transparent,
+    }),
+  ],
 };
 
 const $textPresets: Record<Presets, ThemedStyleArray<TextStyle>> = {
   primary: [$baseTextStyle, ({ colors }) => ({ color: colors.text })],
   secondary: [$baseTextStyle, ({ colors }) => ({ color: colors.palette.primary })],
+  tertiary: [
+    $baseTextStyle,
+    ({ colors }) => ({ color: colors.text, fontSize: 16, fontFamily: 'medium' }),
+  ],
 };

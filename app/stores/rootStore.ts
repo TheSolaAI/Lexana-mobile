@@ -5,7 +5,7 @@ import { persistStore, persistReducer, createTransform } from 'redux-persist';
 import { configureStore } from '@reduxjs/toolkit';
 import { storage } from '@/utils/storage';
 import { rootReducer } from './rootReducer';
-import { chatApi } from './rootApi';
+import { authApi } from './api/authApi';
 
 const loadingTransform = createTransform(
   inboundState => {
@@ -52,7 +52,7 @@ const store = configureStore({
       serializableCheck: {
         ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
       },
-    }).concat(chatApi.middleware),
+    }).concat(authApi.middleware),
   devTools: __DEV__, // Enable devTools only in development
 });
 

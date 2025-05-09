@@ -8,9 +8,9 @@ import { ReactNode, forwardRef, ForwardedRef } from 'react';
 type Presets =
   | 'default'
   | 'secondary'
+  | 'onboardingHeading'
+  | 'onboardingSubHeading'
   | 'pageHeading'
-  | 'pageSubHeading'
-  | 'heading'
   | 'small'
   | 'bold'
   | 'monospace';
@@ -75,9 +75,9 @@ const $presets: Record<Presets, ThemedStyleArray<TextStyle>> = {
   bold: [$baseStyle, { fontFamily: 'bold' }],
   small: [$baseStyle, { fontSize: 12 }],
   secondary: [$secondaryTextBaseStyle],
-  pageHeading: [$baseStyle, { fontSize: 48, fontFamily: 'bold' }],
-  pageSubHeading: [$secondaryTextBaseStyle, { fontSize: 15, fontFamily: 'regular' }],
-  heading: [$baseStyle, { fontSize: 18, fontFamily: 'bold' }],
+  onboardingHeading: [$baseStyle, { fontSize: 48, fontFamily: 'bold' }],
+  onboardingSubHeading: [$secondaryTextBaseStyle, { fontSize: 15, fontFamily: 'regular' }],
+  pageHeading: [$baseStyle, { fontSize: 24, fontFamily: 'bold' }],
   monospace: [$baseStyle, { fontFamily: 'monospace' }],
 };
 const $rtlStyle: TextStyle = isRTL ? { writingDirection: 'rtl' } : {};

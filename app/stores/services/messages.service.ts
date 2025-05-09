@@ -1,14 +1,15 @@
-import { chatApi } from '../rootApi';
+import { authApi } from '../api/authApi';
 import { Message } from 'ai';
 import { ChatMessageResponseWrapper, ChatMessagesResponse } from '../../types/response';
+import { API_URLS } from '@/config/constants';
 
-export const messagesService = chatApi.injectEndpoints({
+export const messagesService = authApi.injectEndpoints({
   endpoints: builder => ({
     /**
      * Fetch messages for a given chat room.
      */
     fetchMessages: builder.query<{ messages: Message[]; next: string }, number>({
-      query: roomId => `${roomId}/messages/?limit=40`,
+      query: roomId => `${API_URLS.CHAT_ROOMS}${roomId}/messages/?limit=40`,
       transformResponse: (response: ChatMessagesResponse) => {
         const messages = response.results
           .reduce((acc: Message[], message: ChatMessageResponseWrapper) => {

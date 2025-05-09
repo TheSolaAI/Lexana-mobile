@@ -11,3 +11,5 @@ export const API_URLS = {
   },
   CHAT_ROOMS: 'chatrooms/',
 };
+
+export const skeletonViewProps = {};

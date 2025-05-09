@@ -3,6 +3,7 @@ import { OnboardingStackNavigator } from './OnboardingNavigator';
 import { AppStackNavigator } from './AppNavigator';
 import { usePrivy } from '@privy-io/expo';
 import { SplashScreen } from '@/screens/AppScreens/SplashScreen';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 export type RootStackNavigatorParamList = {
   Onboarding: undefined;

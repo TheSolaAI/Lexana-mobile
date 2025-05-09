@@ -8,21 +8,21 @@ import {
   NativeSyntheticEvent,
 } from 'react-native';
 import { UIMessage } from '@ai-sdk/ui-utils';
-import { SimpleMessageItem } from '@/components/messages/SimpleMessageItem';
-import { UserInput } from '../messages/UserInput';
+import { SimpleMessageItem } from '@/components/chat/messages/SimpleMessageItem';
+import { UserInput } from './messages/UserInput';
 import { ToolResult } from '@/types/tool';
-import { TokenAddressResultMessageItem } from '../messages/TokenAddressResultMessageItem';
-import { TokenDataResultMessageItem } from '../messages/TokenDataResultMessageItem';
-import { BubbleMapMessageItem } from '../messages/BubbleMapMessageItem';
-import { TopHoldersMessageItem } from '../messages/TopHoldersMessageItem';
-import { AiProjectsMessageItem } from '../messages/AiProjectsMessageItem';
-import { ShowLimitOrderMessageItem } from '../messages/ShowLimitOrderMessageItem';
-import { LuloAssetsMessageItem } from '../messages/LuloAssetsMessageItem';
-import { NFTCollectionMessageItem } from '../messages/NFTCollectionMessageItem';
-import { SNSResolverMessageItem } from '../messages/SNSResolverMessageItem';
-import { SwapTokenMessageItem } from '../messages/SwapTokenMessageItem';
-import { SignedTransactionsMessageItem } from '../messages/SignedTransactionsMessageItem';
-import { TransferTokenMessageItem } from '../messages/TransferTokenMessageItem';
+import { TokenAddressResultMessageItem } from './messages/TokenAddressResultMessageItem';
+import { TokenDataResultMessageItem } from './messages/TokenDataResultMessageItem';
+import { BubbleMapMessageItem } from './messages/BubbleMapMessageItem';
+import { TopHoldersMessageItem } from './messages/TopHoldersMessageItem';
+import { AiProjectsMessageItem } from './messages/AiProjectsMessageItem';
+import { ShowLimitOrderMessageItem } from './messages/ShowLimitOrderMessageItem';
+import { LuloAssetsMessageItem } from './messages/LuloAssetsMessageItem';
+import { NFTCollectionMessageItem } from './messages/NFTCollectionMessageItem';
+import { SNSResolverMessageItem } from './messages/SNSResolverMessageItem';
+import { SwapTokenMessageItem } from './messages/SwapTokenMessageItem';
+import { SignedTransactionsMessageItem } from './messages/SignedTransactionsMessageItem';
+import { TransferTokenMessageItem } from './messages/TransferTokenMessageItem';
 
 interface ChatProps {
   messages: UIMessage[];

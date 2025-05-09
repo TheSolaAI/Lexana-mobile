@@ -4,12 +4,12 @@
 import { combineReducers, AnyAction } from '@reduxjs/toolkit';
 import { userSlice } from './slices/userSlice';
 import selectedRoomReducer from './slices/selectedRoomSlice';
-import { chatApi } from './rootApi';
+import { authApi } from './api/authApi';
 
 const appReducer = combineReducers({
   user: userSlice.reducer,
   selectedRoom: selectedRoomReducer,
-  [chatApi.reducerPath]: chatApi.reducer,
+  [authApi.reducerPath]: authApi.reducer,
 });
 
 export type AppState = ReturnType<typeof appReducer>;

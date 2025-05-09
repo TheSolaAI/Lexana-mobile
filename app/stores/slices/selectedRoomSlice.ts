@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface SelectedRoomState {
-  selectedRoomId: string | null;
+  selectedRoomId: number | null;
 }
 
 const initialState: SelectedRoomState = {
@@ -12,7 +12,7 @@ export const selectedRoomSlice = createSlice({
   name: 'selectedRoom',
   initialState,
   reducers: {
-    setSelectedRoomId: (state, action: PayloadAction<string | null>) => {
+    setSelectedRoomId: (state, action: PayloadAction<number | null>) => {
       state.selectedRoomId = action.payload;
     },
   },
