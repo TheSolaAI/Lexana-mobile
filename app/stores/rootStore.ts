@@ -1,11 +1,15 @@
+/**
+ * Store configuration with persistence and RTK Query API middlewares.
+ */
 import { persistStore, persistReducer, createTransform } from 'redux-persist';
 import { configureStore } from '@reduxjs/toolkit';
 import { storage } from '@/utils/storage';
 import { rootReducer } from './rootReducer';
+import { chatApi } from './rootApi';
 
 const loadingTransform = createTransform(
   inboundState => {
-    if (typeof inboundState === 'object' && inboundState !== null) {
+    if (typeof inboundState === 'object' && inboundState !== null && 'loading' in inboundState) {
       const state = { ...inboundState };
       delete state.loading;
       return state;
@@ -48,7 +52,7 @@ const store = configureStore({
       serializableCheck: {
         ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
       },
-    }),
+    }).concat(chatApi.middleware),
   devTools: __DEV__, // Enable devTools only in development
 });
 

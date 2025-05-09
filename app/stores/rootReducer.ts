@@ -1,12 +1,15 @@
+/**
+ * Root reducer combining all slices and RTK Query API reducers.
+ */
 import { combineReducers, AnyAction } from '@reduxjs/toolkit';
 import { userSlice } from './slices/userSlice';
-import chatRoomsReducer from './slices/chatRoomsSlice';
-import messagesReducer from './slices/messagesSlice';
+import selectedRoomReducer from './slices/selectedRoomSlice';
+import { chatApi } from './rootApi';
 
 const appReducer = combineReducers({
   user: userSlice.reducer,
-  chatRooms: chatRoomsReducer,
-  messages: messagesReducer,
+  selectedRoom: selectedRoomReducer,
+  [chatApi.reducerPath]: chatApi.reducer,
 });
 
 export type AppState = ReturnType<typeof appReducer>;

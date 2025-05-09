@@ -25,6 +25,10 @@ export const privyClient = createPrivyClient({
   clientId: process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID,
 });
 
+/**
+ * ApiClient class for handling API requests with authentication and logging.
+ * Handles GET, POST, PATCH, DELETE, and other HTTP methods with custom logic.
+ */
 export class ApiClient {
   private authClient: AxiosInstance;
   private mainClient: AxiosInstance;
