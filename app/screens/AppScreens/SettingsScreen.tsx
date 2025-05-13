@@ -45,14 +45,14 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
         >
           <Feather name="arrow-left" size={24} color={theme.colors.text} />
         </TouchableOpacity>
-        <Text preset="heading" text="Settings" style={$headerTitle} />
+        <Text preset="pageHeading" text="Settings" style={$headerTitle} />
         <View style={{ width: 24 }} />
       </View>
 
       <ScrollView style={$scrollViewStyle} showsVerticalScrollIndicator={false}>
         {/* Profile Section */}
         <View style={themed($sectionContainer)}>
-          <Text preset="pageSubHeading" text="Account" style={$sectionTitle} />
+          <Text preset="pageHeading" text="Account" style={$sectionTitle} />
           <View style={themed($cardContainer)}>
             <View style={$userInfoContainer}>
               <View style={themed($avatarContainer)}>
@@ -69,7 +69,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
 
         {/* Wallet Section */}
         <View style={themed($sectionContainer)}>
-          <Text preset="pageSubHeading" text="Wallet" style={$sectionTitle} />
+          <Text preset="pageHeading" text="Wallet" style={$sectionTitle} />
           <View style={themed($cardContainer)}>
             <View style={$walletContainer}>
               <View style={$walletHeader}>
@@ -134,7 +134,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
 
         {/* Appearance Section */}
         <View style={themed($sectionContainer)}>
-          <Text preset="pageSubHeading" text="Appearance" style={$sectionTitle} />
+          <Text preset="pageHeading" text="Appearance" style={$sectionTitle} />
           <View style={themed($cardContainer)}>
             <View style={$appearanceContainer}>
               <Text style={themed($settingLabel)}>Theme</Text>
@@ -262,14 +262,16 @@ const $keyLabel: ThemedStyle<TextStyle> = theme => ({
   marginBottom: 4,
 });
 
-const $keyValueContainer: ViewStyle = {
+const $keyValueContainer: ThemedStyle<ViewStyle> = theme => ({
   flexDirection: 'row',
   alignItems: 'center',
-  backgroundColor: '#212121',
+  backgroundColor: theme.colors.secondaryBg,
   borderRadius: 4,
   paddingVertical: 8,
   paddingHorizontal: 12,
-};
+  borderWidth: 1,
+  borderColor: theme.colors.border,
+});
 
 const $keyValue: ThemedStyle<TextStyle> = theme => ({
   color: theme.colors.text,

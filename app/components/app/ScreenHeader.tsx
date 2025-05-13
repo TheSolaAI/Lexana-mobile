@@ -12,7 +12,7 @@ interface ScreenHeaderProps {
   rightComponent?: ReactNode;
 }
 
-export const Screenheader: FC<ScreenHeaderProps> = ({ titleTx, subtitleTx, title, subtitle, rightComponent }) => {
+export const Screenheader: FC<ScreenHeaderProps> = ({ titleTx, title, rightComponent }) => {
   const { theme } = useAppTheme();
 
   return (
@@ -20,7 +20,6 @@ export const Screenheader: FC<ScreenHeaderProps> = ({ titleTx, subtitleTx, title
       <View style={$headerStyle}>
         <View style={$titleContainer}>
           <Text preset="pageHeading" tx={titleTx} text={title} />
-          <Text preset="secondary" tx={subtitleTx} text={subtitle} />
         </View>
         {rightComponent && <View style={$rightComponent}>{rightComponent}</View>}
       </View>

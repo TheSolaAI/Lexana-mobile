@@ -17,10 +17,10 @@ const en = {
   },
   chatScreen: {
     voiceMode: {
-      title: 'Sola AI Voice Mode',
+      title: 'Normal Mode',
     },
     liveMode: {
-      title: 'Sola AI Live Mode',
+      title: 'Live Mode',
     },
   },
   menuScreen: {

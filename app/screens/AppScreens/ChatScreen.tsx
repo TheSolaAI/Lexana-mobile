@@ -100,7 +100,6 @@ export const ChatScreen: FC<ChatScreenProps> = () => {
       >
         <Screenheader 
           titleTx={isLiveMode ? "chatScreen:liveMode.title" : "chatScreen:voiceMode.title"} 
-          subtitle="nothing"
           rightComponent={
             !isLiveMode && (
               <TouchableOpacity
