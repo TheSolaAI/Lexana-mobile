@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { View, TouchableOpacity, ViewStyle, TextStyle } from 'react-native';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
@@ -250,12 +250,6 @@ export const MenuScreen: React.FC<MenuScreenProps> = ({ navigation }) => {
                   <Feather name="user" size={24} color={theme.colors.text} />
                 </TouchableOpacity>
               </View>
-              <Text
-                tx="menuScreen:recentSearches"
-                preset="onboardingSubHeading"
-                style={$sectionHeaderStyle}
-              />
-              <View style={$placeholderStyle} />
               <Text
                 tx="menuScreen:recentChats"
                 preset="onboardingSubHeading"
