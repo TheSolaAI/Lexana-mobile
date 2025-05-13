@@ -1,4 +1,4 @@
-import { FC, Fragment, useEffect, useRef, useCallback } from 'react';
+import { FC, Fragment, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   FlatList,
   View,
@@ -26,12 +26,25 @@ import { TransferTokenMessageItem } from './messages/TransferTokenMessageItem';
 
 interface ChatProps {
   messages: UIMessage[];
+  isLiveMode?: boolean;
 }
 
-export const Chat: FC<ChatProps> = ({ messages }) => {
+export const Chat: FC<ChatProps> = ({ messages, isLiveMode = false }) => {
   const flatListRef = useRef<FlatList>(null);
   const animatedValues = useRef<{ [key: string]: Animated.Value }>({});
   const scrollToBottomOnNextUpdate = useRef<boolean>(true);
+
+  // Filter messages for live mode
+  const filteredMessages = useMemo(() => {
+    if (!isLiveMode) return messages;
+
+    // Find the last user message
+    const lastUserMessageIndex = messages.findLastIndex(msg => msg.role === 'user');
+    if (lastUserMessageIndex === -1) return messages;
+
+    // Get all messages after the last user message
+    return messages.slice(lastUserMessageIndex);
+  }, [messages, isLiveMode]);
 
   const scrollToBottom = useCallback(() => {
     if (flatListRef.current && messages.length > 0) {
@@ -177,7 +190,7 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
     <View style={$chatContainerStyle}>
       <FlatList
         ref={flatListRef}
-        data={messages}
+        data={filteredMessages}
         renderItem={renderItem}
         keyExtractor={item => item.id}
         contentContainerStyle={$listContentContainerStyle}

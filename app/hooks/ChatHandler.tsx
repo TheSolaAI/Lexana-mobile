@@ -33,7 +33,7 @@ export const useChatFunctions = () => {
   useEffect(() => {
     if (
       chatRooms.length > 0 &&
-      (!selectedRoomId || !chatRooms.some((room: any) => room.id === selectedRoomId))
+      selectedRoomId == null
     ) {
       dispatch(setSelectedRoomId(chatRooms[0].id));
     }
@@ -131,8 +131,9 @@ export const useChatFunctions = () => {
       if (toolCall.toolName === 'sign_and_send_tx') {
         result = await handleSignTransaction(toolCall.args as TransactionArgs);
         console.log('Transaction result:', result);
-        return result;
+        
       }
+      return result;
     },
     onError: error => {
       console.error('Error in chat:', error);
@@ -303,7 +304,7 @@ export const useChatFunctions = () => {
     onAudioMessage,
     handleSendMessage,
     selectedRoomId,
-    setSelectedRoomId: (id: string) => dispatch(setSelectedRoomId(id)),
+    setSelectedRoomId: (id: number) => dispatch(setSelectedRoomId(id)),
     chatRooms,
   };
 };

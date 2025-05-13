@@ -15,6 +15,12 @@ import { Feather } from '@expo/vector-icons';
 import type { AppStackParamList } from '@/navigators/AppNavigator';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { KeyboardInputButton } from '@/components/chat/KeyboardInputButton';
+import { LiveModeInputBar } from '@/components/chat/LiveModeInputBar';
+import { useAppDispatch } from '@/stores/hooks';
+import { setSelectedRoomId } from '@/stores/slices/selectedRoomSlice';
+import { useCreateChatRoomMutation } from '@/stores/services/chatRooms.service';
+import { toast } from 'sonner-native';
+import { useFetchChatRoomsQuery } from '@/stores/services/chatRooms.service';
 
 interface ChatScreenProps extends AppStackScreenProps<'ChatScreen'> {}
 
@@ -25,6 +31,12 @@ export const ChatScreen: FC<ChatScreenProps> = () => {
   const { themed, theme } = useAppTheme();
   const { onAudioMessage, messages, handleSendMessage } = useChatFunctions();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
+  const dispatch = useAppDispatch();
+  const [createChatRoom] = useCreateChatRoomMutation();
+  const { data: chatRooms = [] } = useFetchChatRoomsQuery();
+
+  // State for live mode
+  const [isLiveMode, setIsLiveMode] = React.useState(false);
 
   const handleTextMessage = async (text: string) => {
     // Send the message to the AI with empty toolsets array
@@ -42,47 +54,104 @@ export const ChatScreen: FC<ChatScreenProps> = () => {
     }
   };
 
+  const handleEnterLiveMode = async () => {
+    try {
+      const result = await createChatRoom({ name: 'Live Chat' }).unwrap();
+      dispatch(setSelectedRoomId(result.id));
+      setIsLiveMode(true);
+    } catch (error) {
+      toast.error('Failed to enter live mode');
+    }
+  };
+
+  /**
+   * Handles exiting live mode by updating the state and creating a new chat room
+   * @returns {Promise<void>}
+   */
+  const handleExitLiveMode = async () => {
+    try {
+      // First set live mode to false to update UI
+      setIsLiveMode(false);
+      
+      // Create a new chat room
+      const result = await createChatRoom({ name: 'New Chat' }).unwrap();
+      
+      // Update the selected room ID to switch to the new chat
+      dispatch(setSelectedRoomId(result.id));
+      
+      // Clear the input field
+      setInput('');
+    } catch (error) {
+      toast.error('Failed to create new chat');
+      // If creating new chat fails, try to go back to the previous chat
+      if (chatRooms.length > 0) {
+        dispatch(setSelectedRoomId(chatRooms[0].id));
+      }
+    }
+  };
+
   return (
-    <View style={{ flex: 1 }}>
+    <View style={themed($containerStyle)}>
       <Screen
         preset="fixed"
         safeAreaEdges={['top', 'bottom']}
         contentContainerStyle={[themed($styles.screenContainer), $screenContainerStyle]}
         backgroundColor="transparent"
       >
-        <Screenheader titleTx="chatScreen:voiceMode.title" subtitle="nothing" />
-        <Chat messages={messages} />
-      </Screen>
-      {/* Modern input bar at the bottom */}
-      <View style={[styles.inputBar, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, shadowColor: theme.colors.border }]}> 
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={() => navigation.navigate('MenuScreen')}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Feather name="menu" size={24} color={theme.colors.text} />
-        </TouchableOpacity>
-        <TextInput
-          style={[styles.textInput, { color: theme.colors.text }]}
-          placeholder="Type a message..."
-          placeholderTextColor={theme.colors.textDim}
-          value={input}
-          onChangeText={setInput}
-          onSubmitEditing={onSend}
-          returnKeyType="send"
-          multiline={true}
-          scrollEnabled={true}
-          textAlignVertical="top"
+        <Screenheader 
+          titleTx={isLiveMode ? "chatScreen:liveMode.title" : "chatScreen:voiceMode.title"} 
+          subtitle="nothing"
+          rightComponent={
+            !isLiveMode && (
+              <TouchableOpacity
+                style={styles.liveModeButton}
+                onPress={handleEnterLiveMode}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Feather name="radio" size={20} color={theme.colors.primary} />
+              </TouchableOpacity>
+            )
+          }
         />
-        <View style={styles.rightButtonsRow}>
-          <TouchableOpacity style={styles.iconButton} onPress={onSend}>
-            <Feather name="send" size={24} color={theme.colors.primary} />
+        <Chat messages={messages} isLiveMode={isLiveMode} />
+      </Screen>
+      {/* Input bar based on mode */}
+      {isLiveMode ? (
+        <LiveModeInputBar
+          onAudioRecorded={onAudioMessage}
+          onExitLiveMode={handleExitLiveMode}
+        />
+      ) : (
+        <View style={[styles.inputBar, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, shadowColor: theme.colors.border }]}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => navigation.navigate('MenuScreen')}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Feather name="menu" size={24} color={theme.colors.text} />
           </TouchableOpacity>
-          <View style={styles.voiceButtonWrapper}>
-            <PushToTalkButton size={40} onAudioRecorded={onAudioMessage} />
+          <TextInput
+            style={[styles.textInput, { color: theme.colors.text }]}
+            placeholder="Type a message..."
+            placeholderTextColor={theme.colors.textDim}
+            value={input}
+            onChangeText={setInput}
+            onSubmitEditing={onSend}
+            returnKeyType="send"
+            multiline={true}
+            scrollEnabled={true}
+            textAlignVertical="top"
+          />
+          <View style={styles.rightButtonsRow}>
+            <TouchableOpacity style={styles.iconButton} onPress={onSend}>
+              <Feather name="send" size={24} color={theme.colors.primary} />
+            </TouchableOpacity>
+            <View style={styles.voiceButtonWrapper}>
+              <PushToTalkButton size={40} onAudioRecorded={onAudioMessage} />
+            </View>
           </View>
         </View>
-      </View>
+      )}
     </View>
   );
 };
@@ -119,19 +188,28 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   rightButtonsRow: {
-  flexDirection: 'row',
-  paddingHorizontal:6,
-  alignItems: 'center',
-  alignSelf: 'center',
-},
-voiceButtonWrapper: {
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginLeft: 24, 
-},
+    flexDirection: 'row',
+    paddingHorizontal: 6,
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
+  voiceButtonWrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 2,
+  },
+  liveModeButton: {
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+  },
 });
 
 const $screenContainerStyle: ViewStyle = {
   paddingTop: 10,
   height: '100%',
+};
+
+const $containerStyle: ViewStyle = {
+  flex: 1,
 };

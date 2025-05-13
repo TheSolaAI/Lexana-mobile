@@ -19,6 +19,9 @@ const en = {
     voiceMode: {
       title: 'Sola AI Voice Mode',
     },
+    liveMode: {
+      title: 'Sola AI Live Mode',
+    },
   },
   menuScreen: {
     recentSearches: 'Recent Searches',

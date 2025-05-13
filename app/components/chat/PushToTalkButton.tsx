@@ -279,11 +279,8 @@ export const PushToTalkButton: React.FC<PushToTalkButtonProps> = ({
 };
 
 const $containerStyle: ViewStyle = {
-  position: 'absolute',
-  left: 0,
-  right: 0,
-  bottom: 20,
   alignItems: 'center',
+  justifyContent: 'center',
   paddingBottom: 0,
 };
 
