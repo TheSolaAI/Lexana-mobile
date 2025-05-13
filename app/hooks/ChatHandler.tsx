@@ -111,7 +111,7 @@ export const useChatFunctions = () => {
     }
   };
 
-  const { messages, setMessages, append } = useChat({
+  const { messages, setMessages, append , status} = useChat({
     api: `${process.env.EXPO_PUBLIC_MAIN_SERVICE_URL}/api/chat`,
     id: `chat-${roomId}`,
     fetch: expoFetch as unknown as typeof globalThis.fetch,
@@ -307,5 +307,6 @@ export const useChatFunctions = () => {
     setSelectedRoomId: (id: number) => dispatch(setSelectedRoomId(id)),
     chatRooms,
     isFetching,
+    status,
   };
 };

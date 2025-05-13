@@ -28,7 +28,7 @@ export const ChatScreen: FC<ChatScreenProps> = () => {
    * Global State
    */
   const { themed, theme } = useAppTheme();
-  const { onAudioMessage, messages, handleSendMessage, isFetching } = useChatFunctions();
+  const { onAudioMessage, messages, handleSendMessage, isFetching, status } = useChatFunctions();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   const dispatch = useAppDispatch();
   const [createChatRoom] = useCreateChatRoomMutation();
@@ -134,7 +134,7 @@ export const ChatScreen: FC<ChatScreenProps> = () => {
           </View>
         ) : (
           <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
-            <Chat messages={messages} isLiveMode={isLiveMode} />
+            <Chat messages={messages} isLiveMode={isLiveMode} status={status} />
           </Animated.View>
         )}
       </Screen>

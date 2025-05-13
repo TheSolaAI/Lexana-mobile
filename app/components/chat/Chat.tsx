@@ -23,13 +23,15 @@ import { SNSResolverMessageItem } from './messages/SNSResolverMessageItem';
 import { SwapTokenMessageItem } from './messages/SwapTokenMessageItem';
 import { SignedTransactionsMessageItem } from './messages/SignedTransactionsMessageItem';
 import { TransferTokenMessageItem } from './messages/TransferTokenMessageItem';
+import { TypingIndicator } from './messages/TypingIndicator';
 
 interface ChatProps {
   messages: UIMessage[];
   isLiveMode?: boolean;
+  status?: 'idle' | 'submitting' | 'streaming' | 'error' | 'submitted' | 'ready';
 }
 
-export const Chat: FC<ChatProps> = ({ messages, isLiveMode = false }) => {
+export const Chat: FC<ChatProps> = ({ messages, isLiveMode = false, status = 'idle' }) => {
   const flatListRef = useRef<FlatList>(null);
   const animatedValues = useRef<{ [key: string]: Animated.Value }>({});
   const scrollToBottomOnNextUpdate = useRef<boolean>(true);
@@ -186,6 +188,8 @@ export const Chat: FC<ChatProps> = ({ messages, isLiveMode = false }) => {
     );
   };
 
+  const showTypingIndicator = status === 'submitting' || status === 'streaming' || status === 'submitted';
+
   return (
     <View style={$chatContainerStyle}>
       <FlatList
@@ -195,7 +199,11 @@ export const Chat: FC<ChatProps> = ({ messages, isLiveMode = false }) => {
         keyExtractor={item => item.id}
         contentContainerStyle={$listContentContainerStyle}
         onScroll={onScroll}
-        ListFooterComponent={<View style={{ height: 100 }} />}
+        ListFooterComponent={
+          <View style={{ height: 100 }}>
+            {showTypingIndicator && <TypingIndicator isVisible={true} />}
+          </View>
+        }
         scrollEventThrottle={16} // 60fps
         onContentSizeChange={() => {
           if (scrollToBottomOnNextUpdate.current) {
