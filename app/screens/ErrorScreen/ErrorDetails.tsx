@@ -1,8 +1,9 @@
 import { ErrorInfo } from 'react';
 import { ScrollView, TextStyle, View, ViewStyle } from 'react-native';
-import { Button, Icon, Screen, Text } from '../../components/general';
+import { Button, Screen, Text } from '../../components/general';
 import type { ThemedStyle } from '@/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { TxKeyPath } from '@/i18n';
 
 export interface ErrorDetailsProps {
   error: Error;
@@ -24,16 +25,15 @@ export function ErrorDetails(props: ErrorDetailsProps) {
       contentContainerStyle={themed($contentContainer)}
     >
       <View style={$topSection}>
-        <Icon icon="ladybug" size={64} />
-        <Text style={themed($heading)} preset="subheading" tx="errorScreen:title" />
-        <Text tx="errorScreen:friendlySubtitle" />
+        <Text style={themed($heading)} preset="pageHeading" tx={"errorScreen:title" as TxKeyPath} />
+        <Text tx={"errorScreen:friendlySubtitle" as TxKeyPath} />
       </View>
 
       <ScrollView
         style={themed($errorSection)}
         contentContainerStyle={themed($errorSectionContentContainer)}
       >
-        <Text style={themed($errorContent)} weight="bold" text={`${props.error}`.trim()} />
+        <Text style={themed($errorContent)} text={`${props.error}`.trim()} />
         <Text
           selectable
           style={themed($errorBacktrace)}
@@ -42,10 +42,10 @@ export function ErrorDetails(props: ErrorDetailsProps) {
       </ScrollView>
 
       <Button
-        preset="reversed"
+        preset="primary"
         style={themed($resetButton)}
         onPress={props.onReset}
-        tx="errorScreen:reset"
+        tx={"errorScreen:reset" as TxKeyPath}
       />
     </Screen>
   );
@@ -70,7 +70,6 @@ const $heading: ThemedStyle<TextStyle> = ({ colors, spacing }) => ({
 
 const $errorSection: ThemedStyle<ViewStyle> = ({ colors, spacing }) => ({
   flex: 2,
-  backgroundColor: colors.separator,
   marginVertical: spacing.md,
   borderRadius: 6,
 });

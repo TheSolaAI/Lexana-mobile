@@ -43,7 +43,7 @@ export const useChatFunctions = () => {
 
   // Fetch messages for the current room using RTK Query
   const roomId = currentRoom?.id;
-  const { data: messagesData } = useFetchMessagesQuery(roomId, { skip: !roomId });
+  const { data: messagesData, isFetching } = useFetchMessagesQuery(roomId, { skip: !roomId });
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -306,5 +306,6 @@ export const useChatFunctions = () => {
     selectedRoomId,
     setSelectedRoomId: (id: number) => dispatch(setSelectedRoomId(id)),
     chatRooms,
+    isFetching,
   };
 };

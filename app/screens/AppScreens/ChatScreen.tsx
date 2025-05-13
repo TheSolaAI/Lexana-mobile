@@ -6,7 +6,7 @@ import { Screen } from '@/components/general';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { $styles } from '@/theme';
 import { Screenheader } from '@/components/app/ScreenHeader';
-import { ViewStyle, View, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { ViewStyle, View, TouchableOpacity, TextInput, StyleSheet, Animated, ActivityIndicator } from 'react-native';
 import { PushToTalkButton } from '@/components/chat/PushToTalkButton';
 import { useChatFunctions } from '@/hooks/ChatHandler';
 import { Chat } from '@/components/chat/Chat';
@@ -14,7 +14,6 @@ import { useNavigation } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
 import type { AppStackParamList } from '@/navigators/AppNavigator';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { KeyboardInputButton } from '@/components/chat/KeyboardInputButton';
 import { LiveModeInputBar } from '@/components/chat/LiveModeInputBar';
 import { useAppDispatch } from '@/stores/hooks';
 import { setSelectedRoomId } from '@/stores/slices/selectedRoomSlice';
@@ -29,14 +28,31 @@ export const ChatScreen: FC<ChatScreenProps> = () => {
    * Global State
    */
   const { themed, theme } = useAppTheme();
-  const { onAudioMessage, messages, handleSendMessage } = useChatFunctions();
+  const { onAudioMessage, messages, handleSendMessage, isFetching } = useChatFunctions();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   const dispatch = useAppDispatch();
   const [createChatRoom] = useCreateChatRoomMutation();
   const { data: chatRooms = [] } = useFetchChatRoomsQuery();
 
+
+  // Animation value for smooth transition
+  const fadeAnim = React.useRef(new Animated.Value(0)).current;
+
   // State for live mode
   const [isLiveMode, setIsLiveMode] = React.useState(false);
+
+  // Handle fade animation when loading state changes
+  React.useEffect(() => {
+    if (!isFetching) {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      fadeAnim.setValue(0);
+    }
+  }, [isFetching, fadeAnim]);
 
   const handleTextMessage = async (text: string) => {
     // Send the message to the AI with empty toolsets array
@@ -112,7 +128,15 @@ export const ChatScreen: FC<ChatScreenProps> = () => {
             )
           }
         />
-        <Chat messages={messages} isLiveMode={isLiveMode} />
+        {isFetching ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={theme.colors.primary} />
+          </View>
+        ) : (
+          <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
+            <Chat messages={messages} isLiveMode={isLiveMode} />
+          </Animated.View>
+        )}
       </Screen>
       {/* Input bar based on mode */}
       {isLiveMode ? (
@@ -201,6 +225,11 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.05)',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
