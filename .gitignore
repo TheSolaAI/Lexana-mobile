@@ -94,3 +94,8 @@ web-build/
 # Environment
 .env
 .env.*
+
+#publishing
+publishing
+solana-release
+prod-key.keystore

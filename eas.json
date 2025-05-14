@@ -34,6 +34,12 @@
     },
     "production": {}
   },
+  "dapp-store": {
+    "channel": "production",
+    "android": {
+        "buildType": "apk"
+    }
+  },
   "submit": {
     "production": {}
   }

@@ -26,10 +26,10 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = function WelcomeScreen() {
       >
         <View style={themed($headerStyle)} pointerEvents="box-none">
           <View style={themed($topContainerStyle)} pointerEvents="auto">
-            <AutoImage
+            {/* <AutoImage
               source={require('assets/images/transparent-logo.png')}
               style={themed($logoStyle)}
-            />
+            /> */}
             <Text text={translate('common:appName').toUpperCase()} preset="onboardingHeading" />
           </View>
           <Text tx="welcomeScreen:catchLine" preset="onboardingSubHeading" />

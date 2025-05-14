@@ -3,7 +3,7 @@ const en = {
     ok: 'OK!',
     cancel: 'Cancel',
     back: 'Back',
-    appName: 'Sola AI',
+    appName: 'Lexana AI',
     beta: 'Beta',
     save: 'Save',
   },

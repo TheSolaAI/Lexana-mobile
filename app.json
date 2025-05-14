@@ -1,10 +1,10 @@
 {
-  "name": "Sola-AI",
-  "displayName": "Sola-AI",
+  "name": "Lexana-AI",
+  "displayName": "Lexana-AI",
   "expo": {
-    "name": "Sola-AI",
-    "slug": "Sola-AI",
-    "scheme": "sola-ai",
+    "name": "Lexana-AI",
+    "slug": "Lexana-AI",
+    "scheme": "Lexana-AI",
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
@@ -14,10 +14,12 @@
     },
     "newArchEnabled": true,
     "jsEngine": "hermes",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "android": {
       "icon": "./assets/images/app-icon-android-legacy.png",
-      "package": "com.sola.solaai",
+      "package": "com.lexana.lexanaai",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
         "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
@@ -30,7 +32,7 @@
     "ios": {
       "icon": "./assets/images/app-icon-ios.png",
       "supportsTablet": true,
-      "bundleIdentifier": "com.sola.solaai",
+      "bundleIdentifier": "com.lexana.lexanaai",
       "splash": {
         "backgroundColor": "#000000"
       }
