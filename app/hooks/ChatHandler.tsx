@@ -282,13 +282,13 @@ export const useChatFunctions = () => {
       const toolsetResponse = await getToolSet(newMessage, messageHistory);
       // now we determine if we need to pass this to the next stage to get the actual tool and process or we can just show the response
       if (toolsetResponse.selectedToolset.length === 0) {
-        handleAddUserMessage(newMessage);
-        handleAddAIResponse(toolsetResponse.fallbackResponse);
-
         if (toolsetResponse.audioData) {
           // Play audio response
           playAudio(toolsetResponse.audioData);
         }
+
+        handleAddUserMessage(newMessage);
+        handleAddAIResponse(toolsetResponse.fallbackResponse);
         return;
       }
 

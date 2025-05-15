@@ -7,10 +7,27 @@ import { BaseBorderedMessageItem } from './base/BaseBorderedMessageItem';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 
+/**
+ * Interface representing the token address data returned from the system
+ * @interface TokenAddressData
+ * @property {string} response_id - Unique identifier for the response
+ * @property {string} sender - Source of the message (e.g. "system")
+ * @property {string} source - Origin of the data (e.g. "Data Service")
+ * @property {boolean} success - Whether the request was successful
+ * @property {string} symbol - Token symbol (e.g. "JUP")
+ * @property {string} timestamp - ISO timestamp of when the data was generated
+ * @property {string} tokenAddress - The actual token address on the blockchain
+ * @property {string} type - Type of the message (e.g. "token_address_result")
+ */
 interface TokenAddressData {
-  address: string;
-  name?: string;
-  symbol?: string;
+  response_id: string;
+  sender: string;
+  source: string;
+  success: boolean;
+  symbol: string;
+  timestamp: string;
+  tokenAddress: string;
+  type: string;
 }
 
 interface TokenAddressResultMessageItemProps {
@@ -20,6 +37,7 @@ interface TokenAddressResultMessageItemProps {
 export const TokenAddressResultMessageItem: FC<TokenAddressResultMessageItemProps> = ({
   props,
 }) => {
+  console.log('props', props);
   const { themed, theme } = useAppTheme();
 
   // Clipboard function
@@ -30,12 +48,12 @@ export const TokenAddressResultMessageItem: FC<TokenAddressResultMessageItemProp
 
   // Open Solscan link
   const openSolscan = () => {
-    Linking.openURL(`https://solscan.io/token/${props.address}`);
+    Linking.openURL(`https://solscan.io/token/${props.tokenAddress}`);
   };
 
   const footer = (
     <View style={$footerContainer}>
-      <TouchableOpacity style={$actionButton} onPress={() => copyToClipboard(props.address)}>
+      <TouchableOpacity style={$actionButton} onPress={() => copyToClipboard(props.tokenAddress)}>
         <Text style={themed($actionTextStyle)}>Copy Address</Text>
         <Ionicons name="copy-outline" size={14} color={theme.colors.primary} />
       </TouchableOpacity>
@@ -56,11 +74,6 @@ export const TokenAddressResultMessageItem: FC<TokenAddressResultMessageItemProp
     >
       <View style={$contentContainer}>
         <Text preset="small" style={themed($labelStyle)}>
-          Token Name
-        </Text>
-        <Text style={themed($valueStyle)}>{props.name || 'Unknown'}</Text>
-
-        <Text preset="small" style={themed($labelStyle)}>
           Token Symbol
         </Text>
         <Text style={themed($valueStyle)}>{props.symbol || 'Unknown'}</Text>
@@ -69,7 +82,7 @@ export const TokenAddressResultMessageItem: FC<TokenAddressResultMessageItemProp
           Address
         </Text>
         <Text style={themed($addressStyle)} numberOfLines={1} ellipsizeMode="middle">
-          {props.address}
+          {props.tokenAddress}
         </Text>
       </View>
     </BaseBorderedMessageItem>
