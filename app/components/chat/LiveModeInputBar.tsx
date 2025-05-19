@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, ViewStyle, TouchableOpacity, StyleSheet } from 'react-native';
+import { FC } from 'react';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { PushToTalkButton } from './PushToTalkButton';
@@ -9,7 +9,7 @@ interface LiveModeInputBarProps {
   onExitLiveMode: () => void;
 }
 
-export const LiveModeInputBar: React.FC<LiveModeInputBarProps> = ({
+export const LiveModeInputBar: FC<LiveModeInputBarProps> = ({
   onAudioRecorded,
   onExitLiveMode,
 }) => {
@@ -67,4 +67,4 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
   },
-}); 
+});

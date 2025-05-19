@@ -28,7 +28,7 @@ export const ChatScreen: FC<ChatScreenProps> = () => {
    * Global State
    */
   const { themed, theme } = useAppTheme();
-  const { onAudioMessage, messages, handleSendMessage, isFetching, status } = useChatFunctions();
+  const { onAudioMessage, messages, handleTextMessage, isFetching, status, setMessages } = useChatFunctions();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   const dispatch = useAppDispatch();
   const [createChatRoom] = useCreateChatRoomMutation();
@@ -53,12 +53,6 @@ export const ChatScreen: FC<ChatScreenProps> = () => {
       fadeAnim.setValue(0);
     }
   }, [isFetching, fadeAnim]);
-
-  const handleTextMessage = async (text: string) => {
-    // Send the message to the AI with empty toolsets array
-    // The backend will determine which toolsets are needed
-    await handleSendMessage(text, []);
-  };
 
   // State for the text input
   const [input, setInput] = React.useState('');
@@ -86,16 +80,18 @@ export const ChatScreen: FC<ChatScreenProps> = () => {
    */
   const handleExitLiveMode = async () => {
     try {
+      // Clear messages before creating new chat
+      setMessages([]);
       // First set live mode to false to update UI
       setIsLiveMode(false);
+      
+      
       
       // Create a new chat room
       const result = await createChatRoom({ name: 'New Chat' }).unwrap();
       
       // Update the selected room ID to switch to the new chat
       dispatch(setSelectedRoomId(result.id));
-      
-      // Clear the input field
       setInput('');
     } catch (error) {
       toast.error('Failed to create new chat');

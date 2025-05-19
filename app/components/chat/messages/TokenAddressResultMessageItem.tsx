@@ -37,7 +37,6 @@ interface TokenAddressResultMessageItemProps {
 export const TokenAddressResultMessageItem: FC<TokenAddressResultMessageItemProps> = ({
   props,
 }) => {
-  console.log('props', props);
   const { themed, theme } = useAppTheme();
 
   // Clipboard function

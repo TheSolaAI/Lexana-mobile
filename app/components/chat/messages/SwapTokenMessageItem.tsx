@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
   View,
   ViewStyle,
@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Linking,
   Alert,
-  Image,
   ImageStyle,
 } from 'react-native';
 import { Text } from '@/components/general';
@@ -16,37 +15,47 @@ import { BaseExpandableMessageItem } from './base/BaseExpandableMessageItem';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 
+/**
+ * Interface representing the details of a token swap operation
+ */
 interface SwapTokenDetails {
-  fromToken: {
-    address: string;
+  amount: number;
+  inputParams: {
     amount: number;
-    decimals?: number;
-    logo?: string;
-    symbol: string;
+    input_mint: string;
+    output_mint: string;
+    priority_fee_needed: boolean;
+    public_key: string;
+    swap_mode: string;
   };
-  toToken: {
-    address: string;
-    amount?: number;
-    decimals?: number;
-    logo?: string;
-    symbol: string;
+  input_mint: string;
+  outAmount: number;
+  output_mint: string;
+  priorityFee: number;
+  tickers: {
+    inputTokenTicker: string;
+    outputTokenTicker: string;
   };
-  price?: number;
-  priceImpact?: number;
-  fromUsd?: number;
-  toUsd?: number;
-  slippage?: number;
-  transaction?: any;
-  params?: any;
+  versionedTransaction: string;
+  transactionHash: string;
 }
 
+/**
+ * Props for the SwapTokenMessageItem component
+ */
 interface SwapTokenMessageItemProps {
   props: {
-    transaction: string; // serializedTransaction
     details: SwapTokenDetails;
   };
 }
 
+/**
+ * A component that displays token swap information in an expandable message item.
+ * Shows swap details including input/output tokens, amounts, rates, and transaction information.
+ * 
+ * @param props - The component props containing swap token details
+ * @returns A React component that renders the swap token message
+ */
 export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) => {
   const { themed, theme } = useAppTheme();
 
@@ -55,7 +64,14 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
     return null;
   }
 
-  const details = props.details;
+  const {
+    amount,
+    inputParams,
+    outAmount,
+    tickers,
+    input_mint,
+    output_mint,
+  } = props.details;
 
   // Clipboard function
   const copyToClipboard = async (text: string, message = 'Address copied to clipboard') => {
@@ -77,15 +93,11 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
     return `$${value.toFixed(2)}`;
   };
 
-  // Ensure token details exist and have required properties
-  const fromToken = details.fromToken || { address: '', amount: 0, symbol: 'Unknown' };
-  const toToken = details.toToken || { address: '', amount: undefined, symbol: 'Unknown' };
-
   // Compact content
   const compactContent = (
     <View style={$compactContentContainer}>
       <Text style={themed($swapTextStyle)}>
-        {fromToken.amount} {fromToken.symbol} → {toToken.amount || '?'} {toToken.symbol}
+        {amount} {tickers.inputTokenTicker} → {outAmount} {tickers.outputTokenTicker}
       </Text>
     </View>
   );
@@ -95,7 +107,7 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
     <View style={$footerContainer}>
       <View style={$footerActionsContainer}>
         <TouchableOpacity
-          onPress={() => Linking.openURL(`https://solscan.io/token/${fromToken.address}`)}
+          onPress={() => Linking.openURL(`https://solscan.io/token/${input_mint}`)}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={$iconButton}
         >
@@ -104,11 +116,9 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
       </View>
 
       <View style={$priceInfoContainer}>
-        {details.price && (
-          <Text preset="small" style={themed($priceTextStyle)}>
-            Rate: 1 {fromToken.symbol} = {details.price} {toToken.symbol}
-          </Text>
-        )}
+        <Text preset="small" style={themed($priceTextStyle)}>
+          Rate: 1 {tickers.inputTokenTicker} = {(outAmount / amount).toFixed(4)} {tickers.outputTokenTicker}
+        </Text>
       </View>
     </View>
   );
@@ -122,7 +132,7 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
           <View style={themed($iconContainerStyle)}>
             <Ionicons name="swap-horizontal" size={28} color={theme.colors.primary} />
           </View>
-          <Text preset="heading" style={themed($headerTitleStyle)}>
+          <Text preset="default" style={themed($headerTitleStyle)}>
             Token Swap
           </Text>
         </View>
@@ -136,33 +146,22 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
             {/* From Token */}
             <View style={themed($tokenContainerStyle)}>
               <View style={$tokenInfoContainer}>
-                {fromToken.logo ? (
-                  <Image
-                    source={{ uri: fromToken.logo }}
-                    style={$tokenLogoStyle}
-                    resizeMode="contain"
-                  />
-                ) : (
-                  <View style={themed($placeholderLogoStyle)}>
-                    <Text preset="bold">{fromToken.symbol.slice(0, 1)}</Text>
-                  </View>
-                )}
+                <View style={themed($placeholderLogoStyle)}>
+                  <Text preset="bold">{tickers.inputTokenTicker.slice(0, 1)}</Text>
+                </View>
                 <View style={$tokenNameContainer}>
                   <Text preset="bold" style={themed($tokenSymbolStyle)}>
-                    {fromToken.symbol}
+                    {tickers.inputTokenTicker}
                   </Text>
                   <Text style={themed($tokenAddressStyle)} numberOfLines={1} ellipsizeMode="middle">
-                    {getAbbreviatedAddress(fromToken.address)}
+                    {getAbbreviatedAddress(input_mint)}
                   </Text>
                 </View>
               </View>
               <View style={$tokenAmountContainer}>
                 <Text preset="bold" style={themed($tokenAmountStyle)}>
-                  {fromToken.amount}
+                  {amount}
                 </Text>
-                {details.fromUsd !== undefined && (
-                  <Text style={themed($tokenUsdValueStyle)}>{formatCurrency(details.fromUsd)}</Text>
-                )}
               </View>
             </View>
 
@@ -174,33 +173,22 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
             {/* To Token */}
             <View style={themed($tokenContainerStyle)}>
               <View style={$tokenInfoContainer}>
-                {toToken.logo ? (
-                  <Image
-                    source={{ uri: toToken.logo }}
-                    style={$tokenLogoStyle}
-                    resizeMode="contain"
-                  />
-                ) : (
-                  <View style={themed($placeholderLogoStyle)}>
-                    <Text preset="bold">{toToken.symbol.slice(0, 1)}</Text>
-                  </View>
-                )}
+                <View style={themed($placeholderLogoStyle)}>
+                  <Text preset="bold">{tickers.outputTokenTicker.slice(0, 1)}</Text>
+                </View>
                 <View style={$tokenNameContainer}>
                   <Text preset="bold" style={themed($tokenSymbolStyle)}>
-                    {toToken.symbol}
+                    {tickers.outputTokenTicker}
                   </Text>
                   <Text style={themed($tokenAddressStyle)} numberOfLines={1} ellipsizeMode="middle">
-                    {getAbbreviatedAddress(toToken.address)}
+                    {getAbbreviatedAddress(output_mint)}
                   </Text>
                 </View>
               </View>
               <View style={$tokenAmountContainer}>
                 <Text preset="bold" style={themed($tokenAmountStyle)}>
-                  {toToken.amount || '?'}
+                  {outAmount}
                 </Text>
-                {details.toUsd !== undefined && (
-                  <Text style={themed($tokenUsdValueStyle)}>{formatCurrency(details.toUsd)}</Text>
-                )}
               </View>
             </View>
           </View>
@@ -212,28 +200,26 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
                 Rate
               </Text>
               <Text style={themed($detailValueStyle)}>
-                1 {fromToken.symbol} = {details.price || '?'} {toToken.symbol}
+                1 {tickers.inputTokenTicker} = {(outAmount / amount).toFixed(4)} {tickers.outputTokenTicker}
               </Text>
             </View>
 
-            {details.priceImpact !== undefined && (
-              <View style={themed($detailRowStyle)}>
-                <Text preset="small" style={themed($detailLabelStyle)}>
-                  Price Impact
-                </Text>
-                <Text style={themed($priceImpactStyle)}>
-                  {(details.priceImpact * 100).toFixed(2)}%
-                </Text>
-              </View>
-            )}
+            <View style={themed($detailRowStyle)}>
+              <Text preset="small" style={themed($detailLabelStyle)}>
+                Swap Mode
+              </Text>
+              <Text style={themed($detailValueStyle)}>
+                {inputParams.swap_mode}
+              </Text>
+            </View>
 
-            {details.slippage !== undefined && (
+            {inputParams.priority_fee_needed && (
               <View style={themed($detailRowStyle)}>
                 <Text preset="small" style={themed($detailLabelStyle)}>
-                  Slippage Tolerance
+                  Priority Fee
                 </Text>
                 <Text style={themed($detailValueStyle)}>
-                  {(details.slippage * 100).toFixed(2)}%
+                  {props.details.priorityFee} SOL
                 </Text>
               </View>
             )}
@@ -244,14 +230,14 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
             <View style={$actionsRow}>
               <TouchableOpacity
                 style={themed($actionButtonStyle)}
-                onPress={() => copyToClipboard(fromToken.address, 'Token address copied')}
+                onPress={() => copyToClipboard(input_mint, 'Token address copied')}
               >
-                <Text style={themed($actionButtonTextStyle)}>Copy {fromToken.symbol} Address</Text>
+                <Text style={themed($actionButtonTextStyle)}>Copy {tickers.inputTokenTicker} Address</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={themed($actionButtonStyle)}
-                onPress={() => Linking.openURL(`https://solscan.io/token/${fromToken.address}`)}
+                onPress={() => Linking.openURL(`https://solscan.io/token/${input_mint}`)}
               >
                 <Text style={themed($actionButtonTextStyle)}>View on Solscan</Text>
                 <Ionicons name="open-outline" size={12} color={theme.colors.primary} />
@@ -261,14 +247,14 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
             <View style={$actionsRow}>
               <TouchableOpacity
                 style={themed($actionButtonStyle)}
-                onPress={() => copyToClipboard(toToken.address, 'Token address copied')}
+                onPress={() => copyToClipboard(output_mint, 'Token address copied')}
               >
-                <Text style={themed($actionButtonTextStyle)}>Copy {toToken.symbol} Address</Text>
+                <Text style={themed($actionButtonTextStyle)}>Copy {tickers.outputTokenTicker} Address</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={themed($actionButtonStyle)}
-                onPress={() => Linking.openURL(`https://solscan.io/token/${toToken.address}`)}
+                onPress={() => Linking.openURL(`https://solscan.io/token/${output_mint}`)}
               >
                 <Text style={themed($actionButtonTextStyle)}>View on Solscan</Text>
                 <Ionicons name="open-outline" size={12} color={theme.colors.primary} />
@@ -506,3 +492,4 @@ const $expandedFooterStyle: ThemedStyle<ViewStyle> = theme => ({
 const $footerTextStyle: ThemedStyle<TextStyle> = theme => ({
   color: theme.colors.textDim,
 });
+

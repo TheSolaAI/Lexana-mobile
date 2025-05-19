@@ -1,4 +1,4 @@
-import { FC, Fragment, useEffect, useRef, useCallback, useMemo } from 'react';
+import { FC, Fragment, useEffect, useRef, useCallback } from 'react';
 import {
   FlatList,
   View,
@@ -27,26 +27,12 @@ import { TypingIndicator } from './messages/TypingIndicator';
 
 interface ChatProps {
   messages: UIMessage[];
-  isLiveMode?: boolean;
-  status?: 'idle' | 'submitting' | 'streaming' | 'error' | 'submitted' | 'ready';
 }
 
-export const Chat: FC<ChatProps> = ({ messages, isLiveMode = false, status = 'idle' }) => {
+export const Chat: FC<ChatProps> = ({ messages }) => {
   const flatListRef = useRef<FlatList>(null);
   const animatedValues = useRef<{ [key: string]: Animated.Value }>({});
   const scrollToBottomOnNextUpdate = useRef<boolean>(true);
-
-  // Filter messages for live mode
-  const filteredMessages = useMemo(() => {
-    if (!isLiveMode) return messages;
-
-    // Find the last user message
-    const lastUserMessageIndex = messages.findLastIndex(msg => msg.role === 'user');
-    if (lastUserMessageIndex === -1) return messages;
-
-    // Get all messages after the last user message
-    return messages.slice(lastUserMessageIndex);
-  }, [messages, isLiveMode]);
 
   const scrollToBottom = useCallback(() => {
     if (flatListRef.current && messages.length > 0) {
@@ -188,22 +174,16 @@ export const Chat: FC<ChatProps> = ({ messages, isLiveMode = false, status = 'id
     );
   };
 
-  const showTypingIndicator = status === 'submitting' || status === 'streaming' || status === 'submitted';
-
   return (
     <View style={$chatContainerStyle}>
       <FlatList
         ref={flatListRef}
-        data={filteredMessages}
+        data={messages}
         renderItem={renderItem}
         keyExtractor={item => item.id}
         contentContainerStyle={$listContentContainerStyle}
         onScroll={onScroll}
-        ListFooterComponent={
-          <View style={{ height: 100 }}>
-            {showTypingIndicator && <TypingIndicator isVisible={true} />}
-          </View>
-        }
+        ListFooterComponent={<View style={{ height: 100 }} />}
         scrollEventThrottle={16} // 60fps
         onContentSizeChange={() => {
           if (scrollToBottomOnNextUpdate.current) {
@@ -241,8 +221,10 @@ const $assistantWrapperStyle: ViewStyle = {
 const $chatContainerStyle: ViewStyle = {
   flex: 1,
   paddingVertical: 16,
+  backgroundColor: 'transparent', // Make sure this is transparent to show the gradient
 };
 
 const $messagePartsContainer: ViewStyle = {
   flexDirection: 'column',
+  backgroundColor: 'transparent', // Make sure parts container is transparent
 };

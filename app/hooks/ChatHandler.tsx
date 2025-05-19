@@ -10,8 +10,7 @@ import { ToolSetResponse } from '@/types/response';
 import { toast } from 'sonner-native';
 import { Audio } from 'expo-av';
 import { ToolResult } from '@/types/tool';
-import { Connection, Transaction } from '@solana/web3.js';
-import base58 from 'bs58';
+import { Connection, Transaction, VersionedTransaction } from '@solana/web3.js';
 import { useFetchMessagesQuery } from '@/stores/services/messages.service';
 import { useFetchChatRoomsQuery } from '@/stores/services/chatRooms.service';
 import { useAppSelector, useAppDispatch } from '@/stores/hooks';
@@ -75,9 +74,17 @@ export const useChatFunctions = () => {
       const provider = await wallet.getProvider();
       const connection = new Connection('https://api.mainnet-beta.solana.com');
 
-      // Decode the transaction from base58 string
-      const transactionBuffer = base58.decode(args.transactionHash);
-      const transaction = Transaction.from(transactionBuffer);
+      // Decode the transaction from base64 string
+      const transactionBuffer = Buffer.from(args.transactionHash, 'base64');
+      
+      // Try to deserialize as a versioned transaction first
+      let transaction;
+      try {
+        transaction = VersionedTransaction.deserialize(transactionBuffer);
+      } catch {
+        // If that fails, try as a legacy transaction
+        transaction = Transaction.from(transactionBuffer);
+      }
 
       const { signature } = await provider.request({
         method: 'signAndSendTransaction',
@@ -102,11 +109,10 @@ export const useChatFunctions = () => {
       console.error('Error signing transaction:', error);
 
       const errorMessage = error.message || 'Failed to sign and send transaction';
-      toast.error(errorMessage);
 
       return {
         success: false,
-        error: errorMessage,
+        data: {message: 'failed due to less balance'},
       };
     }
   };
@@ -224,6 +230,11 @@ export const useChatFunctions = () => {
     }
   };
 
+  /**
+   * Internal function to send a message with specific toolsets
+   * @param text The message text to send
+   * @param toolsets Array of toolset names to use
+   */
   const handleSendMessage = async (text: string, toolsets: string[]) => {
     try {
       await append(
@@ -235,6 +246,50 @@ export const useChatFunctions = () => {
       );
     } catch (error) {
       console.error('Error sending message:', error);
+    }
+  };
+
+  /**
+   * Handles text input messages by getting required toolsets and processing the message
+   * @param text The message text to process
+   */
+  const handleTextMessage = async (text: string) => {
+    try {
+      // Create a new message object
+      const newMessage: Message = {
+        id: generateId(),
+        content: text,
+        role: 'user',
+        createdAt: new Date(),
+      };
+
+      // Get message history for context
+      const messageHistory = messages.slice(-5).map(message => ({
+        id: message.id,
+        content: message.content,
+        role: message.role,
+        createdAt: new Date(),
+      }));
+
+      // Get required toolsets
+      const toolsetResponse = await getToolSet(newMessage, messageHistory);
+
+      // Handle case with no toolsets
+      if (toolsetResponse.selectedToolset.length === 0) {
+        if (toolsetResponse.audioData) {
+          // Play audio response
+          playAudio(toolsetResponse.audioData);
+        }
+
+        handleAddUserMessage(newMessage);
+        handleAddAIResponse(toolsetResponse.fallbackResponse);
+        return;
+      }
+
+      // Handle case with toolsets
+      await handleSendMessage(newMessage.content, toolsetResponse.selectedToolset);
+    } catch (error) {
+      console.error('Error processing text message:', error);
     }
   };
 
@@ -301,8 +356,9 @@ export const useChatFunctions = () => {
 
   return {
     messages,
+    setMessages,
     onAudioMessage,
-    handleSendMessage,
+    handleTextMessage,
     selectedRoomId,
     setSelectedRoomId: (id: number) => dispatch(setSelectedRoomId(id)),
     chatRooms,
