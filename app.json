@@ -4,7 +4,7 @@
   "expo": {
     "name": "Lexana-AI",
     "slug": "Lexana-AI",
-    "scheme": "Lexana-AI",
+    "scheme": "lexana",
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
@@ -14,9 +14,7 @@
     },
     "newArchEnabled": true,
     "jsEngine": "hermes",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "android": {
       "icon": "./assets/images/app-icon-android-legacy.png",
       "package": "com.lexana.lexanaai",

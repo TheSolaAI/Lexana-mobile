@@ -2380,38 +2380,38 @@
   resolved "https://registry.npmjs.org/@pkgr/core/-/core-0.2.4.tgz"
   integrity sha512-ROFF39F6ZrnzSUEmQQZUar0Jt4xVoP9WnDRdWwF4NNcXs3xBTLgBUDoOwW141y1jP+S8nahIbdxbFC7IShw9Iw==
 
-"@privy-io/api-base@1.4.6":
-  version "1.4.6"
-  resolved "https://registry.npmjs.org/@privy-io/api-base/-/api-base-1.4.6.tgz"
-  integrity sha512-HqCt3wTSx3I9tuZCu4J6w1AZSP8gcCoGEbJonFaCVIdWIq/7usp2PsXIP2utAG0jiXF+wwdhQpxCAkq46wW6ig==
+"@privy-io/api-base@1.5.1":
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@privy-io/api-base/-/api-base-1.5.1.tgz#12dbdac57fd5614c063c0fa0edfff1592f5aa829"
+  integrity sha512-UokueOxl2hoW+kfFTzwV8uqwCNajSaJJEGSWHpsuKvdDQ8ePwXe53Gr5ptnKznaZlMLivc25mrv92bVEJbclfQ==
   dependencies:
-    zod "^3.21.4"
+    zod "^3.24.3"
 
 "@privy-io/chains@0.0.1":
   version "0.0.1"
   resolved "https://registry.npmjs.org/@privy-io/chains/-/chains-0.0.1.tgz"
   integrity sha512-UVRK4iSCmMx1kPt2b6Dolu4dBzesB7DvwEFMFaYggDCVlKXYtuRB7QxeHcKsLpeU9swluiBDAw4r5udG1xCpNg==
 
-"@privy-io/expo-native-extensions@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.npmjs.org/@privy-io/expo-native-extensions/-/expo-native-extensions-0.0.4.tgz"
-  integrity sha512-uUrtzHflSrSr7fM2ttQznuMqxJrVV1Wy1x0fp6f6H9uGxCbqh3Le99AC+cH5zsVdMJhy5bkmJ1DQCvnjEuCeUg==
+"@privy-io/expo-native-extensions@0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@privy-io/expo-native-extensions/-/expo-native-extensions-0.0.5.tgz#e9a5e2e5f5985944542bd3b147b053cc6ce7d5b2"
+  integrity sha512-PEk7HpjEAEMp/gnrlgStkwi2naiSHXjK67E/5rc6Bjsvy3L3R6nSy6musinXKOKf4VghAdaDsTWXD6utxesVsg==
 
-"@privy-io/expo@^0.52.5":
-  version "0.52.5"
-  resolved "https://registry.npmjs.org/@privy-io/expo/-/expo-0.52.5.tgz"
-  integrity sha512-Wx403YtHQ2asgNwHyJMQpePLbkqS3F9WVUnSPqQ6yLjlEJdIGQmFDdLtrnGzT++0ySGZkJdBd43UJD5q7S7R7Q==
+"@privy-io/expo@0.53.3":
+  version "0.53.3"
+  resolved "https://registry.yarnpkg.com/@privy-io/expo/-/expo-0.53.3.tgz#9e48a1e003eac72fb896ea39212a7213215657d1"
+  integrity sha512-sHT6woN8xynU+s8qWUxLO6GWOwCX4HbWzdKbk0C5sGHtWqw+uFI2cRkby3uOkDYe1DzA+3J529lTkcn2Jjy4ag==
   dependencies:
-    "@privy-io/js-sdk-core" "0.48.2"
+    "@privy-io/js-sdk-core" "0.50.3"
     "@scure/base" "^1.2.4"
     react-fast-compare "^3.2.2"
     tweetnacl "^1.0.3"
-    zustand "^4.4.1"
+    zustand "^5.0.4"
 
-"@privy-io/js-sdk-core@0.48.2":
-  version "0.48.2"
-  resolved "https://registry.npmjs.org/@privy-io/js-sdk-core/-/js-sdk-core-0.48.2.tgz"
-  integrity sha512-8B2bybNzCOxYLCb/6IqqgjvzTOPnvLXhl982xZY18VkZvdNemzSNApKb7f2TX1lBuROSxyCRYk1T9cHnooyzoA==
+"@privy-io/js-sdk-core@0.50.3":
+  version "0.50.3"
+  resolved "https://registry.yarnpkg.com/@privy-io/js-sdk-core/-/js-sdk-core-0.50.3.tgz#00f51b49f6b0d512f80d4f6a04dbd00d838320bc"
+  integrity sha512-1hqBrqUvb8//GzTF26wFn+QWNP8S0Wyb+ALcxRYd4I86FkwJ9n3V+4lqJwHP91hQBhi9pULMcZ0VBNuuk46zqg==
   dependencies:
     "@ethersproject/abstract-signer" "^5.7.0"
     "@ethersproject/bignumber" "^5.7.0"
@@ -2419,9 +2419,9 @@
     "@ethersproject/providers" "^5.7.2"
     "@ethersproject/transactions" "^5.7.0"
     "@ethersproject/units" "^5.7.0"
-    "@privy-io/api-base" "1.4.6"
+    "@privy-io/api-base" "1.5.1"
     "@privy-io/chains" "0.0.1"
-    "@privy-io/public-api" "2.23.0"
+    "@privy-io/public-api" "2.27.0"
     canonicalize "^2.0.0"
     eventemitter3 "^5.0.1"
     fetch-retry "^6.0.0"
@@ -2431,16 +2431,16 @@
     set-cookie-parser "^2.6.0"
     uuid ">=8 <10"
 
-"@privy-io/public-api@2.23.0":
-  version "2.23.0"
-  resolved "https://registry.npmjs.org/@privy-io/public-api/-/public-api-2.23.0.tgz"
-  integrity sha512-t6Y8yRCF2qk2Fz2sg3iS2mDmuZduUBbybvp+qRx4fJ8BL244Sp/IR1j2rVzhDL3XIOcSTjveu58SSLIt5wSriw==
+"@privy-io/public-api@2.27.0":
+  version "2.27.0"
+  resolved "https://registry.yarnpkg.com/@privy-io/public-api/-/public-api-2.27.0.tgz#3eeb9328cf85a6396883db72fbdc126fb43299c6"
+  integrity sha512-okGGX29I1Z/HviVMBnVGD5oEB3PhNxebgyvqzjMAJOV/KCXu7xJdMVoxtIsgKTsEHJPtbBqfL7nuV/9UULpTKw==
   dependencies:
-    "@privy-io/api-base" "1.4.6"
+    "@privy-io/api-base" "1.5.1"
     bs58 "^5.0.0"
     libphonenumber-js "^1.10.31"
     viem "^2"
-    zod "^3.22.4"
+    zod "^3.24.3"
 
 "@react-native-masked-view/masked-view@^0.3.2":
   version "0.3.2"
@@ -11427,14 +11427,12 @@ zod-to-json-schema@^3.24.1:
   resolved "https://registry.npmjs.org/zod-to-json-schema/-/zod-to-json-schema-3.24.5.tgz"
   integrity sha512-/AuWwMP+YqiPbsJx5D6TfgRTc4kTLjsh5SOcd4bLsfUg2RcEXrFMJl1DGgdHy2aCfsIA/cr/1JM0xcB2GZji8g==
 
-zod@^3.21.4, zod@^3.22.4, zod@^3.24.3:
+zod@^3.24.3:
   version "3.24.3"
   resolved "https://registry.npmjs.org/zod/-/zod-3.24.3.tgz"
   integrity sha512-HhY1oqzWCQWuUqvBFnsyrtZRhyPeR7SUGv+C4+MsisMuVfSPx8HpwWqH8tRahSlt6M3PiFAcoeFhZAqIXTxoSg==
 
-zustand@^4.4.1:
-  version "4.5.6"
-  resolved "https://registry.npmjs.org/zustand/-/zustand-4.5.6.tgz"
-  integrity sha512-ibr/n1hBzLLj5Y+yUcU7dYw8p6WnIVzdJbnX+1YpaScvZVF2ziugqHs+LAmHw4lWO9c/zRj+K1ncgWDQuthEdQ==
-  dependencies:
-    use-sync-external-store "^1.2.2"
+zustand@^5.0.4:
+  version "5.0.5"
+  resolved "https://registry.yarnpkg.com/zustand/-/zustand-5.0.5.tgz#3e236f6a953142d975336d179bc735d97db17e84"
+  integrity sha512-mILtRfKW9xM47hqxGIxCv12gXusoY/xTSHBYApXozR0HmQv299whhBeeAcRy+KrPPybzosvJBCOmVjq6x12fCg==
