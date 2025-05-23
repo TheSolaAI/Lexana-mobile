@@ -24,9 +24,9 @@ export const AppStackNavigator = function AppStack() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        navigationBarColor: colors.background,
+        navigationBarColor: colors.secondaryBg,
         contentStyle: {
-          backgroundColor: colors.background,
+          backgroundColor: colors.secondaryBg,
         },
       }}
     >

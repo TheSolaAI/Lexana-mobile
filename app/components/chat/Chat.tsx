@@ -23,7 +23,6 @@ import { SNSResolverMessageItem } from './messages/SNSResolverMessageItem';
 import { SwapTokenMessageItem } from './messages/SwapTokenMessageItem';
 import { SignedTransactionsMessageItem } from './messages/SignedTransactionsMessageItem';
 import { TransferTokenMessageItem } from './messages/TransferTokenMessageItem';
-import { TypingIndicator } from './messages/TypingIndicator';
 
 interface ChatProps {
   messages: UIMessage[];

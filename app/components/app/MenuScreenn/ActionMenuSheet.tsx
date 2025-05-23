@@ -56,7 +56,3 @@ const $sheetButton: ViewStyle = {
   paddingVertical: 14,
   paddingHorizontal: 12,
 };
-
-const $sheetButtonDelete: TextStyle = {
-  color: '#FF3B30',
-};

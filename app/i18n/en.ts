@@ -18,6 +18,7 @@ const en = {
   chatScreen: {
     voiceMode: {
       title: 'Normal Mode',
+      placeholder: 'Ask Lexana anything...',
     },
     liveMode: {
       title: 'Live Mode',
