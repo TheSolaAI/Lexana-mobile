@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Whenever generating a component use the ThemedStyle for styles that require access to only the colors of an application. For other styles you can just create an empty javascript object in the type of ViewStyle, TextStyle, ImageStyle etc and use those as the styles.
+
+Always start a theme name with $ sign and never use the inbuilt react native createStylesheet functionality instead always use this functionality

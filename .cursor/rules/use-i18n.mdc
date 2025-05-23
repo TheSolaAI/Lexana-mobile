@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Whenever generating a component that requires text to be hardcoded always use i18n strings and refer to the en.ts file or any other language file for defining the strings
