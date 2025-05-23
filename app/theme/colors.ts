@@ -6,7 +6,7 @@ const palette = {
   textColor: '#212121',
   secText: '#757575',
   border: '#EEEEEE',
-  primary: '#6200EE',
+  primary: '#732255',
   primaryDark: '#3700B3',
   success: '#4CAF50',
   error: '#F44336',
