@@ -20,19 +20,25 @@ import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-c
 import * as SplashScreen from 'expo-splash-screen';
 import { AppNavigator } from './navigators';
 import { ErrorBoundary } from './screens/ErrorScreen/ErrorBoundary';
-import { customFontsToLoad, darkTheme } from './theme';
+import { customFontsToLoad } from './theme';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { PrivyProvider } from '@privy-io/expo';
-import { PrivyElements } from '@privy-io/expo/ui';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Provider } from 'react-redux';
 import { persistor, store } from './stores/rootStore';
 import { Toaster } from 'sonner-native';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { useThemeProvider } from './utils/useAppTheme';
 
 export function App() {
   const [areFontsLoaded, fontLoadError] = useFonts(customFontsToLoad);
   const [isI18nInitialized, setIsI18nInitialized] = useState(false);
+
+  /**
+   * Theming Setup
+   */
+  const { themeScheme, setThemeContextOverride, ThemeProvider } = useThemeProvider();
 
   useEffect(() => {
     initI18n().then(() => setIsI18nInitialized(true));
@@ -44,42 +50,35 @@ export function App() {
 
   // otherwise, we're ready to render the app
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-          <ErrorBoundary catchErrors={'dev'}>
-            <GestureHandlerRootView>
-              <KeyboardProvider>
-                <PrivyProvider
-                  appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID!}
-                  clientId={process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID}
-                  config={{
-                    embedded: {
-                      solana: {
-                        createOnLogin: 'users-without-wallets',
-                      },
-                    },
-                  }}
-                >
-                  <PrivyElements
-                    config={{
-                      appearance: { colorScheme: 'dark', accentColor: darkTheme.colors.primary },
-                    }}
-                  />
-                  <AppNavigator />
-                </PrivyProvider>
-              </KeyboardProvider>
-              <Toaster
-                richColors
-                theme="system"
-                swipeToDismissDirection="left"
-                gap={40}
-                offset={40}
-              />
-            </GestureHandlerRootView>
-          </ErrorBoundary>
-        </SafeAreaProvider>
-      </PersistGate>
-    </Provider>
+    <ThemeProvider value={{ themeScheme, setThemeContextOverride }}>
+      <ErrorBoundary catchErrors={'dev'}>
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+              <GestureHandlerRootView>
+                <BottomSheetModalProvider>
+                  <KeyboardProvider>
+                    <PrivyProvider
+                      appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID!}
+                      clientId={process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID}
+                      config={{
+                        embedded: {
+                          solana: {
+                            createOnLogin: 'users-without-wallets',
+                          },
+                        },
+                      }}
+                    >
+                      <AppNavigator />
+                    </PrivyProvider>
+                  </KeyboardProvider>
+                </BottomSheetModalProvider>
+                <Toaster richColors theme="system" />
+              </GestureHandlerRootView>
+            </SafeAreaProvider>
+          </PersistGate>
+        </Provider>
+      </ErrorBoundary>
+    </ThemeProvider>
   );
 }
