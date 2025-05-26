@@ -1,13 +1,5 @@
 import { FC, useState, useEffect } from 'react';
-import {
-  TextInput,
-  TextStyle,
-  View,
-  ViewStyle,
-  TouchableOpacity,
-  Keyboard,
-  Dimensions,
-} from 'react-native';
+import { TextInput, TextStyle, View, ViewStyle, TouchableOpacity, Dimensions } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Animated, {
   useSharedValue,
@@ -114,7 +106,6 @@ export const InputCard: FC<InputCardProps> = ({
     toolbarAnim.value = 0;
     toolbarAnim.value = withTiming(1, { duration: 400 }, () => {
       runOnJS(onEnterLiveMode)();
-      runOnJS(Keyboard.dismiss)();
     });
   };
 
@@ -137,7 +128,7 @@ export const InputCard: FC<InputCardProps> = ({
             onPress={handleEnterLiveMode}
             activeOpacity={0.7}
           >
-            <MaterialIcons name="graphic-eq" size={24} color={theme.colors.primary} />
+            <MaterialIcons name="graphic-eq" size={24} color={theme.colors.textDim} />
             <Animated.Text
               style={[themed($liveModeTextStyle), liveModeTextAnimatedStyle]}
               numberOfLines={1}
@@ -167,7 +158,7 @@ export const InputCard: FC<InputCardProps> = ({
                 },
               ]}
             >
-              <MaterialIcons name="mic" size={24} color={theme.colors.text} />
+              <MaterialIcons name="mic" size={24} color={theme.colors.textDim} />
             </Animated.View>
             {/* Send Icon with surface container */}
             <Animated.View
@@ -208,10 +199,6 @@ const $containerStyle: ThemedStyle<ViewStyle> = theme => ({
   paddingTop: 10,
   borderTopLeftRadius: 20,
   borderTopRightRadius: 20,
-  position: 'absolute',
-  bottom: 0,
-  left: 0,
-  right: 0,
 });
 
 const $bottomContainerStyle: ViewStyle = {

@@ -25,14 +25,25 @@ import { SignedTransactionsMessageItem } from './messages/SignedTransactionsMess
 import { TransferTokenMessageItem } from './messages/TransferTokenMessageItem';
 
 interface ChatProps {
+  /**
+   * Array of chat messages to display
+   */
   messages: UIMessage[];
 }
 
+/**
+ * Chat component renders the chat messages with an optional sticky header that auto-hides on scroll.
+ * @param {ChatProps} props - The props for the chat component.
+ * @returns {JSX.Element} The rendered chat list with header.
+ */
 export const Chat: FC<ChatProps> = ({ messages }) => {
   const flatListRef = useRef<FlatList>(null);
   const animatedValues = useRef<{ [key: string]: Animated.Value }>({});
   const scrollToBottomOnNextUpdate = useRef<boolean>(true);
 
+  /**
+   * Scrolls the chat to the bottom with animation
+   */
   const scrollToBottom = useCallback(() => {
     if (flatListRef.current && messages.length > 0) {
       setTimeout(() => {
@@ -48,7 +59,7 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
       // Create animation values for new messages that don't have them yet
       messages.forEach(message => {
         if (!animatedValues.current[message.id]) {
-          animatedValues.current[message.id] = new Animated.Value(50); // Start from 50 (offscreen) and animate to 0
+          animatedValues.current[message.id] = new Animated.Value(50);
           // Animate the new message
           Animated.spring(animatedValues.current[message.id], {
             toValue: 0,
@@ -61,8 +72,10 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
     }
   }, [messages, scrollToBottom]);
 
+  /**
+   * Handles scroll events to manage auto-scrolling behavior
+   */
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    // When user scrolls manually, disable auto-scrolling
     const currentScrollPosition = event.nativeEvent.contentOffset.y;
     const scrollViewHeight = event.nativeEvent.layoutMeasurement.height;
     const contentHeight = event.nativeEvent.contentSize.height;
@@ -75,8 +88,10 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
     }
   };
 
+  /**
+   * Renders tool result components based on tool name and result data
+   */
   const renderToolResult = (toolName: string, args: ToolResult | undefined): React.ReactNode => {
-    // In case we have a caught error in the tool and propagated it to the frontend
     if (args === undefined) {
       return null;
     }
@@ -119,6 +134,9 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
     }
   };
 
+  /**
+   * Renders the content of a single message
+   */
   const renderMessageContent = (message: UIMessage) => {
     const role = message.role;
     if (message.role === 'user') {
@@ -126,7 +144,6 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
     }
 
     if (message.parts) {
-      // If we have multiple parts, wrap them in a View with column layout
       const messageParts = message.parts
         .map((part, partIndex) => {
           if (part.type === 'text') {
@@ -146,16 +163,16 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
         })
         .filter(Boolean);
 
-      // Wrap in column container if there are multiple parts
       return <View style={$messagePartsContainer}>{messageParts}</View>;
     }
 
-    // Handle simple text messages
     return <SimpleMessageItem text={message.content} />;
   };
 
+  /**
+   * Renders a single message item with animation
+   */
   const renderItem = ({ item }: { item: UIMessage }) => {
-    // Get the animation value for this item or create one if it doesn't exist
     if (!animatedValues.current[item.id]) {
       animatedValues.current[item.id] = new Animated.Value(0);
     }
@@ -174,34 +191,26 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
   };
 
   return (
-    <View style={$chatContainerStyle}>
-      <FlatList
-        ref={flatListRef}
-        data={messages}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        contentContainerStyle={$listContentContainerStyle}
-        onScroll={onScroll}
-        ListFooterComponent={<View style={{ height: 100 }} />}
-        scrollEventThrottle={16} // 60fps
-        onContentSizeChange={() => {
-          if (scrollToBottomOnNextUpdate.current) {
-            scrollToBottom();
-          }
-        }}
-        onLayout={() => {
-          if (scrollToBottomOnNextUpdate.current) {
-            scrollToBottom();
-          }
-        }}
-      />
-    </View>
+    <FlatList
+      ref={flatListRef}
+      data={messages}
+      renderItem={renderItem}
+      keyExtractor={item => item.id}
+      onScroll={onScroll}
+      ListFooterComponent={<View style={$footerSpacing} />}
+      scrollEventThrottle={16}
+      onContentSizeChange={() => {
+        if (scrollToBottomOnNextUpdate.current) {
+          scrollToBottom();
+        }
+      }}
+      onLayout={() => {
+        if (scrollToBottomOnNextUpdate.current) {
+          scrollToBottom();
+        }
+      }}
+    />
   );
-};
-
-const $listContentContainerStyle: ViewStyle = {
-  padding: 16,
-  gap: 16,
 };
 
 const $messageWrapperStyle: ViewStyle = {
@@ -217,13 +226,11 @@ const $assistantWrapperStyle: ViewStyle = {
   justifyContent: 'flex-start',
 };
 
-const $chatContainerStyle: ViewStyle = {
-  flex: 1,
-  paddingVertical: 16,
-  backgroundColor: 'transparent', // Make sure this is transparent to show the gradient
-};
-
 const $messagePartsContainer: ViewStyle = {
   flexDirection: 'column',
-  backgroundColor: 'transparent', // Make sure parts container is transparent
+  backgroundColor: 'transparent',
+};
+
+const $footerSpacing: ViewStyle = {
+  height: 100,
 };
