@@ -3,23 +3,54 @@ import { FC, ReactNode } from 'react';
 import { View, ViewStyle } from 'react-native';
 import { Text } from '@/components/general';
 import { useAppTheme } from '@/utils/useAppTheme';
+import { ThemedStyle } from '@/theme';
 
 interface ScreenHeaderProps {
+  /**
+   * i18n key for the title
+   */
   titleTx?: TxKeyPath;
+  /**
+   * i18n key for the subtitle
+   */
   subtitleTx?: TxKeyPath;
+  /**
+   * Fallback string for the title
+   */
   title?: string;
+  /**
+   * Fallback string for the subtitle
+   */
   subtitle?: string;
+  /**
+   * Optional right component (e.g. button)
+   */
   rightComponent?: ReactNode;
+  /**
+   * Optional left component (e.g. back button)
+   */
+  leftComponent?: ReactNode;
 }
 
-export const Screenheader: FC<ScreenHeaderProps> = ({ titleTx, title, rightComponent }) => {
-  const { theme } = useAppTheme();
+/**
+ * Screenheader displays a themed header for screens.
+ * @param {ScreenHeaderProps} props - The props for the header.
+ * @returns {JSX.Element} The rendered header.
+ */
+export const Screenheader: FC<ScreenHeaderProps> = ({
+  titleTx,
+  title,
+  rightComponent,
+  leftComponent,
+}) => {
+  const { themed } = useAppTheme();
 
   return (
-    <View style={$containerStyle}>
+    <View style={themed($containerStyle)}>
       <View style={$headerStyle}>
+        {leftComponent && <View style={$leftComponent}>{leftComponent}</View>}
         <View style={$titleContainer}>
-          <Text preset="pageHeading" tx={titleTx} text={title} />
+          <Text preset="bold" tx={titleTx} text={title} />
         </View>
         {rightComponent && <View style={$rightComponent}>{rightComponent}</View>}
       </View>
@@ -27,11 +58,15 @@ export const Screenheader: FC<ScreenHeaderProps> = ({ titleTx, title, rightCompo
   );
 };
 
-const $containerStyle: ViewStyle = {
+const $containerStyle: ThemedStyle<ViewStyle> = theme => ({
   flexDirection: 'row',
   justifyContent: 'center',
-  paddingHorizontal: 16,
-};
+  padding: 16,
+  backgroundColor: theme.colors.secondaryBg,
+  borderBottomColor: theme.colors.border,
+  borderBottomLeftRadius: 20,
+  borderBottomRightRadius: 20,
+});
 
 const $headerStyle: ViewStyle = {
   flexDirection: 'row',
@@ -49,4 +84,9 @@ const $titleContainer: ViewStyle = {
 const $rightComponent: ViewStyle = {
   position: 'absolute',
   right: 0,
+};
+
+const $leftComponent: ViewStyle = {
+  position: 'absolute',
+  left: 0,
 };
