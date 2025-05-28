@@ -3,6 +3,7 @@ import { Pressable, PressableProps, StyleProp, TextStyle, ViewStyle, Animated } 
 import { $styles, type ThemedStyle, type ThemedStyleArray } from '@/theme';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { TextProps, Text } from './Text';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 
 type Presets = 'primary' | 'secondary' | 'tertiary';
 
@@ -113,6 +114,7 @@ export function Button(props: ButtonProps) {
         useNativeDriver: true,
       }),
     ]).start();
+    ReactNativeHapticFeedback.trigger('effectClick');
 
     $onPressIn?.(e);
   };

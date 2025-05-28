@@ -8,12 +8,15 @@ const en = {
     save: 'Save',
   },
   welcomeScreen: {
-    catchLine: 'Just speak! Your voice interface to the Solana blockchain.',
-    button: 'Login to Continue',
+    catchLine: 'Join to building the future.',
+    description: 'Tap into the full Solana chain with only your voice from anywhere',
+    exploreButton: 'Start Lexana',
+    signInButton: 'Sign in with Email',
     terms: 'By continuing, you agree to our',
     termsLink: 'Terms of Service',
     privacy: 'and',
     privacyLink: 'Privacy Policy',
+    button: 'Login to Continue',
   },
   chatScreen: {
     voiceMode: {
@@ -22,6 +25,34 @@ const en = {
     },
     liveMode: {
       title: 'Live Mode',
+    },
+  },
+  liveMode: {
+    status: 'Status',
+    active: 'Active',
+    inactive: 'Inactive',
+    connection: 'Connection',
+    transcript: 'Transcript',
+    noTranscript: 'No transcript available yet...',
+    start: 'Start Live Chat',
+    stop: 'Stop',
+    mute: 'Mute',
+    unmute: 'Unmute',
+    connecting: 'Connecting...',
+    disconnected: 'Disconnected',
+    listening: 'Listening...',
+    speaking: 'Lexana is speaking...',
+    readyToListen: 'Ready to listen',
+    youSaid: 'You said',
+    lexanaSays: 'Lexana says',
+    listeningEllipsis: 'Listening...',
+    thinkingEllipsis: 'Thinking...',
+    startSpeaking: 'Start Speaking',
+    startSpeakingDescription: 'Tap and hold the microphone to start a conversation',
+    error: {
+      title: 'Error',
+      failedToStart:
+        'Failed to start live session. Please check your internet connection and try again.',
     },
   },
   menuScreen: {

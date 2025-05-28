@@ -77,7 +77,7 @@ const $presets: Record<Presets, ThemedStyleArray<TextStyle>> = {
   secondary: [$secondaryTextBaseStyle],
   onboardingHeading: [$baseStyle, { fontSize: 48, fontFamily: 'bold' }],
   onboardingSubHeading: [$secondaryTextBaseStyle, { fontSize: 15, fontFamily: 'regular' }],
-  pageHeading: [$baseStyle, { fontSize: 24, fontFamily: 'bold' }],
+  pageHeading: [$baseStyle, { fontSize: 20, fontFamily: 'bold' }],
   monospace: [$baseStyle, { fontFamily: 'monospace' }],
 };
 const $rtlStyle: TextStyle = isRTL ? { writingDirection: 'rtl' } : {};

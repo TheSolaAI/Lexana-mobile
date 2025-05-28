@@ -14,6 +14,7 @@ import { Text } from '@/components/general/';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { translate, TxKeyPath } from '@/i18n';
 import { TOptions } from 'i18next';
+import { useBottomSheetInternal } from '@gorhom/bottom-sheet';
 
 type Presets = 'primary';
 
@@ -74,6 +75,11 @@ export interface TextFieldProps extends Omit<TextInputProps, 'style'> {
    * Animation duration in milliseconds
    */
   animationDuration?: number;
+
+  /**
+   * Is triggered when the input container is clicked
+   */
+  onContainerPress?: () => void;
 }
 
 export function TextField(props: TextFieldProps) {
@@ -95,6 +101,7 @@ export function TextField(props: TextFieldProps) {
     keyboardType,
     autoComplete,
     secureTextEntry,
+    onContainerPress,
     ...rest
   } = props;
 
@@ -108,6 +115,8 @@ export function TextField(props: TextFieldProps) {
     ? translate(placeholderTx, placeholderTxOptions)
     : placeholder;
 
+  const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
+
   const handleFocus = (e: any) => {
     setIsFocused(true);
     Animated.timing(animatedOpacity, {
@@ -115,6 +124,7 @@ export function TextField(props: TextFieldProps) {
       duration: animationDuration,
       useNativeDriver: true,
     }).start();
+    shouldHandleKeyboardEvents.value = true;
     if (props.onFocus) {
       props.onFocus(e);
     }
@@ -127,12 +137,16 @@ export function TextField(props: TextFieldProps) {
       duration: animationDuration,
       useNativeDriver: true,
     }).start();
+    shouldHandleKeyboardEvents.value = false;
     if (props.onBlur) {
       props.onBlur(e);
     }
   };
 
   const handleContainerPress = () => {
+    if (onContainerPress) {
+      onContainerPress();
+    }
     inputRef.current?.focus();
   };
 
