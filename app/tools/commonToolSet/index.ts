@@ -1,0 +1,1 @@
+export { createTokenAddressTool } from './tokenAddress';

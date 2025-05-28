@@ -1,0 +1,1 @@
+export { createTrendingAiProjectsTool } from './filterTrendingAiProjectsTool';
