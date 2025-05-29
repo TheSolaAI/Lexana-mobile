@@ -29,7 +29,7 @@ export const $styles = {
   screenContainer: ((theme: Theme): ViewStyle => ({
     backgroundColor: theme.colors.background,
     width: '100%',
-    paddingHorizontal: 15,
+    // paddingHorizontal: 15,
   })) as ThemedStyle<ViewStyle>,
 
   // Pre-computed themed styles with defaults
