@@ -1,60 +1,42 @@
 /* eslint-disable react-native/no-color-literals */
 import { AppStackScreenProps } from '@/navigators/AppNavigator';
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useState } from 'react';
 import { Screen } from '@/components/general';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { $styles } from '@/theme';
 import { Screenheader } from '@/components/app/ScreenHeader';
-import {
-  ViewStyle,
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  Animated,
-  ActivityIndicator,
-} from 'react-native';
-import { useChatFunctions } from '@/hooks/ChatHandler';
+import { ViewStyle, View, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { useStandardProvider } from '@/hooks/useStandardProvider';
 import { Chat } from '@/components/chat/Chat';
 import { Feather } from '@expo/vector-icons';
-import { LiveModeInputBar } from '@/components/chat/LiveModeInputBar';
 import { InputCard } from '@/components/chat/InputCard';
 import { useAppDispatch } from '@/stores/hooks';
 import { setSelectedRoomId } from '@/stores/slices/selectedRoomSlice';
 import { useCreateChatRoomMutation } from '@/stores/services/chatRooms.service';
 import { toast } from 'sonner-native';
 import { useFetchChatRoomsQuery } from '@/stores/services/chatRooms.service';
+import { LiveMode } from '@/components/chat/LiveMode';
 
 interface ChatScreenProps extends AppStackScreenProps<'ChatScreen'> {}
 
-export const ChatScreen: FC<ChatScreenProps> = () => {
+/**
+ * ChatScreen displays the chat UI and header, and auto-hides the header on scroll.
+ * @param {ChatScreenProps} props - The props for the chat screen.
+ * @returns {JSX.Element} The rendered chat screen.
+ */
+export const ChatScreen: FC<ChatScreenProps> = ({ navigation }) => {
   /**
    * Global State
    */
   const { themed, theme } = useAppTheme();
   const { onAudioMessage, messages, handleTextMessage, isFetching, setMessages } =
-    useChatFunctions();
+    useStandardProvider();
   const dispatch = useAppDispatch();
   const [createChatRoom] = useCreateChatRoomMutation();
   const { data: chatRooms = [] } = useFetchChatRoomsQuery();
 
-  // Animation value for smooth transition
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-
   // State for live mode
   const [isLiveMode, setIsLiveMode] = useState(false);
-
-  // Handle fade animation when loading state changes
-  useEffect(() => {
-    if (!isFetching) {
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    } else {
-      fadeAnim.setValue(0);
-    }
-  }, [isFetching, fadeAnim]);
 
   /**
    * Handles entering live mode by creating a new chat room and updating state
@@ -104,29 +86,23 @@ export const ChatScreen: FC<ChatScreenProps> = () => {
     >
       <Screenheader
         titleTx={isLiveMode ? 'chatScreen:liveMode.title' : 'chatScreen:voiceMode.title'}
-        rightComponent={
-          !isLiveMode && (
-            <TouchableOpacity
-              style={styles.liveModeButton}
-              onPress={handleEnterLiveMode}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Feather name="radio" size={20} color={theme.colors.primary} />
-            </TouchableOpacity>
-          )
+        leftComponent={
+          <TouchableOpacity onPress={() => navigation.navigate('MenuScreen')}>
+            <Feather name="menu" size={32} color={theme.colors.textDim} />
+          </TouchableOpacity>
         }
       />
       {isFetching ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
+      ) : isLiveMode ? (
+        <LiveMode onExitLiveMode={handleExitLiveMode} />
       ) : (
-        <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
-          <Chat messages={messages} />
-        </Animated.View>
+        <Chat messages={messages} />
       )}
       {isLiveMode ? (
-        <LiveModeInputBar onAudioRecorded={onAudioMessage} onExitLiveMode={handleExitLiveMode} />
+        <></>
       ) : (
         <InputCard
           onSendMessage={handleTextMessage}
@@ -139,11 +115,6 @@ export const ChatScreen: FC<ChatScreenProps> = () => {
 };
 
 const styles = StyleSheet.create({
-  liveModeButton: {
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-    borderRadius: 20,
-    padding: 8,
-  },
   loadingContainer: {
     alignItems: 'center',
     flex: 1,
@@ -152,6 +123,5 @@ const styles = StyleSheet.create({
 });
 
 const $screenContainerStyle: ViewStyle = {
-  paddingTop: 10,
-  height: '100%',
+  flex: 1,
 };

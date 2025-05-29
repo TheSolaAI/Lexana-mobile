@@ -15,6 +15,7 @@
     "lib": ["esnext", "dom"],
     "skipLibCheck": true,
     "resolveJsonModule": true,
+    "resolvePackageJsonExports": false,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./app/*"],

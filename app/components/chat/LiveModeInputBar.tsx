@@ -1,70 +1,127 @@
 import { FC } from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, ViewStyle } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useAppTheme } from '@/utils/useAppTheme';
-import { PushToTalkButton } from './PushToTalkButton';
+import { ThemedStyle } from '@/theme';
 
 interface LiveModeInputBarProps {
-  onAudioRecorded: (audioUri: string) => void;
+  /**
+   * Callback function called when exiting live mode
+   */
   onExitLiveMode: () => void;
+  /**
+   * Whether the microphone is currently muted
+   */
+  isMuted?: boolean;
+  /**
+   * Callback function to toggle microphone mute state
+   */
+  onToggleMute?: () => void;
 }
 
+/**
+ * LiveModeInputBar component that provides controls for live mode interaction
+ * @param {LiveModeInputBarProps} props - The props for the input bar
+ * @returns {JSX.Element} The rendered input bar with controls
+ */
 export const LiveModeInputBar: FC<LiveModeInputBarProps> = ({
-  onAudioRecorded,
   onExitLiveMode,
+  isMuted = false,
+  onToggleMute,
 }) => {
-  const { theme } = useAppTheme();
+  const { theme, themed } = useAppTheme();
 
   return (
-    <View style={styles.container}>
-      <View style={styles.row}>
-        <View style={styles.buttonWrapper}>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={onExitLiveMode}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Feather name="x" size={32} color={theme.colors.text} />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.buttonWrapper}>
-          <PushToTalkButton onAudioRecorded={onAudioRecorded} />
-        </View>
-      </View>
+    <View style={themed($barContainerStyle)}>
+      {/* Close Button */}
+      <TouchableOpacity
+        style={themed($iconButtonStyle)}
+        onPress={onExitLiveMode}
+        hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+      >
+        <Feather name="x" size={24} color={theme.colors.text} />
+      </TouchableOpacity>
+
+      {/* Microphone Button - Centered */}
+      {onToggleMute && (
+        <TouchableOpacity
+          style={themed(isMuted ? $mutedMicButtonStyle : $activeMicButtonStyle)}
+          onPress={onToggleMute}
+          hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+        >
+          <Feather
+            name={isMuted ? 'mic-off' : 'mic'}
+            size={32}
+            color={isMuted ? theme.colors.error : theme.colors.text}
+          />
+        </TouchableOpacity>
+      )}
+
+      {/* Right side Icon (placeholder or future use) */}
+      <View style={themed($iconButtonStyle)} />
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 32,
-    backgroundColor: 'transparent',
+// Styles
+const $barContainerStyle: ThemedStyle<ViewStyle> = theme => ({
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingHorizontal: 20,
+  paddingVertical: 20,
+  borderTopWidth: 1,
+  borderTopColor: theme.colors.border,
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
+  backgroundColor: theme.colors.secondaryBg,
+});
+
+const $iconButtonStyle: ThemedStyle<ViewStyle> = theme => ({
+  width: 48,
+  height: 48,
+  borderRadius: 24,
+  backgroundColor: theme.colors.surface,
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderWidth: 1,
+  borderColor: theme.colors.border,
+});
+
+const $activeMicButtonStyle: ThemedStyle<ViewStyle> = theme => ({
+  width: 64,
+  height: 64,
+  padding: 16,
+  backgroundColor: theme.colors.primary,
+  borderRadius: 32,
+  alignItems: 'center',
+  justifyContent: 'center',
+  shadowColor: theme.colors.primary,
+  shadowOffset: {
+    width: 4,
+    height: 4,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 80,
-    borderRadius: 40,
-    paddingHorizontal: 16,
+  shadowOpacity: 0.4,
+  shadowRadius: 10,
+  elevation: 10,
+});
+
+const $mutedMicButtonStyle: ThemedStyle<ViewStyle> = theme => ({
+  width: 64,
+  height: 64,
+  padding: 16,
+  borderRadius: 32,
+  backgroundColor: theme.colors.surface,
+  borderWidth: 2,
+  borderColor: theme.colors.error,
+  alignItems: 'center',
+  justifyContent: 'center',
+  shadowColor: theme.colors.error,
+  shadowOffset: {
+    width: 4,
+    height: 4,
   },
-  buttonWrapper: {
-    width: 64,
-    height: 64,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconButton: {
-    borderRadius: 32,
-    backgroundColor: 'transparent',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 56,
-    height: 56,
-  },
+  shadowOpacity: 0.3,
+  shadowRadius: 10,
+  elevation: 10,
 });

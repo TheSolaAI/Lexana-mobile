@@ -20,7 +20,7 @@ interface TransactionArgs {
   transactionHash: string;
 }
 
-export const useChatFunctions = () => {
+export const useStandardProvider = () => {
   /**
    * Global State
    */
@@ -30,10 +30,7 @@ export const useChatFunctions = () => {
   const selectedRoomId = useAppSelector(state => state.selectedRoom.selectedRoomId);
   // Update selectedRoomId if chatRooms changes and selectedRoomId is not valid
   useEffect(() => {
-    if (
-      chatRooms.length > 0 &&
-      selectedRoomId == null
-    ) {
+    if (chatRooms.length > 0 && selectedRoomId == null) {
       dispatch(setSelectedRoomId(chatRooms[0].id));
     }
   }, [chatRooms, selectedRoomId, dispatch]);
@@ -76,7 +73,7 @@ export const useChatFunctions = () => {
 
       // Decode the transaction from base64 string
       const transactionBuffer = Buffer.from(args.transactionHash, 'base64');
-      
+
       // Try to deserialize as a versioned transaction first
       let transaction;
       try {
@@ -112,12 +109,12 @@ export const useChatFunctions = () => {
 
       return {
         success: false,
-        data: {message: 'failed due to less balance'},
+        data: { message: 'failed due to less balance' },
       };
     }
   };
 
-  const { messages, setMessages, append , status} = useChat({
+  const { messages, setMessages, append, status } = useChat({
     api: `${process.env.EXPO_PUBLIC_MAIN_SERVICE_URL}/api/chat`,
     id: `chat-${roomId}`,
     fetch: expoFetch as unknown as typeof globalThis.fetch,
@@ -137,7 +134,6 @@ export const useChatFunctions = () => {
       if (toolCall.toolName === 'sign_and_send_tx') {
         result = await handleSignTransaction(toolCall.args as TransactionArgs);
         console.log('Transaction result:', result);
-        
       }
       return result;
     },
