@@ -38,7 +38,7 @@ export const messagesService = authApi.injectEndpoints({
       },
     }),
   }),
-  overrideExisting: false,
+  overrideExisting: __DEV__,
 });
 
 export const { useFetchMessagesQuery, useFetchMoreMessagesQuery } = messagesService;

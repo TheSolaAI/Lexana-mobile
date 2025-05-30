@@ -63,7 +63,7 @@ export const chatRoomsService = authApi.injectEndpoints({
       invalidatesTags: ['ChatRoom'],
     }),
   }),
-  overrideExisting: true,
+  overrideExisting: __DEV__,
 });
 
 export const {

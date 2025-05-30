@@ -151,7 +151,7 @@ export const MenuScreen: React.FC<MenuScreenProps> = ({ navigation }) => {
       <Screen
         preset="fixed"
         safeAreaEdges={['top']}
-        contentContainerStyle={themed($styles.screenContainer)}
+        contentContainerStyle={[themed($styles.screenContainer), $screenContainerStyle]}
       >
         <Animated.FlatList
           data={
@@ -304,8 +304,8 @@ const $sectionHeaderStyle: TextStyle = {
   fontWeight: '600',
 };
 
-const $placeholderStyle: ViewStyle = {
-  height: 100,
+const $screenContainerStyle: ViewStyle = {
+  paddingHorizontal: 15,
 };
 
 const $chatCardStyle: ViewStyle = {

@@ -2,12 +2,10 @@
  * Root reducer combining all slices and RTK Query API reducers.
  */
 import { combineReducers, AnyAction } from '@reduxjs/toolkit';
-import { userSlice } from './slices/userSlice';
 import selectedRoomReducer from './slices/selectedRoomSlice';
 import { authApi } from './api/authApi';
 
 const appReducer = combineReducers({
-  user: userSlice.reducer,
   selectedRoom: selectedRoomReducer,
   [authApi.reducerPath]: authApi.reducer,
 });
