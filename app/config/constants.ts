@@ -12,6 +12,6 @@ export const API_URLS = {
   CHAT_ROOMS: 'chatrooms/',
 };
 
-export const REALTIME_MODEL = 'gpt-4o-realtime-preview-2024-12-17';
+export const REALTIME_MODEL = 'gpt-4o-realtime-preview-2025-06-03';
 
 export const skeletonViewProps = {};

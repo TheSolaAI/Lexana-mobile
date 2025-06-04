@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { View, ViewStyle, Text, useWindowDimensions, TextStyle } from 'react-native';
+import { View, ViewStyle, Text, useWindowDimensions, TextStyle, ScrollView } from 'react-native';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { ThemedStyle } from '@/theme';
 
@@ -13,9 +13,13 @@ export const SimpleMessageItem: FC<SimpleMessageItemProps> = ({ text }) => {
 
   return (
     <View style={themed($containerStyle)}>
-      <View style={[themed($messageContentStyle), { maxHeight: screenHeight * 0.6 - 40 }]}>
+      <ScrollView 
+        style={[themed($messageContentStyle), { maxHeight: screenHeight * 0.6 - 40 }]}
+        showsVerticalScrollIndicator={true}
+        nestedScrollEnabled={true}
+      >
         <Text style={themed($textStyle)}>{text}</Text>
-      </View>
+      </ScrollView>
     </View>
   );
 };

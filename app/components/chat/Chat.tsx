@@ -103,11 +103,11 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
     switch (toolName) {
       case 'tokenAddressTool':
         return <TokenAddressResultMessageItem props={args.data} />;
-      case 'getTokenDataTool':
+      case 'getTokenData':
         return <TokenDataResultMessageItem props={args.data} />;
-      case 'bubblemapTool':
+      case 'bubblemap':
         return <BubbleMapMessageItem props={args.data} />;
-      case 'topHoldersTool':
+      case 'topHolders':
         return <TopHoldersMessageItem props={args.data} />;
       case 'trendingAiProjects':
         return <AiProjectsMessageItem props={args.data} />;
@@ -199,6 +199,7 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
       onScroll={onScroll}
       ListFooterComponent={<View style={$footerSpacing} />}
       scrollEventThrottle={16}
+      contentContainerStyle={$flatListContentContainer}
       onContentSizeChange={() => {
         if (scrollToBottomOnNextUpdate.current) {
           scrollToBottom();
@@ -233,4 +234,8 @@ const $messagePartsContainer: ViewStyle = {
 
 const $footerSpacing: ViewStyle = {
   height: 100,
+};
+
+const $flatListContentContainer: ViewStyle = {
+  paddingHorizontal: 16,
 };
