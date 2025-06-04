@@ -5,7 +5,7 @@
     "name": "Lexana-AI",
     "slug": "Lexana-AI",
     "scheme": "lexana",
-    "version": "0.1.0",
+    "version": "0.1.3",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "icon": "./assets/images/app-icon-all.png",
@@ -17,7 +17,7 @@
     "assetBundlePatterns": ["**/*"],
     "android": {
       "icon": "./assets/images/app-icon-android-legacy.png",
-      "package": "com.lexana.lexanaai",
+      "package": "com.sola.lexanaai",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
         "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
@@ -30,7 +30,7 @@
     "ios": {
       "icon": "./assets/images/app-icon-ios.png",
       "supportsTablet": true,
-      "bundleIdentifier": "com.lexana.lexanaai",
+      "bundleIdentifier": "com.sola.lexanaai",
       "splash": {
         "backgroundColor": "#000000"
       }
