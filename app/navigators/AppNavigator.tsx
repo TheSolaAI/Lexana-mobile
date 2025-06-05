@@ -31,7 +31,13 @@ export const AppStackNavigator = function AppStack() {
       }}
     >
       <Stack.Screen name="ChatScreen" component={Screens.ChatScreen} />
-      <Stack.Screen name="SettingsScreen" component={Screens.SettingsScreen} />
+      <Stack.Screen 
+        name="SettingsScreen" 
+        component={Screens.SettingsScreen}
+        options={{
+          animation: 'ios_from_right',
+        }}
+      />
       <Stack.Screen
         name="MenuScreen"
         component={Screens.MenuScreen}

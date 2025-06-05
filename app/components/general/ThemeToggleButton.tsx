@@ -1,37 +1,39 @@
 import { useRef, useEffect } from 'react';
-import { TouchableOpacity, ViewStyle, Animated, StyleSheet } from 'react-native';
+import { ViewStyle, Animated, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { ThemedStyle } from '@/theme';
 
-export const ThemeToggleButton: React.FC = () => {
-  const { theme, themeContext, setThemeContextOverride, themed } = useAppTheme();
-  const isDark = themeContext === 'dark';
+interface ThemeToggleButtonProps {
+  isDark: boolean;
+}
 
+/**
+ * A presentational component that displays the theme toggle button with animation
+ * @param isDark - Whether the current theme is dark mode
+ */
+export const ThemeToggleButton: React.FC<ThemeToggleButtonProps> = ({ isDark }) => {
   // Animation values
   const rotateAnim = useRef(new Animated.Value(isDark ? 1 : 0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   // Update animation when theme changes
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(rotateAnim, {
-        toValue: isDark ? 1 : 0,
-        duration: 300,
+    // Immediately update the icon
+    rotateAnim.setValue(isDark ? 1 : 0);
+    
+    // Quick scale animation for feedback
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 0.9,
+        duration: 100,
         useNativeDriver: true,
       }),
-      Animated.sequence([
-        Animated.timing(scaleAnim, {
-          toValue: 0.8,
-          duration: 150,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 150,
-          useNativeDriver: true,
-        }),
-      ]),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
     ]).start();
   }, [isDark, rotateAnim, scaleAnim]);
 
@@ -41,34 +43,24 @@ export const ThemeToggleButton: React.FC = () => {
     outputRange: ['0deg', '180deg'],
   });
 
-  // Toggle theme handler
-  const toggleTheme = () => {
-    setThemeContextOverride(isDark ? 'light' : 'dark');
-  };
+  const { theme, themed } = useAppTheme();
 
   return (
-    <TouchableOpacity
-      style={styles.container}
-      onPress={toggleTheme}
-      activeOpacity={0.7}
-      hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+    <Animated.View
+      style={[
+        styles.iconContainer,
+        themed($iconContainer),
+        {
+          transform: [{ rotate: spin }, { scale: scaleAnim }],
+        },
+      ]}
     >
-      <Animated.View
-        style={[
-          styles.iconContainer,
-          themed($iconContainer),
-          {
-            transform: [{ rotate: spin }, { scale: scaleAnim }],
-          },
-        ]}
-      >
-        {isDark ? (
-          <Feather name="moon" size={20} color={theme.colors.text} />
-        ) : (
-          <Feather name="sun" size={20} color={theme.colors.text} />
-        )}
-      </Animated.View>
-    </TouchableOpacity>
+      {isDark ? (
+        <Feather name="moon" size={20} color={theme.colors.text} />
+      ) : (
+        <Feather name="sun" size={20} color={theme.colors.text} />
+      )}
+    </Animated.View>
   );
 };
 

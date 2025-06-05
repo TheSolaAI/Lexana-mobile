@@ -68,7 +68,7 @@ export function App() {
                           },
                         },
                       }}
-                    >
+                    > 
                       <AppNavigator />
                     </PrivyProvider>
                   </KeyboardProvider>

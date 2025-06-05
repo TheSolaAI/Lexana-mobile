@@ -17,7 +17,7 @@ type ThemeContextType = {
 
 // create a React context and provider for the current theme
 export const ThemeContext = createContext<ThemeContextType>({
-  themeScheme: undefined, // default to the system theme
+  themeScheme: undefined,
   setThemeContextOverride: (_newTheme: ThemeContexts) => {
     console.error('Tried to call setThemeContextOverride before the ThemeProvider was initialized');
   },
@@ -26,8 +26,16 @@ export const ThemeContext = createContext<ThemeContextType>({
 const themeContextToTheme = (themeContext: ThemeContexts): Theme =>
   themeContext === 'dark' ? darkTheme : lightTheme;
 
+// Debounce the system UI update to prevent blocking the main thread
+let systemUIUpdateTimeout: NodeJS.Timeout | null = null;
 const setImperativeTheming = (theme: Theme) => {
-  SystemUI.setBackgroundColorAsync(theme.colors.background);
+  if (systemUIUpdateTimeout) {
+    clearTimeout(systemUIUpdateTimeout);
+  }
+  // Update UI immediately
+  requestAnimationFrame(() => {
+    SystemUI.setBackgroundColorAsync(theme.colors.background).catch(console.error);
+  });
 };
 
 export const useThemeProvider = (initialTheme: ThemeContexts = undefined) => {
@@ -35,14 +43,20 @@ export const useThemeProvider = (initialTheme: ThemeContexts = undefined) => {
   const [overrideTheme, setTheme] = useState<ThemeContexts>(initialTheme);
 
   const setThemeContextOverride = useCallback((newTheme: ThemeContexts) => {
+    // Update theme immediately
     setTheme(newTheme);
+    // Update system UI in the next frame
+    requestAnimationFrame(() => {
+      setImperativeTheming(themeContextToTheme(newTheme));
+    });
   }, []);
 
   const themeScheme = overrideTheme || colorScheme || 'light';
 
+  // Only update system UI on mount and when colorScheme changes
   useEffect(() => {
     setImperativeTheming(themeContextToTheme(themeScheme));
-  }, [themeScheme]);
+  }, [colorScheme]);
 
   return {
     themeScheme,

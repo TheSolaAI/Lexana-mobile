@@ -5,17 +5,24 @@ import { useAppTheme } from '@/utils/useAppTheme';
 import { Feather } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 import { useEmbeddedSolanaWallet, useHeadlessDelegatedActions, usePrivy } from '@privy-io/expo';
+import { useFundSolanaWallet } from '@privy-io/expo/dist/ui';
 import { navigate } from '@/navigators/navigationUtilities';
 import { AppStackScreenProps } from '@/navigators/AppNavigator';
 import { logoutAndClearState } from '@/utils/logout';
+import { toast } from 'sonner-native';
+import { Linking } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 interface SettingsScreenProps extends AppStackScreenProps<'SettingsScreen'> {}
 
 export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
-  const { themed, theme } = useAppTheme();
+  const { themed, theme, themeContext, setThemeContextOverride } = useAppTheme();
   const { user, logout } = usePrivy();
   const { wallets } = useEmbeddedSolanaWallet();
+  const { fundWallet } = useFundSolanaWallet();
+
   const { delegateWallet } = useHeadlessDelegatedActions();
+  const isDark = themeContext === 'dark';
 
   /**
    * Handles logout by clearing all application state and then calling Privy logout.
@@ -39,6 +46,37 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
 
   const handleBack = () => {
     navigate('ChatScreen');
+  };
+
+  const handleThemeToggle = () => {
+    setThemeContextOverride(isDark ? 'light' : 'dark');
+  };
+
+  /**
+   * Copies the wallet address to clipboard and shows a toast notification
+   */
+  const handleCopyAddress = async () => {
+    const address = wallets?.[0]?.publicKey;
+    if (address) {
+      await Clipboard.setString(address);
+      toast.success('Address copied to clipboard');
+    }
+  };
+
+  /**
+   * Opens the wallet address in Solscan explorer
+   */
+  const handleOpenSolscan = async () => {
+    const address = wallets?.[0]?.publicKey;
+    if (address) {
+      const solscanUrl = `https://solscan.io/account/${address}`;
+      const canOpen = await Linking.canOpenURL(solscanUrl);
+      if (canOpen) {
+        await Linking.openURL(solscanUrl);
+      } else {
+        toast.error('Could not open Solscan');
+      }
+    }
   };
 
   return (
@@ -87,11 +125,6 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
                 <Text preset="bold" style={themed($walletTitle)}>
                   Privy Embedded Wallet
                 </Text>
-                <View style={themed($defaultBadge)}>
-                  <Text preset="small" style={themed($defaultText)}>
-                    Default
-                  </Text>
-                </View>
               </View>
 
               <View style={$keyContainer}>
@@ -105,12 +138,14 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
                   <TouchableOpacity
                     style={$copyButton}
                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    onPress={handleCopyAddress}
                   >
                     <Feather name="copy" size={20} color={theme.colors.text} />
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={$exportButton}
                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    onPress={handleOpenSolscan}
                   >
                     <Feather name="external-link" size={20} color={theme.colors.text} />
                   </TouchableOpacity>
@@ -121,13 +156,23 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
                 <TouchableOpacity
                   style={themed($walletActionButton)}
                   onPress={async () =>
-                    delegateWallet({
-                      address: wallets ? wallets[0].address : '',
-                      chainType: 'solana',
-                    })
+                  {delegateWallet({
+                    address: wallets ? wallets[0].address : '',
+                    chainType: 'solana',
+                  })
+                  toast.success('Delegated')}
                   }
                 >
                   <Feather name="users" size={18} color={theme.colors.text} />
+                  <Text style={themed($actionButtonText)}>Delegate</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={themed($walletActionButton)}
+                  onPress={async () =>
+                  {toast.info('This feature will be available soon')}
+                  }
+                >
+                  <Feather name="credit-card" size={18} color={theme.colors.text} />
                   <Text style={themed($actionButtonText)}>Delegate</Text>
                 </TouchableOpacity>
               </View>
@@ -138,12 +183,16 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
         {/* Appearance Section */}
         <View style={themed($sectionContainer)}>
           <Text preset="pageHeading" text="Appearance" style={$sectionTitle} />
-          <View style={themed($cardContainer)}>
+          <TouchableOpacity 
+            style={themed($cardContainer)} 
+            onPress={handleThemeToggle}
+            activeOpacity={0.7}
+          >
             <View style={$appearanceContainer}>
               <Text style={themed($settingLabel)}>Theme</Text>
-              <ThemeToggleButton />
+              <ThemeToggleButton isDark={isDark} />
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* Logout Section */}
@@ -249,11 +298,6 @@ const $defaultBadge: ThemedStyle<ViewStyle> = theme => ({
   paddingHorizontal: 8,
   paddingVertical: 2,
   marginLeft: 8,
-});
-
-const $defaultText: ThemedStyle<TextStyle> = theme => ({
-  color: theme.colors.text,
-  fontSize: 12,
 });
 
 const $keyContainer: ViewStyle = {

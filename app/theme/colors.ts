@@ -1,16 +1,16 @@
 const palette = {
-  background: '#FAFAFA',
+  background: '#F8F9FC',
   baseBackground: '#FFFFFF',
-  sec_background: '#F5F5F5',
+  sec_background: '#F0F2F5',
   surface: '#FFFFFF',
-  textColor: '#212121',
-  secText: '#757575',
-  border: '#EEEEEE',
-  primary: '#732255',
-  primaryDark: '#3700B3',
-  success: '#4CAF50',
-  error: '#F44336',
-  warning: '#FFC107',
+  textColor: '#1A1F36',
+  secText: '#697386',
+  border: '#E6E8F0',
+  primary: '#9945FF',
+  primaryDark: '#7B2CBF',
+  success: '#14F195',
+  error: '#FF4D4D',
+  warning: '#FFB800',
 } as const;
 
 export const colors = {
