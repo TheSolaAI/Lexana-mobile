@@ -1,5 +1,5 @@
 import React from 'react';
-import { FC, useRef, useEffect, useState, useMemo, createRef } from 'react';
+import { FC, useRef, useEffect, useState, useMemo, createRef, useCallback } from 'react';
 import { OnboardingStackScreenProps } from '@/navigators/OnboardingNavigator';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { Button, Screen, Text, TextField } from '@/components/general';
@@ -63,6 +63,8 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = function WelcomeScreen() {
   const [emailError, setEmailError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [otpError, setOtpError] = useState('');
+  const [otp, setOtp] = useState('');
+  const [isInputFocused, setIsInputFocused] = useState(false);
 
   const { sendCode, loginWithCode } = useLoginWithEmail();
 
@@ -72,52 +74,54 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = function WelcomeScreen() {
     []
   );
 
+  // Memoize animation functions to prevent unnecessary re-renders
+  const randomScroll = useCallback((ref: React.RefObject<ScrollView>) => {
+    if (ref.current && !isInputFocused) {
+      const estimatedChipWidth = 140;
+      const visibleChips = 3;
+      const extendedChipsCount = chipRows[0].length;
+      const maxOffset = Math.max(0, estimatedChipWidth * (extendedChipsCount - visibleChips));
+      
+      // Random direction: -1 (left) or 1 (right)
+      const direction = Math.random() > 0.5 ? 1 : -1;
+      // Random scroll amount (between 0.5 and 2 chip widths)
+      const amount = estimatedChipWidth * (0.5 + Math.random() * 1.5) * direction;
+      
+      let randomOffset = Math.floor(Math.random() * maxOffset);
+      randomOffset = Math.max(0, Math.min(maxOffset, randomOffset + amount));
+      
+      ref.current.scrollTo({ x: randomOffset, animated: true });
+    }
+  }, [isInputFocused]);
+
+  const scheduleRandomScroll = useCallback((ref: React.RefObject<ScrollView>, rowIdx: number, timeouts: NodeJS.Timeout[]) => {
+    if (isInputFocused) return; // Don't schedule new animations when input is focused
+    
+    const interval = 3000 + Math.random() * 4000; // 3-7 seconds, slightly longer intervals
+    const timeout = setTimeout(() => {
+      randomScroll(ref);
+      scheduleRandomScroll(ref, rowIdx, timeouts);
+    }, interval);
+    timeouts[rowIdx] = timeout;
+  }, [randomScroll, isInputFocused]);
+
   // On mount, set up random scroll intervals for each row
   useEffect(() => {
-    const estimatedChipWidth = 140;
-    const visibleChips = 3;
-    const extendedChipsCount = chipRows[0].length; // all rows same length
-    const maxOffset = Math.max(0, estimatedChipWidth * (extendedChipsCount - visibleChips));
     const timeouts: NodeJS.Timeout[] = [];
 
-    function randomScroll(ref: React.RefObject<ScrollView>) {
-      if (ref.current) {
-        // Random direction: -1 (left) or 1 (right)
-        const direction = Math.random() > 0.5 ? 1 : -1;
-        // Random scroll amount (between 0.5 and 2 chip widths)
-        const amount = estimatedChipWidth * (0.5 + Math.random() * 5) * direction;
-        // Get current scroll position
-        ref.current.scrollTo({ x: 0, animated: false }); // fallback if can't get current
-        setTimeout(() => {
-          let randomOffset = Math.floor(Math.random() * maxOffset);
-          // Clamp to [0, maxOffset]
-          randomOffset = Math.max(0, Math.min(maxOffset, randomOffset + amount));
-          if (ref.current) {
-            ref.current.scrollTo({ x: randomOffset, animated: true });
-          }
-        }, 10);
-      }
+    // Only start animations if input is not focused
+    if (!isInputFocused) {
+      // Initial random scroll for each row with staggered timing
+      scrollRefs.forEach((ref, idx) => {
+        setTimeout(() => randomScroll(ref), 500 + idx * 200);
+        setTimeout(() => scheduleRandomScroll(ref, idx, timeouts), 1000 + idx * 200);
+      });
     }
-
-    function scheduleRandomScroll(ref: React.RefObject<ScrollView>, rowIdx: number) {
-      const interval = 2000 + Math.random() * 4000; // 2-6 seconds
-      const timeout = setTimeout(() => {
-        randomScroll(ref);
-        scheduleRandomScroll(ref, rowIdx);
-      }, interval);
-      timeouts[rowIdx] = timeout;
-    }
-
-    // Initial random scroll for each row
-    scrollRefs.forEach((ref, idx) => {
-      setTimeout(() => randomScroll(ref), 300 + idx * 100);
-      scheduleRandomScroll(ref, idx);
-    });
 
     return () => {
       timeouts.forEach(t => clearTimeout(t));
     };
-  }, []);
+  }, [randomScroll, scheduleRandomScroll, isInputFocused]);
 
   /**
    * Handler for sign in button press
@@ -126,6 +130,7 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = function WelcomeScreen() {
     setEmail('');
     setEmailError('');
     setOtpError('');
+    setIsInputFocused(false);
     emailSheetRef.current?.present();
   };
 
@@ -142,6 +147,7 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = function WelcomeScreen() {
     }
 
     setIsLoading(true);
+    setIsInputFocused(false);
     Keyboard.dismiss();
 
     try {
@@ -185,6 +191,15 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = function WelcomeScreen() {
       setOtpError('Invalid OTP. Please try again.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  /**
+   * Handler for verify button press
+   */
+  const handleVerifyPress = () => {
+    if (otp.length === 6) {
+      handleVerifyOtp(otp);
     }
   };
 
@@ -260,6 +275,8 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = function WelcomeScreen() {
             autoComplete="email"
             error={emailError}
             containerStyle={$inputContainerStyle}
+            onFocus={() => setIsInputFocused(true)}
+            onBlur={() => setIsInputFocused(false)}
           />
           <Button
             text="Continue"
@@ -286,7 +303,10 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = function WelcomeScreen() {
             hideStick={true}
             blurOnFilled={true}
             type="numeric"
-            onFilled={handleVerifyOtp}
+            onFilled={(code: string) => {
+              setOtp(code);
+              handleVerifyOtp(code);
+            }}
             error={otpError}
           />
 
@@ -297,7 +317,7 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = function WelcomeScreen() {
           <Button
             text="Verify"
             preset="primary"
-            onPress={handleVerifyOtp}
+            onPress={handleVerifyPress}
             disabled={isLoading}
             style={$verifyButtonStyle}
           />

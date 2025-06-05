@@ -30,7 +30,10 @@ export const useStandardProvider = () => {
   const selectedRoomId = useAppSelector(state => state.selectedRoom.selectedRoomId);
   // Update selectedRoomId if chatRooms changes and selectedRoomId is not valid
   useEffect(() => {
-    if (chatRooms.length > 0 && selectedRoomId == null) {
+    // Only set the first room if there's no selected room ID or if the selected room doesn't exist in the current rooms
+    const isSelectedRoomValid = selectedRoomId && chatRooms.some((room: any) => room.id === selectedRoomId);
+    
+    if (chatRooms.length > 0 && !isSelectedRoomValid) {
       dispatch(setSelectedRoomId(chatRooms[0].id));
     }
   }, [chatRooms, selectedRoomId, dispatch]);

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-color-literals */
 import { AppStackScreenProps } from '@/navigators/AppNavigator';
-import { FC, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Screen } from '@/components/general';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { $styles } from '@/theme';
@@ -8,7 +8,7 @@ import { Screenheader } from '@/components/app/ScreenHeader';
 import { ViewStyle, View, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useStandardProvider } from '@/hooks/useStandardProvider';
 import { Chat } from '@/components/chat/Chat';
-import { Feather } from '@expo/vector-icons';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { InputCard } from '@/components/chat/InputCard';
 import { useAppDispatch } from '@/stores/hooks';
 import { setSelectedRoomId } from '@/stores/slices/selectedRoomSlice';
@@ -16,6 +16,7 @@ import { useCreateChatRoomMutation } from '@/stores/services/chatRooms.service';
 import { toast } from 'sonner-native';
 import { useFetchChatRoomsQuery } from '@/stores/services/chatRooms.service';
 import { LiveMode } from '@/components/chat/LiveMode';
+import { Text } from '@/components/general';
 
 interface ChatScreenProps extends AppStackScreenProps<'ChatScreen'> {}
 
@@ -57,25 +58,23 @@ export const ChatScreen: FC<ChatScreenProps> = ({ navigation }) => {
    * @returns {Promise<void>}
    */
   const handleExitLiveMode = async () => {
+    setIsLiveMode(false);
+  };
+
+  /**
+   * Handles creating a new chat room and selecting it
+   */
+  const handleCreateNewChat = async () => {
     try {
-      // Clear messages before creating new chat
-      setMessages([]);
-      // First set live mode to false to update UI
-      setIsLiveMode(false);
-
-      // Create a new chat room
       const result = await createChatRoom({ name: 'New Chat' }).unwrap();
-
-      // Update the selected room ID to switch to the new chat
       dispatch(setSelectedRoomId(result.id));
+      toast.success('Created new chat');
     } catch {
-      toast.error('Failed to create new chat');
-      // If creating new chat fails, try to go back to the previous chat
-      if (chatRooms.length > 0) {
-        dispatch(setSelectedRoomId(chatRooms[0].id));
-      }
+      toast.error('Error creating chat room');
     }
   };
+
+  const hasNoChats = chatRooms.length === 0;
 
   return (
     <Screen
@@ -98,17 +97,17 @@ export const ChatScreen: FC<ChatScreenProps> = ({ navigation }) => {
         </View>
       ) : isLiveMode ? (
         <LiveMode onExitLiveMode={handleExitLiveMode} />
+      ) : hasNoChats ? (
+        <EmptyState onCreateChat={handleCreateNewChat} />
       ) : (
-        <Chat messages={messages} />
-      )}
-      {isLiveMode ? (
-        <></>
-      ) : (
-        <InputCard
-          onSendMessage={handleTextMessage}
-          onAudioRecorded={onAudioMessage}
-          onEnterLiveMode={handleEnterLiveMode}
-        />
+        <>
+          <Chat messages={messages} />
+          <InputCard
+            onSendMessage={handleTextMessage}
+            onAudioRecorded={onAudioMessage}
+            onEnterLiveMode={handleEnterLiveMode}
+          />
+        </>
       )}
     </Screen>
   );
@@ -120,8 +119,53 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  emptyTitle: {
+    marginTop: 20,
+    marginBottom: 8,
+  },
+  emptyDescription: {
+    textAlign: 'center',
+    marginBottom: 24,
+    opacity: 0.7,
+  },
+  createButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
+  },
+  createButtonText: {
+    color: 'white',
+    fontWeight: '600',
+  },
 });
 
 const $screenContainerStyle: ViewStyle = {
   flex: 1,
+};
+
+/**
+ * EmptyState component shown when there are no chats
+ */
+const EmptyState: FC<{ onCreateChat: () => void }> = ({ onCreateChat }) => {
+  const { theme } = useAppTheme();
+  return (
+    <View style={styles.emptyContainer}>
+      <MaterialIcons name="mic" size={64} color={theme.colors.textDim} />
+      <Text preset="onboardingSubHeading" style={styles.emptyTitle}>
+        Welcome to Lexana
+      </Text>
+      <Text preset="default" style={styles.emptyDescription}>
+        Explore the power of solana voice engine 
+      </Text>
+      <TouchableOpacity style={[styles.createButton, { backgroundColor: theme.colors.primary }]} onPress={onCreateChat}>
+        <Text style={styles.createButtonText}>Get Started</Text>
+      </TouchableOpacity>
+    </View>
+  );
 };

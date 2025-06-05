@@ -143,4 +143,4 @@ const $dotStyle: ThemedStyle<ViewStyle> = theme => ({
   height: 8,
   borderRadius: 4,
   backgroundColor: theme.colors.primary,
-}); 
+});

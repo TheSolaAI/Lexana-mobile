@@ -25,8 +25,8 @@ export function ErrorDetails(props: ErrorDetailsProps) {
       contentContainerStyle={themed($contentContainer)}
     >
       <View style={$topSection}>
-        <Text style={themed($heading)} preset="pageHeading" tx={"errorScreen:title" as TxKeyPath} />
-        <Text tx={"errorScreen:friendlySubtitle" as TxKeyPath} />
+        <Text style={themed($heading)} preset="pageHeading" tx={'errorScreen:title' as TxKeyPath} />
+        <Text tx={'errorScreen:friendlySubtitle' as TxKeyPath} />
       </View>
 
       <ScrollView
@@ -45,7 +45,7 @@ export function ErrorDetails(props: ErrorDetailsProps) {
         preset="primary"
         style={themed($resetButton)}
         onPress={props.onReset}
-        tx={"errorScreen:reset" as TxKeyPath}
+        tx={'errorScreen:reset' as TxKeyPath}
       />
     </Screen>
   );

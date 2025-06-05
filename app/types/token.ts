@@ -1,4 +1,3 @@
-
 export interface TopHolder {
   amount: number;
   insider: boolean;

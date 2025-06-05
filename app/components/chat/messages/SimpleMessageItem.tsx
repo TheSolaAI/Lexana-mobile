@@ -13,7 +13,7 @@ export const SimpleMessageItem: FC<SimpleMessageItemProps> = ({ text }) => {
 
   return (
     <View style={themed($containerStyle)}>
-      <ScrollView 
+      <ScrollView
         style={[themed($messageContentStyle), { maxHeight: screenHeight * 0.6 - 40 }]}
         showsVerticalScrollIndicator={true}
         nestedScrollEnabled={true}

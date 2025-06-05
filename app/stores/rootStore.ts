@@ -50,7 +50,22 @@ const store = configureStore({
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+        ignoredActions: [
+          'persist/PERSIST', 
+          'persist/REHYDRATE', 
+          'persist/FLUSH', 
+          'persist/PURGE'
+        ],
+        ignoredActionPaths: [
+          'meta.arg', 
+          'payload.timestamp',
+          'meta.baseQueryMeta'
+        ],
+        ignoredPaths: [
+          'items.dates',
+          'api.queries',
+          'api.mutations'
+        ],
       },
     }).concat(authApi.middleware),
   devTools: __DEV__, // Enable devTools only in development

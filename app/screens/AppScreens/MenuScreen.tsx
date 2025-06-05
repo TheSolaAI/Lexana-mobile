@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, FC } from 'react';
 import { View, TouchableOpacity, ViewStyle, TextStyle } from 'react-native';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
@@ -72,16 +72,12 @@ export const MenuScreen: React.FC<MenuScreenProps> = ({ navigation }) => {
    */
   const handleAddChat = async () => {
     try {
-      toast.promise(createChatRoom({ name: 'New Chat' }).unwrap(), {
-        loading: 'Creating...',
-        success: result => {
-          dispatch(setSelectedRoomId(result.id));
-          navigation.goBack();
-          return 'Created';
-        },
-        error: 'Error',
-      });
-    } catch {
+      const result = await createChatRoom({ name: 'New Chat' }).unwrap();
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      dispatch(setSelectedRoomId(result.id));
+      navigation.goBack();
+      toast.success('Created');
+    } catch (error) {
       toast.error('Error creating chat room');
     } finally {
       setSelectedActionRoom(null);
@@ -153,85 +149,34 @@ export const MenuScreen: React.FC<MenuScreenProps> = ({ navigation }) => {
         safeAreaEdges={['top']}
         contentContainerStyle={[themed($styles.screenContainer), $screenContainerStyle]}
       >
-        <Animated.FlatList
-          data={
-            isLoading
-              ? (Array.from({ length: 7 }) as any[])
-              : (chatRooms as { id: number; name: string }[])
-          }
-          showsVerticalScrollIndicator={false}
-          keyExtractor={item => {
-            if (
-              item &&
-              typeof item === 'object' &&
-              'id' in item &&
-              typeof (item as any).id === 'number'
-            ) {
-              return (item as any).id.toString();
-            }
-            return Math.random().toString();
-          }}
-          itemLayoutAnimation={LinearTransition.springify().damping(10).stiffness(100)}
-          renderItem={({ item }) => {
-            // If loading or placeholder, render skeleton
-            if (isLoading || chatRooms.length === 0) {
-              return (
-                <SkeletonPlaceholder
-                  enabled={true}
-                  backgroundColor={theme.colors.secondaryBg}
-                  highlightColor={theme.colors.surface}
+        {isLoading ? (
+          <Animated.FlatList
+            data={Array.from({ length: 7 })}
+            showsVerticalScrollIndicator={false}
+            keyExtractor={() => Math.random().toString()}
+            itemLayoutAnimation={LinearTransition.springify().damping(10).stiffness(100)}
+            renderItem={() => (
+              <SkeletonPlaceholder
+                enabled={true}
+                backgroundColor={theme.colors.secondaryBg}
+                highlightColor={theme.colors.surface}
+              >
+                <SkeletonPlaceholder.Item
+                  flexDirection="row"
+                  alignItems="center"
+                  marginBottom={30}
                 >
+                  <SkeletonPlaceholder.Item width={40} height={40} borderRadius={10} />
                   <SkeletonPlaceholder.Item
-                    flexDirection="row"
-                    alignItems="center"
-                    marginBottom={30}
-                  >
-                    <SkeletonPlaceholder.Item width={40} height={40} borderRadius={10} />
-                    <SkeletonPlaceholder.Item
-                      width={200}
-                      height={20}
-                      marginLeft={10}
-                      borderRadius={5}
-                    />
-                  </SkeletonPlaceholder.Item>
-                </SkeletonPlaceholder>
-              );
-            }
-            // Render actual chat room
-            const chatRoom = item as { id: number; name: string };
-            const isSelected = chatRoom.id === selectedRoomId;
-            return (
-              <View style={isSelected ? themed($selectedChatContainerStyle) : null}>
-                <TouchableOpacity
-                  style={[themed($chatCardStyle), isSelected && themed($selectedChatCardStyle)]}
-                  onPress={() => {
-                    dispatch(setSelectedRoomId(chatRoom.id));
-                    navigation.goBack();
-                  }}
-                  onLongPress={() => handleLongPressRoom(chatRoom)}
-                  activeOpacity={0.7}
-                >
-                  <View
-                    style={[
-                      themed($chatIconContainer),
-                      isSelected && themed($selectedChatIconStyle),
-                    ]}
-                  >
-                    <MaterialIcons
-                      name={isSelected ? 'chat-bubble' : 'chat-bubble-outline'}
-                      size={22}
-                      color={isSelected ? theme.colors.text : theme.colors.textDim}
-                    />
-                  </View>
-                  <Text preset="default" style={isSelected && $selectedChatTextStyle}>
-                    {chatRoom.name}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            );
-          }}
-          ListHeaderComponent={
-            <>
+                    width={200}
+                    height={20}
+                    marginLeft={10}
+                    borderRadius={5}
+                  />
+                </SkeletonPlaceholder.Item>
+              </SkeletonPlaceholder>
+            )}
+            ListHeaderComponent={
               <View style={$headerStyle}>
                 <TouchableOpacity
                   style={themed($userIconContainer)}
@@ -250,14 +195,75 @@ export const MenuScreen: React.FC<MenuScreenProps> = ({ navigation }) => {
                   <Feather name="user" size={24} color={theme.colors.text} />
                 </TouchableOpacity>
               </View>
-              <Text
-                tx="menuScreen:recentChats"
-                preset="onboardingSubHeading"
-                style={$sectionHeaderStyle}
-              />
-            </>
-          }
-        />
+            }
+          />
+        ) : (
+          <Animated.FlatList
+            data={chatRooms}
+            showsVerticalScrollIndicator={false}
+            keyExtractor={item => item.id.toString()}
+            itemLayoutAnimation={LinearTransition.springify().damping(10).stiffness(100)}
+            renderItem={({ item: chatRoom }) => {
+              const isSelected = chatRoom.id === selectedRoomId;
+              return (
+                <View style={isSelected ? themed($selectedChatContainerStyle) : null}>
+                  <TouchableOpacity
+                    style={[themed($chatCardStyle), isSelected && themed($selectedChatCardStyle)]}
+                    onPress={() => {
+                      dispatch(setSelectedRoomId(chatRoom.id));
+                      navigation.goBack();
+                    }}
+                    onLongPress={() => handleLongPressRoom(chatRoom)}
+                    activeOpacity={0.7}
+                  >
+                    <View
+                      style={[
+                        themed($chatIconContainer),
+                        isSelected && themed($selectedChatIconStyle),
+                      ]}
+                    >
+                      <MaterialIcons
+                        name={isSelected ? 'chat-bubble' : 'chat-bubble-outline'}
+                        size={22}
+                        color={isSelected ? theme.colors.text : theme.colors.textDim}
+                      />
+                    </View>
+                    <Text preset="default" style={isSelected && $selectedChatTextStyle}>
+                      {chatRoom.name}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            }}
+            ListHeaderComponent={
+              <>
+                <View style={$headerStyle}>
+                  <TouchableOpacity
+                    style={themed($userIconContainer)}
+                    onPress={() => {
+                      navigation.goBack();
+                    }}
+                  >
+                    <Feather name="x" size={24} color={theme.colors.text} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={themed($userIconContainer)}
+                    onPress={() => {
+                      navigation.navigate('SettingsScreen');
+                    }}
+                  >
+                    <Feather name="user" size={24} color={theme.colors.text} />
+                  </TouchableOpacity>
+                </View>
+                <Text
+                  tx="menuScreen:recentChats"
+                  preset="onboardingSubHeading"
+                  style={$sectionHeaderStyle}
+                />
+              </>
+            }
+          />
+        )}
 
         {/* Bottom Sheet for actions */}
         <BottomSheetCard sheetRef={bottomSheetRef}>
@@ -272,9 +278,11 @@ export const MenuScreen: React.FC<MenuScreenProps> = ({ navigation }) => {
           />
         </BottomSheetCard>
       </Screen>
-      <TouchableOpacity style={themed($fab)} onPress={handleAddChat}>
-        <MaterialIcons name="add" size={32} color={theme.colors.text} />
-      </TouchableOpacity>
+      {!isLoading && (
+        <TouchableOpacity style={themed($fab)} onPress={handleAddChat}>
+          <MaterialIcons name="add" size={32} color={theme.colors.text} />
+        </TouchableOpacity>
+      )}
     </BottomSheetModalProvider>
   );
 };

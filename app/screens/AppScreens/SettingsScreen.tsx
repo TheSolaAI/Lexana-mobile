@@ -7,7 +7,7 @@ import { TouchableOpacity } from 'react-native';
 import { useEmbeddedSolanaWallet, useHeadlessDelegatedActions, usePrivy } from '@privy-io/expo';
 import { navigate } from '@/navigators/navigationUtilities';
 import { AppStackScreenProps } from '@/navigators/AppNavigator';
-import { useFundSolanaWallet } from '@privy-io/expo/ui';
+import { logoutAndClearState } from '@/utils/logout';
 
 interface SettingsScreenProps extends AppStackScreenProps<'SettingsScreen'> {}
 
@@ -15,11 +15,22 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
   const { themed, theme } = useAppTheme();
   const { user, logout } = usePrivy();
   const { wallets } = useEmbeddedSolanaWallet();
-  const { fundWallet } = useFundSolanaWallet();
   const { delegateWallet } = useHeadlessDelegatedActions();
 
+  /**
+   * Handles logout by clearing all application state and then calling Privy logout.
+   * This ensures complete cleanup of user data including:
+   * - Redux state reset
+   * - RTK Query cache clearing
+   * - Persisted data purging
+   * - Privy authentication logout
+   */
   const handleLogout = async () => {
     try {
+      // First clear all application state
+      await logoutAndClearState();
+      
+      // Then logout from Privy
       await logout();
     } catch (error) {
       console.error('Logout error:', error);
@@ -107,14 +118,6 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
               </View>
 
               <View style={$walletActions}>
-                <TouchableOpacity
-                  style={themed($walletActionButton)}
-                  onPress={() => fundWallet({ address: wallets ? wallets[0].address : '' })}
-                >
-                  <Feather name="dollar-sign" size={18} color={theme.colors.text} />
-                  <Text style={themed($actionButtonText)}>Fund</Text>
-                </TouchableOpacity>
-
                 <TouchableOpacity
                   style={themed($walletActionButton)}
                   onPress={async () =>

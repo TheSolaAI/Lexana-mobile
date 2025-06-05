@@ -56,8 +56,11 @@ const en = {
     },
   },
   menuScreen: {
+    recentChats: "Recent Chats",
+    noChatsTitle: "No Chats Yet",
+    noChatsDescription: "Start a new conversation to begin chatting.",
+    createNewChat: "Create New Chat",
     recentSearches: 'Recent Searches',
-    recentChats: 'Recent Chats',
     editChatName: 'Edit Chat Name',
     deleteChat: 'Delete Chat',
   },

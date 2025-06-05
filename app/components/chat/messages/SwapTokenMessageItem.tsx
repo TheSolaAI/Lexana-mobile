@@ -52,7 +52,7 @@ interface SwapTokenMessageItemProps {
 /**
  * A component that displays token swap information in an expandable message item.
  * Shows swap details including input/output tokens, amounts, rates, and transaction information.
- * 
+ *
  * @param props - The component props containing swap token details
  * @returns A React component that renders the swap token message
  */
@@ -64,14 +64,7 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
     return null;
   }
 
-  const {
-    amount,
-    inputParams,
-    outAmount,
-    tickers,
-    input_mint,
-    output_mint,
-  } = props.details;
+  const { amount, inputParams, outAmount, tickers, input_mint, output_mint } = props.details;
 
   // Clipboard function
   const copyToClipboard = async (text: string, message = 'Address copied to clipboard') => {
@@ -117,7 +110,8 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
 
       <View style={$priceInfoContainer}>
         <Text preset="small" style={themed($priceTextStyle)}>
-          Rate: 1 {tickers.inputTokenTicker} = {(outAmount / amount).toFixed(4)} {tickers.outputTokenTicker}
+          Rate: 1 {tickers.inputTokenTicker} = {(outAmount / amount).toFixed(4)}{' '}
+          {tickers.outputTokenTicker}
         </Text>
       </View>
     </View>
@@ -200,7 +194,8 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
                 Rate
               </Text>
               <Text style={themed($detailValueStyle)}>
-                1 {tickers.inputTokenTicker} = {(outAmount / amount).toFixed(4)} {tickers.outputTokenTicker}
+                1 {tickers.inputTokenTicker} = {(outAmount / amount).toFixed(4)}{' '}
+                {tickers.outputTokenTicker}
               </Text>
             </View>
 
@@ -208,9 +203,7 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
               <Text preset="small" style={themed($detailLabelStyle)}>
                 Swap Mode
               </Text>
-              <Text style={themed($detailValueStyle)}>
-                {inputParams.swap_mode}
-              </Text>
+              <Text style={themed($detailValueStyle)}>{inputParams.swap_mode}</Text>
             </View>
 
             {inputParams.priority_fee_needed && (
@@ -218,9 +211,7 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
                 <Text preset="small" style={themed($detailLabelStyle)}>
                   Priority Fee
                 </Text>
-                <Text style={themed($detailValueStyle)}>
-                  {props.details.priorityFee} SOL
-                </Text>
+                <Text style={themed($detailValueStyle)}>{props.details.priorityFee} SOL</Text>
               </View>
             )}
           </View>
@@ -232,7 +223,9 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
                 style={themed($actionButtonStyle)}
                 onPress={() => copyToClipboard(input_mint, 'Token address copied')}
               >
-                <Text style={themed($actionButtonTextStyle)}>Copy {tickers.inputTokenTicker} Address</Text>
+                <Text style={themed($actionButtonTextStyle)}>
+                  Copy {tickers.inputTokenTicker} Address
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -249,7 +242,9 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
                 style={themed($actionButtonStyle)}
                 onPress={() => copyToClipboard(output_mint, 'Token address copied')}
               >
-                <Text style={themed($actionButtonTextStyle)}>Copy {tickers.outputTokenTicker} Address</Text>
+                <Text style={themed($actionButtonTextStyle)}>
+                  Copy {tickers.outputTokenTicker} Address
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -492,4 +487,3 @@ const $expandedFooterStyle: ThemedStyle<ViewStyle> = theme => ({
 const $footerTextStyle: ThemedStyle<TextStyle> = theme => ({
   color: theme.colors.textDim,
 });
-
