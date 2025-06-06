@@ -123,14 +123,14 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
         return <SNSResolverMessageItem props={args.data} />;
       case 'swapTokens':
         return <SwapTokenMessageItem props={args.data} />;
-      case 'sign_and_send_tx':
-        return <SignedTransactionsMessageItem props={args.data} />;
+      // case 'sign_and_send_tx':
+      //   return <SignedTransactionsMessageItem props={args.data} />;
       case 'transferSol':
         return <TransferTokenMessageItem props={args.data} />;
       case 'transferSpl':
         return <TransferTokenMessageItem props={args.data} />;
-      default:
-        return <SimpleMessageItem text={JSON.stringify(args.data)} />;
+      // default:
+      //   return <SimpleMessageItem text={JSON.stringify(args.data)} />;
     }
   };
 

@@ -39,7 +39,7 @@ export const LiveModeInputBar: FC<LiveModeInputBarProps> = ({
         onPress={onExitLiveMode}
         hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
       >
-        <Feather name="x" size={24} color={theme.colors.text} />
+        <Feather name="x" size={32} color={theme.colors.text} />
       </TouchableOpacity>
 
       {/* Microphone Button - Centered */}
@@ -56,9 +56,6 @@ export const LiveModeInputBar: FC<LiveModeInputBarProps> = ({
           />
         </TouchableOpacity>
       )}
-
-      {/* Right side Icon (placeholder or future use) */}
-      <View style={themed($iconButtonStyle)} />
     </View>
   );
 };
@@ -67,7 +64,8 @@ export const LiveModeInputBar: FC<LiveModeInputBarProps> = ({
 const $barContainerStyle: ThemedStyle<ViewStyle> = theme => ({
   flexDirection: 'row',
   alignItems: 'center',
-  justifyContent: 'space-between',
+  justifyContent: 'center',
+  gap: 10,
   paddingHorizontal: 20,
   paddingVertical: 20,
   borderTopWidth: 1,
@@ -77,51 +75,34 @@ const $barContainerStyle: ThemedStyle<ViewStyle> = theme => ({
   backgroundColor: theme.colors.secondaryBg,
 });
 
-const $iconButtonStyle: ThemedStyle<ViewStyle> = theme => ({
-  width: 48,
-  height: 48,
-  borderRadius: 24,
-  backgroundColor: theme.colors.surface,
+const $baseCircleButtonStyle: ThemedStyle<ViewStyle> = _theme => ({
+  width: 64,
+  height: 64,
+  borderRadius: 32,
   alignItems: 'center',
   justifyContent: 'center',
+});
+
+const $iconButtonStyle: ThemedStyle<ViewStyle> = theme => ({
+  ...$baseCircleButtonStyle(theme),
+  backgroundColor: theme.colors.surface,
   borderWidth: 1,
   borderColor: theme.colors.border,
 });
 
-const $activeMicButtonStyle: ThemedStyle<ViewStyle> = theme => ({
-  width: 64,
-  height: 64,
+const $micButtonStyle: ThemedStyle<ViewStyle> = theme => ({
+  ...$baseCircleButtonStyle(theme),
   padding: 16,
+});
+
+const $activeMicButtonStyle: ThemedStyle<ViewStyle> = theme => ({
+  ...$micButtonStyle(theme),
   backgroundColor: theme.colors.primary,
-  borderRadius: 32,
-  alignItems: 'center',
-  justifyContent: 'center',
-  shadowColor: theme.colors.primary,
-  shadowOffset: {
-    width: 4,
-    height: 4,
-  },
-  shadowOpacity: 0.4,
-  shadowRadius: 10,
-  elevation: 10,
 });
 
 const $mutedMicButtonStyle: ThemedStyle<ViewStyle> = theme => ({
-  width: 64,
-  height: 64,
-  padding: 16,
-  borderRadius: 32,
+  ...$micButtonStyle(theme),
   backgroundColor: theme.colors.surface,
   borderWidth: 2,
   borderColor: theme.colors.error,
-  alignItems: 'center',
-  justifyContent: 'center',
-  shadowColor: theme.colors.error,
-  shadowOffset: {
-    width: 4,
-    height: 4,
-  },
-  shadowOpacity: 0.3,
-  shadowRadius: 10,
-  elevation: 10,
 });

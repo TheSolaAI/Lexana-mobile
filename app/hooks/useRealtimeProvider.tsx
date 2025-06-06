@@ -120,9 +120,14 @@ export const useRealtimeProvider = (): UseRealtimeProviderProps => {
       },
     };
 
+    const generateEventResponse = {
+      type: 'response.create',
+    };
+
     try {
       dataChannel.current.send(JSON.stringify(event));
       console.log('Tool response sent:', { callId, result });
+      dataChannel.current.send(JSON.stringify(generateEventResponse));
     } catch (error) {
       console.error('Failed to send tool response:', error);
     }
@@ -266,7 +271,6 @@ export const useRealtimeProvider = (): UseRealtimeProviderProps => {
             setLiveState(prev => ({
               ...prev,
               assistantResponse: currentResponseText.current,
-              isAssistantSpeaking: true,
             }));
           }
           break;
@@ -280,7 +284,6 @@ export const useRealtimeProvider = (): UseRealtimeProviderProps => {
             setLiveState(prev => ({
               ...prev,
               assistantResponse: finalTranscript,
-              isAssistantSpeaking: false,
             }));
             if (finalTranscript.trim()) {
               const assistantMessage: UIMessage = {
@@ -303,10 +306,6 @@ export const useRealtimeProvider = (): UseRealtimeProviderProps => {
         case 'response.done':
           console.log('Response done:', event.response_id);
           setAudioIntensity(0.1);
-          setLiveState(prev => ({
-            ...prev,
-            isAssistantSpeaking: false,
-          }));
           break;
 
         case 'response.function_call_arguments.delta':
@@ -326,6 +325,19 @@ export const useRealtimeProvider = (): UseRealtimeProviderProps => {
 
         case 'response.output_item.done':
           // console.log('Output item done:', event); // Can be noisy
+          break;
+        case 'output_audio_buffer.started':
+          setLiveState(prev => ({
+            ...prev,
+            isAssistantSpeaking: true,
+          }));
+          break;
+
+        case 'output_audio_buffer.stopped':
+          setLiveState(prev => ({
+            ...prev,
+            isAssistantSpeaking: false,
+          }));
           break;
         default:
           break;

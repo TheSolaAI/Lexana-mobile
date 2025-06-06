@@ -106,6 +106,7 @@ export const LiveMode: FC<LiveModeProps> = ({ onExitLiveMode, onSaveMessages }) 
     <View style={$containerStyle}>
       <LiveModeDisplay
         isAssistantSpeaking={liveState.isAssistantSpeaking}
+        isUserSpeaking={liveState.isUserSpeaking}
         isSessionActive={isSessionActive}
         connectionState={connectionState}
         isLoadingFirstMessage={isLoadingFirstMessage}

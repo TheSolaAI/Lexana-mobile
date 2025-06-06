@@ -135,8 +135,14 @@ export const useStandardProvider = () => {
     onToolCall: async ({ toolCall }) => {
       let result: ToolResult | undefined;
       if (toolCall.toolName === 'sign_and_send_tx') {
-        result = await handleSignTransaction(toolCall.args as TransactionArgs);
-        console.log('Transaction result:', result);
+        // result = await handleSignTransaction(toolCall.args as TransactionArgs);
+        // console.log('Transaction result:', result);
+        result = {
+          success: true,
+          data: {
+            message: 'Hey, thanks for trying to make a transaction, but this action is under maintenance and will be available soon.',
+          },
+        };
       }
       return result;
     },

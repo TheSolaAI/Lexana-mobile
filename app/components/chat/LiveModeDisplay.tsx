@@ -12,6 +12,10 @@ interface LiveModeDisplayProps {
    */
   isAssistantSpeaking: boolean;
   /**
+   * Whether the user is currently speaking
+   */
+  isUserSpeaking: boolean;
+  /**
    * Whether the realtime session is active
    */
   isSessionActive: boolean;
@@ -37,6 +41,7 @@ interface LiveModeDisplayProps {
  */
 export const LiveModeDisplay: FC<LiveModeDisplayProps> = ({
   isAssistantSpeaking,
+  isUserSpeaking,
   isSessionActive,
   connectionState,
   isLoadingFirstMessage,
@@ -68,16 +73,11 @@ export const LiveModeDisplay: FC<LiveModeDisplayProps> = ({
     <View style={themed($containerStyle)}>
       {/* AnimatedGradientCircle visualizer, only when session is active */}
       <AnimatedGradientCircle
-        speaker={isAssistantSpeaking ? 'assistant' : 'none'}
+        speaker={isAssistantSpeaking ? 'assistant' : isUserSpeaking ? 'user' : 'none'}
         intensity={1}
         style={{
           height: 100,
           width: 100,
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
         }}
       />
       {statusMessage !== '' && (
@@ -92,6 +92,8 @@ export const LiveModeDisplay: FC<LiveModeDisplayProps> = ({
 // Styles
 const $containerStyle: ThemedStyle<ViewStyle> = theme => ({
   flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
   backgroundColor: theme.colors.background,
 });
 
