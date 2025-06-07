@@ -106,6 +106,7 @@ export const ChatScreen: FC<ChatScreenProps> = ({ navigation }) => {
             onSendMessage={handleTextMessage}
             onAudioRecorded={onAudioMessage}
             onEnterLiveMode={handleEnterLiveMode}
+            isProcessing={isProcessing}
           />
         </>
       )}

@@ -17,18 +17,25 @@ interface InputCardProps {
   onSendMessage: (message: string) => void;
   onAudioRecorded: (audioUri: string) => void;
   onEnterLiveMode: () => void;
+  /**
+   * Whether the system is currently processing a message
+   */
+  isProcessing?: boolean;
 }
 
 /**
  * InputCard component that provides a text input with animated mic/send button and live mode toggle
+ * Automatically disables all input methods when the system is processing a message
  * @param onSendMessage - Callback function to handle sending text messages
  * @param onAudioRecorded - Callback function to handle audio recording
  * @param onEnterLiveMode - Callback function to enter live mode
+ * @param isProcessing - Whether the system is currently processing a message (disables input)
  */
 export const InputCard: FC<InputCardProps> = ({
   onSendMessage,
   onAudioRecorded,
   onEnterLiveMode,
+  isProcessing = false,
 }) => {
   const { themed, theme } = useAppTheme();
   const [inputText, setInputText] = useState('');
@@ -43,6 +50,9 @@ export const InputCard: FC<InputCardProps> = ({
   const toolbarAnim = useSharedValue(0); // 0: normal, 1: offscreen
   const recordingAnim = useSharedValue(0); // Animation for recording state
   const screenHeight = Dimensions.get('window').height;
+
+  // Disable interactions when processing
+  const isInputDisabled = isProcessing || isRecording;
 
   useEffect(() => {
     iconFade.value = withTiming(hasText ? 1 : 0, { duration: 200 });
@@ -301,7 +311,7 @@ export const InputCard: FC<InputCardProps> = ({
    * Handles sending the message when send button is pressed
    */
   const handleSendPress = () => {
-    if (hasText) {
+    if (hasText && !isProcessing) {
       onSendMessage(inputText.trim());
       setInputText('');
     }
@@ -311,14 +321,16 @@ export const InputCard: FC<InputCardProps> = ({
    * Handles text input changes
    */
   const handleTextChange = (text: string) => {
-    setInputText(text);
+    if (!isProcessing) {
+      setInputText(text);
+    }
   };
 
   /**
    * Handles mic button press start (push-to-talk)
    */
   const handleMicPressIn = () => {
-    if (!hasText && !isRecording) {
+    if (!hasText && !isRecording && !isProcessing) {
       setShouldStopRecording(false); // Clear any pending stop
       startRecording();
     }
@@ -328,7 +340,7 @@ export const InputCard: FC<InputCardProps> = ({
    * Handles mic button press end (push-to-talk)
    */
   const handleMicPressOut = () => {
-    if (isRecording) {
+    if (isRecording && !isProcessing) {
       stopRecording();
     } else {
       // If recording hasn't started yet, mark it to stop when it does
@@ -387,6 +399,8 @@ export const InputCard: FC<InputCardProps> = ({
 
   // Wrap the onEnterLiveMode to trigger the animation
   const handleEnterLiveMode = () => {
+    if (isProcessing) return; // Prevent entering live mode when processing
+    
     // Animate: fall (0->1)
     toolbarAnim.value = 0;
     toolbarAnim.value = withTiming(1, { duration: 400 }, () => {
@@ -397,12 +411,13 @@ export const InputCard: FC<InputCardProps> = ({
   return (
     <Animated.View style={[themed($containerStyle), toolbarAnimatedStyle]}>
       <TextInput
-        placeholder={translate('chatScreen:voiceMode.placeholder')}
+        placeholder={isProcessing ? translate('chatScreen:processing.thinking') : translate('chatScreen:voiceMode.placeholder')}
         placeholderTextColor={theme.colors.textDim}
         value={inputText}
         onChangeText={handleTextChange}
-        autoFocus
-        style={themed($inputStyle)}
+        autoFocus={!isProcessing}
+        editable={!isProcessing}
+        style={[themed($inputStyle), isInputDisabled && themed($disabledInputStyle)]}
         multiline
       />
       <View style={$bottomContainerStyle}>
@@ -411,11 +426,12 @@ export const InputCard: FC<InputCardProps> = ({
           <TouchableOpacity
             style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}
             onPress={handleEnterLiveMode}
-            activeOpacity={0.7}
+            activeOpacity={isProcessing ? 1 : 0.7}
+            disabled={isProcessing}
           >
-            <MaterialIcons name="graphic-eq" size={24} color={theme.colors.textDim} />
+            <MaterialIcons name="graphic-eq" size={24} color={isProcessing ? theme.colors.textDim + '50' : theme.colors.textDim} />
             <Animated.Text
-              style={[themed($liveModeTextStyle), liveModeTextAnimatedStyle]}
+              style={[themed($liveModeTextStyle), liveModeTextAnimatedStyle, isProcessing && { opacity: 0.5 }]}
               numberOfLines={1}
             >
               {translate('chatScreen:liveMode.title')}
@@ -426,10 +442,11 @@ export const InputCard: FC<InputCardProps> = ({
         {/* Mic/Send Button (Right) */}
         <TouchableOpacity
           style={themed($micSendButtonStyle)}
-          onPress={hasText ? handleSendPress : undefined}
-          onPressIn={!hasText ? handleMicPressIn : undefined}
-          onPressOut={!hasText ? handleMicPressOut : undefined}
-          activeOpacity={0.7}
+          onPress={hasText && !isProcessing ? handleSendPress : undefined}
+          onPressIn={!hasText && !isProcessing ? handleMicPressIn : undefined}
+          onPressOut={!hasText && !isProcessing ? handleMicPressOut : undefined}
+          activeOpacity={isInputDisabled ? 1 : 0.7}
+          disabled={isInputDisabled}
         >
           <View style={$animatedButtonContainer}>
             {/* Recording indicator background */}
@@ -461,7 +478,7 @@ export const InputCard: FC<InputCardProps> = ({
               <MaterialIcons 
                 name="mic" 
                 size={24} 
-                color={isRecording ? theme.colors.primary : theme.colors.textDim} 
+                color={isInputDisabled ? theme.colors.textDim + '50' : (isRecording ? theme.colors.primary : theme.colors.textDim)} 
               />
             </Animated.View>
             {/* Send Icon with surface container */}
@@ -477,8 +494,8 @@ export const InputCard: FC<InputCardProps> = ({
                 },
               ]}
             >
-              <View style={$sendIconContainerStyle(theme)}>
-                <MaterialIcons name="send" size={24} color={theme.colors.primary} />
+              <View style={$sendIconContainerStyle(theme, isInputDisabled)}>
+                <MaterialIcons name="send" size={24} color={isInputDisabled ? theme.colors.textDim + '50' : theme.colors.primary} />
               </View>
             </Animated.View>
           </View>
@@ -532,13 +549,17 @@ const $animatedButtonContainer: ViewStyle = {
   alignItems: 'center',
 };
 
-const $sendIconContainerStyle = (theme: any): ViewStyle => ({
-  backgroundColor: theme.colors.surface,
+const $sendIconContainerStyle = (theme: any, isDisabled?: boolean): ViewStyle => ({
+  backgroundColor: isDisabled ? theme.colors.surface + '50' : theme.colors.surface,
   borderRadius: 22,
   width: 44,
   height: 44,
   justifyContent: 'center',
   alignItems: 'center',
   borderWidth: 1,
-  borderColor: theme.colors.border,
+  borderColor: isDisabled ? theme.colors.border + '50' : theme.colors.border,
+});
+
+const $disabledInputStyle: ThemedStyle<TextStyle> = theme => ({
+  color: theme.colors.textDim,
 });

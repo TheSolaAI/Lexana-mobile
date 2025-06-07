@@ -38,9 +38,12 @@ export const useStandardProvider = () => {
     // Only set the first room if there's no selected room ID or if the selected room doesn't exist in the current rooms
     const isSelectedRoomValid = selectedRoomId && chatRooms.some((room: any) => room.id === selectedRoomId);
     
-    if (chatRooms.length > 0 && !isSelectedRoomValid) {
+    // Only override the selected room if there's no selected room at all, not if it's just temporarily invalid
+    if (chatRooms.length > 0 && !selectedRoomId) {
       dispatch(setSelectedRoomId(chatRooms[0].id));
     }
+    // If we have a selected room but it's not in the current rooms list, and we have rooms available,
+    // it might be a temporary state during room creation, so let's wait before overriding
   }, [chatRooms, selectedRoomId, dispatch]);
   const currentRoom = chatRooms.find((room: any) => room.id === selectedRoomId) || chatRooms[0];
   const [bearerToken, setBearerToken] = useState<string | null>(null);
