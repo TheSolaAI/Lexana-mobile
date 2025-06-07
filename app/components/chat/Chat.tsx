@@ -21,7 +21,7 @@ import { LuloAssetsMessageItem } from './messages/LuloAssetsMessageItem';
 import { NFTCollectionMessageItem } from './messages/NFTCollectionMessageItem';
 import { SNSResolverMessageItem } from './messages/SNSResolverMessageItem';
 import { SwapTokenMessageItem } from './messages/SwapTokenMessageItem';
-import { SignedTransactionsMessageItem } from './messages/SignedTransactionsMessageItem';
+// import { SignedTransactionsMessageItem } from './messages/SignedTransactionsMessageItem';
 import { TransferTokenMessageItem } from './messages/TransferTokenMessageItem';
 
 interface ChatProps {

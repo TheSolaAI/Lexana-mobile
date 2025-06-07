@@ -6,6 +6,7 @@ const en = {
     appName: 'Lexana AI',
     beta: 'Beta',
     save: 'Save',
+    error: 'Error',
   },
   welcomeScreen: {
     catchLine: 'Join to building the future.',
@@ -22,6 +23,8 @@ const en = {
     voiceMode: {
       title: 'Normal Mode',
       placeholder: 'Ask Lexana anything...',
+      permissionDenied: 'Microphone permission is required for voice recording.',
+      recordingError: 'Failed to record audio. Please try again.',
     },
     liveMode: {
       title: 'Live Mode',
