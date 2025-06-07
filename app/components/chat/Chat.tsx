@@ -54,12 +54,11 @@ export const Chat: FC<ChatProps> = ({ messages, isProcessing, processingStage })
    * Scrolls the chat to the bottom with animation
    */
   const scrollToBottom = useCallback(() => {
-    if (flatListRef.current && messages.length > 0) {
-      setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
-      }, 100);
+    if (flatListRef.current) {
+      // Use setTimeout to ensure scrollToEnd is called after the FlatList has had a chance to update.
+      setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 0);
     }
-  }, [messages.length]);
+  }, []);
 
   // Auto-scroll to bottom when new messages are added
   useEffect(() => {
@@ -89,25 +88,29 @@ export const Chat: FC<ChatProps> = ({ messages, isProcessing, processingStage })
   }, [isProcessing, scrollToBottom]);
 
   /**
+   * Disables auto-scrolling when the user starts dragging the list.
+   */
+  const onScrollBeginDrag = () => {
+    scrollToBottomOnNextUpdate.current = false;
+  };
+
+  /**
    * Handles scroll events to manage auto-scrolling behavior
    */
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const currentScrollPosition = event.nativeEvent.contentOffset.y;
-    const scrollViewHeight = event.nativeEvent.layoutMeasurement.height;
-    const contentHeight = event.nativeEvent.contentSize.height;
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+    const isAtBottom = contentSize.height - contentOffset.y - layoutMeasurement.height < 20;
 
-    // If within ~20px of the bottom, enable auto-scroll for future updates
-    if (contentHeight - currentScrollPosition - scrollViewHeight < 20) {
+    // If the user scrolls back to the bottom, re-enable auto-scrolling
+    if (isAtBottom) {
       scrollToBottomOnNextUpdate.current = true;
-    } else {
-      scrollToBottomOnNextUpdate.current = false;
     }
   };
 
   /**
    * Renders tool result components based on tool name and result data
    */
-  const renderToolResult = (toolName: string, args: ToolResult | undefined): React.ReactNode => {
+  const renderToolResult = useCallback((toolName: string, args: ToolResult | undefined): React.ReactNode => {
     if (args === undefined) {
       return null;
     }
@@ -148,12 +151,12 @@ export const Chat: FC<ChatProps> = ({ messages, isProcessing, processingStage })
       default:
         return null;
     }
-  };
+  }, []);
 
   /**
    * Renders the content of a single message
    */
-  const renderMessageContent = (message: UIMessage) => {
+  const renderMessageContent = useCallback((message: UIMessage) => {
     const role = message.role;
     if (message.role === 'user') {
       return <UserInput text={message.content} transcript={true} />;
@@ -183,12 +186,12 @@ export const Chat: FC<ChatProps> = ({ messages, isProcessing, processingStage })
     }
 
     return <SimpleMessageItem text={message.content} />;
-  };
+  }, [renderToolResult]);
 
   /**
    * Renders a single message item with animation
    */
-  const renderItem = ({ item }: { item: UIMessage }) => {
+  const renderItem = useCallback(({ item }: { item: UIMessage }) => {
     if (!animatedValues.current[item.id]) {
       animatedValues.current[item.id] = new Animated.Value(0);
     }
@@ -204,19 +207,19 @@ export const Chat: FC<ChatProps> = ({ messages, isProcessing, processingStage })
         {renderMessageContent(item)}
       </Animated.View>
     );
-  };
+  }, [renderMessageContent]);
 
   /**
    * Renders the footer component with loading indicator and spacing
    */
-  const renderFooter = () => (
+  const renderFooter = useCallback(() => (
     <View style={$footerContainer}>
       {isProcessing && processingStage && (
         <LoadingBubble stage={processingStage} />
       )}
       <View style={$footerSpacing} />
     </View>
-  );
+  ), [isProcessing, processingStage]);
 
   return (
     <FlatList
@@ -225,19 +228,10 @@ export const Chat: FC<ChatProps> = ({ messages, isProcessing, processingStage })
       renderItem={renderItem}
       keyExtractor={item => item.id}
       onScroll={onScroll}
+      onScrollBeginDrag={onScrollBeginDrag}
       ListFooterComponent={renderFooter}
       scrollEventThrottle={16}
       contentContainerStyle={$flatListContentContainer}
-      onContentSizeChange={() => {
-        if (scrollToBottomOnNextUpdate.current) {
-          scrollToBottom();
-        }
-      }}
-      onLayout={() => {
-        if (scrollToBottomOnNextUpdate.current) {
-          scrollToBottom();
-        }
-      }}
     />
   );
 };

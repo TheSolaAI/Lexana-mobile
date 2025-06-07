@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { View, ViewStyle, TextStyle, TouchableOpacity, Alert, Linking } from 'react-native';
 import { Text } from '@/components/general';
 import { useAppTheme } from '@/utils/useAppTheme';
@@ -25,7 +25,7 @@ interface TransferTokenMessageItemProps {
   props: TransferTokenData;
 }
 
-export const TransferTokenMessageItem: FC<TransferTokenMessageItemProps> = ({ props }) => {
+export const TransferTokenMessageItem: FC<TransferTokenMessageItemProps> = memo(({ props }) => {
   const { themed, theme } = useAppTheme();
 
   // Abbreviate address for display
@@ -95,7 +95,7 @@ export const TransferTokenMessageItem: FC<TransferTokenMessageItemProps> = ({ pr
           <View style={themed($iconContainerStyle)}>
             <Ionicons name="arrow-up-outline" size={28} color={theme.colors.primary} />
           </View>
-          <Text preset="heading" style={themed($headerTitleStyle)}>
+          <Text preset="pageHeading" style={themed($headerTitleStyle)}>
             Token Transfer
           </Text>
         </View>
@@ -251,7 +251,7 @@ export const TransferTokenMessageItem: FC<TransferTokenMessageItemProps> = ({ pr
       footer={compactFooter}
     />
   );
-};
+});
 
 // Styles
 const $compactContentContainer: ViewStyle = {

@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { View, ViewStyle, TextStyle, TouchableOpacity, Linking } from 'react-native';
 import { Text } from '@/components/general';
 import { useAppTheme } from '@/utils/useAppTheme';
@@ -30,7 +30,7 @@ interface ShowLimitOrderMessageItemProps {
   props: LimitOrder;
 }
 
-export const ShowLimitOrderMessageItem: FC<ShowLimitOrderMessageItemProps> = ({ props }) => {
+export const ShowLimitOrderMessageItem: FC<ShowLimitOrderMessageItemProps> = memo(({ props }) => {
   const { themed, theme } = useAppTheme();
 
   // Format date/time
@@ -170,7 +170,7 @@ export const ShowLimitOrderMessageItem: FC<ShowLimitOrderMessageItemProps> = ({ 
       </View>
     </BaseStatusMessageItem>
   );
-};
+});
 
 // Styles
 const $contentContainer: ViewStyle = {

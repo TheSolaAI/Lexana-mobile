@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect, memo } from 'react';
 import {
   View,
   ViewStyle,
@@ -32,7 +32,7 @@ interface AiProjectsMessageItemProps {
   };
 }
 
-export const AiProjectsMessageItem: FC<AiProjectsMessageItemProps> = ({ props }) => {
+export const AiProjectsMessageItem: FC<AiProjectsMessageItemProps> = memo(({ props }) => {
   const { themed, theme } = useAppTheme();
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -110,7 +110,7 @@ export const AiProjectsMessageItem: FC<AiProjectsMessageItemProps> = ({ props })
       </BaseGridMessageItem>
     </BaseBorderedMessageItem>
   );
-};
+});
 
 // Styles
 const $loadingContainer: ViewStyle = {

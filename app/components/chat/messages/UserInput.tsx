@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { View, ViewStyle, TextStyle } from 'react-native';
 import { Text } from '@/components/general';
 import { useAppTheme } from '@/utils/useAppTheme';
@@ -9,7 +9,7 @@ interface UserInputProps {
   transcript?: boolean;
 }
 
-export const UserInput: FC<UserInputProps> = ({ text, transcript = false }) => {
+export const UserInput: FC<UserInputProps> = memo(({ text, transcript = false }) => {
   const { themed } = useAppTheme();
 
   return (
@@ -19,7 +19,7 @@ export const UserInput: FC<UserInputProps> = ({ text, transcript = false }) => {
       </View>
     </View>
   );
-};
+});
 
 // Styles
 const $containerStyle: ViewStyle = {

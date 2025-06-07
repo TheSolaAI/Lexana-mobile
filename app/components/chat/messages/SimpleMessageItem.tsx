@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { View, ViewStyle, Text, useWindowDimensions, TextStyle, ScrollView } from 'react-native';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { ThemedStyle } from '@/theme';
@@ -7,7 +7,7 @@ interface SimpleMessageItemProps {
   text: string;
 }
 
-export const SimpleMessageItem: FC<SimpleMessageItemProps> = ({ text }) => {
+export const SimpleMessageItem: FC<SimpleMessageItemProps> = memo(({ text }) => {
   const { themed, theme: _theme } = useAppTheme();
   const { height: screenHeight } = useWindowDimensions();
 
@@ -22,7 +22,7 @@ export const SimpleMessageItem: FC<SimpleMessageItemProps> = ({ text }) => {
       </ScrollView>
     </View>
   );
-};
+});
 
 // Styles
 const $containerStyle: ThemedStyle<ViewStyle> = theme => ({

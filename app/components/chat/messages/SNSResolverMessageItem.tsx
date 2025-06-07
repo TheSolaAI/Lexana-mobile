@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { View, ViewStyle, TextStyle, TouchableOpacity, Linking, Alert } from 'react-native';
 import { Text } from '@/components/general';
 import { useAppTheme } from '@/utils/useAppTheme';
@@ -17,7 +17,7 @@ interface SNSResolverMessageItemProps {
   props: SNSResolverResultData;
 }
 
-export const SNSResolverMessageItem: FC<SNSResolverMessageItemProps> = ({ props }) => {
+export const SNSResolverMessageItem: FC<SNSResolverMessageItemProps> = memo(({ props }) => {
   const { themed, theme } = useAppTheme();
 
   // Abbreviate address for display
@@ -78,7 +78,7 @@ export const SNSResolverMessageItem: FC<SNSResolverMessageItemProps> = ({ props 
           <View style={themed($iconContainerStyle)}>
             <Ionicons name="search" size={28} color={theme.colors.primary} />
           </View>
-          <Text preset="heading" style={themed($headerTitleStyle)}>
+          <Text preset="pageHeading" style={themed($headerTitleStyle)}>
             SNS Domain Resolution
           </Text>
         </View>
@@ -169,7 +169,7 @@ export const SNSResolverMessageItem: FC<SNSResolverMessageItemProps> = ({ props 
       footer={compactFooter}
     />
   );
-};
+});
 
 // Styles
 const $compactContentContainer: ViewStyle = {

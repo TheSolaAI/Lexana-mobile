@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { View, ViewStyle, TextStyle, Image, ImageStyle } from 'react-native';
 import { Text } from '@/components/general';
 import { useAppTheme } from '@/utils/useAppTheme';
@@ -23,7 +23,7 @@ interface NFTCollectionMessageItemProps {
  * This component displays basic details of an NFT collection, including its
  * image, title, price, and the number of listed items.
  */
-export const NFTCollectionMessageItem: FC<NFTCollectionMessageItemProps> = ({ props }) => {
+export const NFTCollectionMessageItem: FC<NFTCollectionMessageItemProps> = memo(({ props }) => {
   const { themed } = useAppTheme();
 
   return (
@@ -50,7 +50,7 @@ export const NFTCollectionMessageItem: FC<NFTCollectionMessageItemProps> = ({ pr
       </View>
     </BaseGridMessageItem>
   );
-};
+});
 
 // Styles
 const $collectionCardStyle: ThemedStyle<ViewStyle> = theme => ({

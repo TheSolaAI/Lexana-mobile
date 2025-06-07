@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useRef } from 'react';
+import { FC, useState, useEffect, useRef, memo, useCallback } from 'react';
 import {
   View,
   ViewStyle,
@@ -34,7 +34,7 @@ interface LuloAssetsMessageItemProps {
   props: AssetsResponse;
 }
 
-export const LuloAssetsMessageItem: FC<LuloAssetsMessageItemProps> = ({ props }) => {
+export const LuloAssetsMessageItem: FC<LuloAssetsMessageItemProps> = memo(({ props }) => {
   const { themed, theme } = useAppTheme();
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -112,6 +112,68 @@ export const LuloAssetsMessageItem: FC<LuloAssetsMessageItemProps> = ({ props })
     );
   }
 
+  const renderItem = useCallback(({ item, index }: { item: TokenBalance, index: number }) => (
+    <TouchableOpacity
+      style={[
+        themed($tokenCardStyle),
+        activeIndex === index && themed($activeTokenCardStyle),
+      ]}
+      onPress={() => openDexScreener(item.mint)}
+      activeOpacity={0.7}
+    >
+      <View style={$tokenCardContentRow}>
+        <View style={$tokenIconContainer}>
+          <Image
+            source={{
+              uri: `https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/${item.mint}/logo.png`,
+            }}
+            style={$tokenIconStyle}
+            // defaultSource={require('@/assets/images/placeholder.png')}
+          />
+          {activeIndex === index && (
+            <Animated.View
+              style={[
+                $pulseRingStyle,
+                {
+                  opacity: pulseAnim,
+                  transform: [
+                    {
+                      scale: pulseAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [1, 1.2],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            />
+          )}
+        </View>
+
+        <View style={$tokenInfoContainer}>
+          <Text preset="bold" style={themed($tokenBalanceStyle)}>
+            {item.balance.toFixed(2)}
+          </Text>
+          <Text style={themed($tokenMintStyle)}>
+            {item.mint.substring(0, 4)}...{item.mint.slice(-4)}
+          </Text>
+        </View>
+      </View>
+
+      <View style={$tokenCardBottomRow}>
+        <Text style={themed($usdValueStyle)}>${item.usdValue.toFixed(2)}</Text>
+        <Ionicons
+          name="open-outline"
+          size={16}
+          color={theme.colors.primary}
+          style={{ opacity: activeIndex === index ? 1 : 0.5 }}
+        />
+      </View>
+
+      {activeIndex === index && <View style={themed($highlightLineStyle)} />}
+    </TouchableOpacity>
+  ), [themed, theme, activeIndex, pulseAnim]);
+
   return (
     <BaseStatusMessageItem
       title="Lulo Finance"
@@ -126,7 +188,7 @@ export const LuloAssetsMessageItem: FC<LuloAssetsMessageItemProps> = ({ props })
           <Text preset="small" style={themed($statLabelStyle)}>
             Deposit Value
           </Text>
-          <Text preset="heading" style={themed($statValueStyle)}>
+          <Text preset="pageHeading" style={themed($statValueStyle)}>
             ${props.depositValue.toFixed(2)}
           </Text>
         </View>
@@ -135,7 +197,7 @@ export const LuloAssetsMessageItem: FC<LuloAssetsMessageItemProps> = ({ props })
           <Text preset="small" style={themed($statLabelStyle)}>
             Interest Earned
           </Text>
-          <Text preset="heading" style={[themed($statValueStyle), $positiveValueStyle]}>
+          <Text preset="pageHeading" style={[themed($statValueStyle), $positiveValueStyle]}>
             +${props.interestEarned.toFixed(2)}
           </Text>
         </View>
@@ -144,7 +206,7 @@ export const LuloAssetsMessageItem: FC<LuloAssetsMessageItemProps> = ({ props })
           <Text preset="small" style={themed($statLabelStyle)}>
             Total Value
           </Text>
-          <Text preset="heading" style={themed($statValueStyle)}>
+          <Text preset="pageHeading" style={themed($statValueStyle)}>
             ${props.totalValue.toFixed(2)}
           </Text>
         </View>
@@ -152,7 +214,7 @@ export const LuloAssetsMessageItem: FC<LuloAssetsMessageItemProps> = ({ props })
 
       {/* Token Balances */}
       <View style={$tokenBalancesSection}>
-        <Text preset="heading" style={themed($sectionTitleStyle)}>
+        <Text preset="pageHeading" style={themed($sectionTitleStyle)}>
           Token Balances
         </Text>
 
@@ -161,72 +223,12 @@ export const LuloAssetsMessageItem: FC<LuloAssetsMessageItemProps> = ({ props })
           keyExtractor={item => item.mint}
           numColumns={1}
           scrollEnabled={false}
-          renderItem={({ item, index }) => (
-            <TouchableOpacity
-              style={[
-                themed($tokenCardStyle),
-                activeIndex === index && themed($activeTokenCardStyle),
-              ]}
-              onPress={() => openDexScreener(item.mint)}
-              activeOpacity={0.7}
-            >
-              <View style={$tokenCardContentRow}>
-                <View style={$tokenIconContainer}>
-                  <Image
-                    source={{
-                      uri: `https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/${item.mint}/logo.png`,
-                    }}
-                    style={$tokenIconStyle}
-                    // defaultSource={require('@/assets/images/placeholder.png')}
-                  />
-                  {activeIndex === index && (
-                    <Animated.View
-                      style={[
-                        $pulseRingStyle,
-                        {
-                          opacity: pulseAnim,
-                          transform: [
-                            {
-                              scale: pulseAnim.interpolate({
-                                inputRange: [0, 1],
-                                outputRange: [1, 1.2],
-                              }),
-                            },
-                          ],
-                        },
-                      ]}
-                    />
-                  )}
-                </View>
-
-                <View style={$tokenInfoContainer}>
-                  <Text preset="bold" style={themed($tokenBalanceStyle)}>
-                    {item.balance.toFixed(2)}
-                  </Text>
-                  <Text style={themed($tokenMintStyle)}>
-                    {item.mint.substring(0, 4)}...{item.mint.slice(-4)}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={$tokenCardBottomRow}>
-                <Text style={themed($usdValueStyle)}>${item.usdValue.toFixed(2)}</Text>
-                <Ionicons
-                  name="open-outline"
-                  size={16}
-                  color={theme.colors.primary}
-                  style={{ opacity: activeIndex === index ? 1 : 0.5 }}
-                />
-              </View>
-
-              {activeIndex === index && <View style={themed($highlightLineStyle)} />}
-            </TouchableOpacity>
-          )}
+          renderItem={renderItem}
         />
       </View>
     </BaseStatusMessageItem>
   );
-};
+});
 
 // Styles
 const $loadingContainer: ViewStyle = {

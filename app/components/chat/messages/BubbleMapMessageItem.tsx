@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { View, ViewStyle, Linking, TextStyle } from 'react-native';
 import { Text } from '@/components/general';
 import { useAppTheme } from '@/utils/useAppTheme';
@@ -11,7 +11,7 @@ interface BubbleMapMessageItemProps {
   props: { token: string };
 }
 
-export const BubbleMapMessageItem: FC<BubbleMapMessageItemProps> = ({ props }) => {
+export const BubbleMapMessageItem: FC<BubbleMapMessageItemProps> = memo(({ props }) => {
   const { themed, theme } = useAppTheme();
 
   if (!props || !props.token) {
@@ -60,7 +60,7 @@ export const BubbleMapMessageItem: FC<BubbleMapMessageItemProps> = ({ props }) =
       </View>
     </BaseBorderedMessageItem>
   );
-};
+});
 
 // Styles
 const $webviewContainer: ViewStyle = {

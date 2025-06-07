@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState, memo } from 'react';
 import {
   View,
   ViewStyle,
@@ -56,7 +56,7 @@ interface SwapTokenMessageItemProps {
  * @param props - The component props containing swap token details
  * @returns A React component that renders the swap token message
  */
-export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) => {
+export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = memo(({ props }) => {
   const { themed, theme } = useAppTheme();
 
   // Guard against undefined props
@@ -126,7 +126,7 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
           <View style={themed($iconContainerStyle)}>
             <Ionicons name="swap-horizontal" size={28} color={theme.colors.primary} />
           </View>
-          <Text preset="default" style={themed($headerTitleStyle)}>
+          <Text style={themed($headerTitleStyle)}>
             Token Swap
           </Text>
         </View>
@@ -277,7 +277,7 @@ export const SwapTokenMessageItem: FC<SwapTokenMessageItemProps> = ({ props }) =
       footer={compactFooter}
     />
   );
-};
+});
 
 // Styles
 const $compactContentContainer: ViewStyle = {

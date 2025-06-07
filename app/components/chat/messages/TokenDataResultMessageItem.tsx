@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import {
   View,
   ViewStyle,
@@ -68,7 +68,7 @@ interface TokenDataResultMessageItemProps {
   props: TokenDataResponse;
 }
 
-export const TokenDataResultMessageItem: FC<TokenDataResultMessageItemProps> = ({ props }) => {
+export const TokenDataResultMessageItem: FC<TokenDataResultMessageItemProps> = memo(({ props }) => {
   const { themed, theme } = useAppTheme();
 
   // Clipboard function
@@ -194,7 +194,7 @@ export const TokenDataResultMessageItem: FC<TokenDataResultMessageItemProps> = (
         </View>
 
         {/* Volume Data */}
-        <Text preset="heading" style={themed($sectionTitleStyle)}>
+        <Text preset="pageHeading" style={themed($sectionTitleStyle)}>
           24h Volume
         </Text>
         <View style={themed($volumeContainerStyle)}>
@@ -311,7 +311,7 @@ export const TokenDataResultMessageItem: FC<TokenDataResultMessageItemProps> = (
       </View>
     </BaseBorderedMessageItem>
   );
-};
+});
 
 // Styles
 const $contentContainer: ViewStyle = {

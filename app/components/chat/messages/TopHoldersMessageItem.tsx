@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, memo, useCallback } from 'react';
 import {
   View,
   ViewStyle,
@@ -37,7 +37,7 @@ interface TopHoldersMessageItemProps {
   props: TopHoldersProps;
 }
 
-export const TopHoldersMessageItem: FC<TopHoldersMessageItemProps> = ({ props }) => {
+export const TopHoldersMessageItem: FC<TopHoldersMessageItemProps> = memo(({ props }) => {
   const { themed, theme } = useAppTheme();
 
   // Process and transform the data to match our component needs
@@ -85,7 +85,7 @@ export const TopHoldersMessageItem: FC<TopHoldersMessageItemProps> = ({ props })
   };
 
   // Render each holder row
-  const renderHolderItem = ({ item, index }: { item: Holder; index: number }) => (
+  const renderHolderItem = useCallback(({ item, index }: { item: Holder; index: number }) => (
     <View style={themed($holderItemStyle)}>
       <View style={$numberAndAddressContainer}>
         <View style={themed($indexContainer)}>
@@ -130,7 +130,7 @@ export const TopHoldersMessageItem: FC<TopHoldersMessageItemProps> = ({ props })
         />
       </View>
     </View>
-  );
+  ), [themed, theme]);
 
   const footer = (
     <TouchableOpacity
@@ -175,7 +175,7 @@ export const TopHoldersMessageItem: FC<TopHoldersMessageItemProps> = ({ props })
       </View>
     </BaseBorderedMessageItem>
   );
-};
+});
 
 // Styles
 const $headerRowStyle: ThemedStyle<ViewStyle> = theme => ({

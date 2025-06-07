@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, memo } from 'react';
 import { View, ViewStyle, TextStyle, TouchableOpacity, Linking, Alert } from 'react-native';
 import { Text } from '@/components/general';
 import { useAppTheme } from '@/utils/useAppTheme';
@@ -34,7 +34,7 @@ interface TokenAddressResultMessageItemProps {
   props: TokenAddressData;
 }
 
-export const TokenAddressResultMessageItem: FC<TokenAddressResultMessageItemProps> = ({
+export const TokenAddressResultMessageItem: FC<TokenAddressResultMessageItemProps> = memo(({
   props,
 }) => {
   const { themed, theme } = useAppTheme();
@@ -86,7 +86,7 @@ export const TokenAddressResultMessageItem: FC<TokenAddressResultMessageItemProp
       </View>
     </BaseBorderedMessageItem>
   );
-};
+});
 
 // Styles
 const $contentContainer: ViewStyle = {

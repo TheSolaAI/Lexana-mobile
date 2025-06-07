@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-color-literals */
 import { AppStackScreenProps } from '@/navigators/AppNavigator';
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useCallback, memo } from 'react';
 import { Screen } from '@/components/general';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { $styles } from '@/theme';
@@ -43,7 +43,7 @@ export const ChatScreen: FC<ChatScreenProps> = ({ navigation }) => {
    * Handles entering live mode by creating a new chat room and updating state
    * @returns {Promise<void>}
    */
-  const handleEnterLiveMode = async () => {
+  const handleEnterLiveMode = useCallback(async () => {
     try {
       const result = await createChatRoom({ name: 'Live Chat' }).unwrap();
       dispatch(setSelectedRoomId(result.id));
@@ -51,20 +51,20 @@ export const ChatScreen: FC<ChatScreenProps> = ({ navigation }) => {
     } catch {
       toast.error('Failed to enter live mode');
     }
-  };
+  }, [createChatRoom, dispatch]);
 
   /**
    * Handles exiting live mode by updating the state and creating a new chat room
    * @returns {Promise<void>}
    */
-  const handleExitLiveMode = async () => {
+  const handleExitLiveMode = useCallback(async () => {
     setIsLiveMode(false);
-  };
+  }, []);
 
   /**
    * Handles creating a new chat room and selecting it
    */
-  const handleCreateNewChat = async () => {
+  const handleCreateNewChat = useCallback(async () => {
     try {
       const result = await createChatRoom({ name: 'New Chat' }).unwrap();
       dispatch(setSelectedRoomId(result.id));
@@ -72,7 +72,7 @@ export const ChatScreen: FC<ChatScreenProps> = ({ navigation }) => {
     } catch {
       toast.error('Error creating chat room');
     }
-  };
+  }, [createChatRoom, dispatch]);
 
   const hasNoChats = chatRooms.length === 0;
 
@@ -153,7 +153,7 @@ const $screenContainerStyle: ViewStyle = {
 /**
  * EmptyState component shown when there are no chats
  */
-const EmptyState: FC<{ onCreateChat: () => void }> = ({ onCreateChat }) => {
+const EmptyState: FC<{ onCreateChat: () => void }> = memo(({ onCreateChat }) => {
   const { theme } = useAppTheme();
   return (
     <View style={styles.emptyContainer}>
@@ -162,11 +162,11 @@ const EmptyState: FC<{ onCreateChat: () => void }> = ({ onCreateChat }) => {
         Welcome to Lexana
       </Text>
       <Text preset="default" style={styles.emptyDescription}>
-        Explore the power of solana voice engine 
+        Explore the power of solana voice engine
       </Text>
       <TouchableOpacity style={[styles.createButton, { backgroundColor: theme.colors.primary }]} onPress={onCreateChat}>
         <Text style={styles.createButtonText}>Get Started</Text>
       </TouchableOpacity>
     </View>
   );
-};
+});
