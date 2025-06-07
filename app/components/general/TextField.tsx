@@ -1,4 +1,11 @@
-import { useRef, useState } from 'react';
+import {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+  useMemo,
+  useCallback,
+} from 'react';
 import {
   View,
   TextInput,
@@ -6,15 +13,15 @@ import {
   StyleProp,
   TextStyle,
   ViewStyle,
-  Animated,
   TouchableWithoutFeedback,
 } from 'react-native';
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import { type ThemedStyle, type ThemedStyleArray } from '@/theme';
 import { Text } from '@/components/general/';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { translate, TxKeyPath } from '@/i18n';
 import { TOptions } from 'i18next';
-import { useBottomSheetInternal } from '@gorhom/bottom-sheet';
+import React from 'react';
 
 type Presets = 'primary';
 
@@ -71,10 +78,6 @@ export interface TextFieldProps extends Omit<TextInputProps, 'style'> {
    * Whether the input is disabled
    */
   disabled?: boolean;
-  /**
-   * Animation duration in milliseconds
-   */
-  animationDuration?: number;
 
   /**
    * Is triggered when the input container is clicked
@@ -82,133 +85,129 @@ export interface TextFieldProps extends Omit<TextInputProps, 'style'> {
   onContainerPress?: () => void;
 }
 
-export function TextField(props: TextFieldProps) {
-  const {
-    label,
-    labelTx,
-    labelTxOptions,
-    placeholderTx,
-    placeholderTxOptions,
-    containerStyle,
-    inputStyle,
-    labelStyle,
-    rightAccessory,
-    leftAccessory,
-    error,
-    disabled,
-    animationDuration = 150,
-    placeholder,
-    keyboardType,
-    autoComplete,
-    secureTextEntry,
-    onContainerPress,
-    ...rest
-  } = props;
+const TextFieldComponent = React.memo(
+  forwardRef<TextInput, TextFieldProps>((props, ref) => {
+    const {
+      label,
+      labelTx,
+      labelTxOptions,
+      placeholderTx,
+      placeholderTxOptions,
+      containerStyle,
+      inputStyle,
+      labelStyle,
+      rightAccessory,
+      leftAccessory,
+      error,
+      disabled,
+      placeholder,
+      keyboardType,
+      autoComplete,
+      secureTextEntry,
+      onContainerPress,
+      ...rest
+    } = props;
 
-  const [isFocused, setIsFocused] = useState(false);
-  const { themed, theme } = useAppTheme();
-  const inputRef = useRef<TextInput>(null);
-  const animatedOpacity = useRef(new Animated.Value(1)).current;
+    const [isFocused, setIsFocused] = useState(false);
+    const { themed, theme } = useAppTheme();
+    const inputRef = useRef<TextInput>(null);
 
-  const preset: Presets = props.preset ?? 'primary';
-  const placeholderText = placeholderTx
-    ? translate(placeholderTx, placeholderTxOptions)
-    : placeholder;
+    useImperativeHandle(ref, () => inputRef.current as TextInput);
 
-  const { shouldHandleKeyboardEvents } = useBottomSheetInternal();
+    const preset: Presets = props.preset ?? 'primary';
+    const placeholderText = useMemo(
+      () => (placeholderTx ? translate(placeholderTx, placeholderTxOptions) : placeholder),
+      [placeholder, placeholderTx, placeholderTxOptions]
+    );
 
-  const handleFocus = (e: any) => {
-    setIsFocused(true);
-    Animated.timing(animatedOpacity, {
-      toValue: 0.8,
-      duration: animationDuration,
-      useNativeDriver: true,
-    }).start();
-    shouldHandleKeyboardEvents.value = true;
-    if (props.onFocus) {
-      props.onFocus(e);
-    }
-  };
+    const handleFocus = useCallback(
+      (e: any) => {
+        setIsFocused(true);
+        if (props.onFocus) {
+          props.onFocus(e);
+        }
+      },
+      [props.onFocus]
+    );
 
-  const handleBlur = (e: any) => {
-    setIsFocused(false);
-    Animated.timing(animatedOpacity, {
-      toValue: 1,
-      duration: animationDuration,
-      useNativeDriver: true,
-    }).start();
-    shouldHandleKeyboardEvents.value = false;
-    if (props.onBlur) {
-      props.onBlur(e);
-    }
-  };
+    const handleBlur = useCallback(
+      (e: any) => {
+        setIsFocused(false);
+        if (props.onBlur) {
+          props.onBlur(e);
+        }
+      },
+      [props.onBlur]
+    );
 
-  const handleContainerPress = () => {
-    if (onContainerPress) {
-      onContainerPress();
-    }
-    inputRef.current?.focus();
-  };
+    const handleContainerPress = useCallback(() => {
+      if (onContainerPress) {
+        onContainerPress();
+      }
+      inputRef.current?.focus();
+    }, [onContainerPress]);
 
-  const hasError = !!error;
+    const hasError = !!error;
 
-  return (
-    <View style={[themed($containerStyle), containerStyle]}>
-      <View style={themed($labelContainerStyle)}>
-        {/* This empty View creates space for the label in the border */}
-        <View style={themed($labelSpacerStyle)} />
+    return (
+      <View style={[themed($containerStyle), containerStyle]}>
+        <View style={themed($labelContainerStyle)}>
+          {/* This empty View creates space for the label in the border */}
+          <View style={themed($labelSpacerStyle)} />
 
-        {/* The actual label that sits on the border */}
-        {(label || labelTx) && (
-          <Text
-            tx={labelTx}
-            text={label}
-            txOptions={labelTxOptions}
+          {/* The actual label that sits on the border */}
+          {(label || labelTx) && (
+            <Text
+              tx={labelTx}
+              text={label}
+              txOptions={labelTxOptions}
+              style={[
+                themed($labelStyle),
+                isFocused && themed($focusedLabelStyle),
+                hasError && themed($errorLabelStyle),
+                labelStyle,
+              ]}
+            />
+          )}
+        </View>
+
+        <TouchableWithoutFeedback onPress={handleContainerPress} disabled={disabled}>
+          <View
             style={[
-              themed($labelStyle),
-              isFocused && themed($focusedLabelStyle),
-              hasError && themed($errorLabelStyle),
-              labelStyle,
+              themed($viewPresets[preset]),
+              isFocused && themed($focusedStyle),
+              hasError && themed($errorInputStyle),
+              disabled && themed($disabledStyle),
             ]}
-          />
-        )}
+          >
+            {leftAccessory && <View style={themed($leftAccessoryStyle)}>{leftAccessory}</View>}
+
+            <BottomSheetTextInput
+              ref={inputRef as any}
+              style={[themed($inputStyle), inputStyle]}
+              placeholder={placeholderText}
+              placeholderTextColor={theme.colors.textDim}
+              editable={!disabled}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              keyboardType={keyboardType}
+              autoCapitalize="none"
+              autoComplete={autoComplete}
+              secureTextEntry={secureTextEntry}
+              {...rest}
+            />
+
+            {rightAccessory && <View style={themed($rightAccessoryStyle)}>{rightAccessory}</View>}
+          </View>
+        </TouchableWithoutFeedback>
+
+        {hasError && <Text text={error} style={themed($errorTextStyle)} />}
       </View>
+    );
+  })
+);
 
-      <TouchableWithoutFeedback onPress={handleContainerPress} disabled={disabled}>
-        <Animated.View
-          style={[
-            themed($viewPresets[preset]),
-            isFocused && themed($focusedStyle),
-            hasError && themed($errorInputStyle),
-            disabled && themed($disabledStyle),
-            { opacity: animatedOpacity },
-          ]}
-        >
-          {leftAccessory && <View style={themed($leftAccessoryStyle)}>{leftAccessory}</View>}
-
-          <TextInput
-            ref={inputRef}
-            style={[themed($inputStyle), inputStyle]}
-            placeholder={placeholderText}
-            placeholderTextColor={theme.colors.textDim}
-            editable={!disabled}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            keyboardType={keyboardType}
-            autoCapitalize="none"
-            autoComplete={autoComplete}
-            secureTextEntry={secureTextEntry}
-            {...rest}
-          />
-
-          {rightAccessory && <View style={themed($rightAccessoryStyle)}>{rightAccessory}</View>}
-        </Animated.View>
-      </TouchableWithoutFeedback>
-
-      {hasError && <Text text={error} style={themed($errorTextStyle)} />}
-    </View>
-  );
-}
+export const TextField = TextFieldComponent;
 
 const $containerStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
   marginVertical: spacing.xs,

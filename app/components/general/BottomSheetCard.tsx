@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react';
 import {
   BottomSheetModal,
-  BottomSheetView,
+  BottomSheetScrollView,
   BottomSheetModalProps,
   BottomSheetBackdropProps,
   BottomSheetBackdrop,
@@ -26,7 +26,7 @@ export interface BottomSheetCardProps
 export function BottomSheetCard({
   children,
   sheetRef,
-  snapPoints,
+  snapPoints = ['50%'],
   ...props
 }: BottomSheetCardProps) {
   // Allow external ref or create one
@@ -49,22 +49,22 @@ export function BottomSheetCard({
       enablePanDownToClose
       handleIndicatorStyle={themed($bottomSheetIndicatorStyle)}
       handleStyle={themed($bottomSheetHandleStyle)}
-      backgroundStyle={themed($bottomSheetContentStyle)}
-      keyboardBehavior="interactive"
+      backgroundStyle={themed($bottomSheetBackgroundStyle)}
+      keyboardBehavior='interactive'
+      keyboardBlurBehavior="restore"
       stackBehavior="replace"
       snapPoints={snapPoints}
       {...props}
     >
-      <BottomSheetView style={themed($bottomSheetContentStyle)}>{children}</BottomSheetView>
+      <BottomSheetScrollView>{children}</BottomSheetScrollView>
     </BottomSheetModal>
   );
 }
 
-const $bottomSheetContentStyle: ThemedStyle<ViewStyle> = theme => ({
+const $bottomSheetBackgroundStyle: ThemedStyle<ViewStyle> = theme => ({
   backgroundColor: theme.colors.secondaryBg,
   borderTopLeftRadius: 20,
   borderTopRightRadius: 20,
-  paddingBottom: 10,
 });
 
 const $bottomSheetIndicatorStyle: ThemedStyle<ViewStyle> = theme => ({

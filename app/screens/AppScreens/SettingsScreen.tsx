@@ -5,7 +5,6 @@ import { useAppTheme } from '@/utils/useAppTheme';
 import { Feather } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 import { useEmbeddedSolanaWallet, useHeadlessDelegatedActions, usePrivy } from '@privy-io/expo';
-import { useFundSolanaWallet } from '@privy-io/expo/dist/ui';
 import { navigate } from '@/navigators/navigationUtilities';
 import { AppStackScreenProps } from '@/navigators/AppNavigator';
 import { logoutAndClearState } from '@/utils/logout';
@@ -19,7 +18,6 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = () => {
   const { themed, theme, themeContext, setThemeContextOverride } = useAppTheme();
   const { user, logout } = usePrivy();
   const { wallets } = useEmbeddedSolanaWallet();
-  const { fundWallet } = useFundSolanaWallet();
 
   const { delegateWallet } = useHeadlessDelegatedActions();
   const isDark = themeContext === 'dark';
