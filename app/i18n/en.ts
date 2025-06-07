@@ -29,6 +29,11 @@ const en = {
     liveMode: {
       title: 'Live Mode',
     },
+    processing: {
+      convertingAudio: 'Analysing Audio',
+      analyzingMessage: 'Analyzing Conversation',
+      thinking: 'Thinking',
+    },
   },
   liveMode: {
     status: 'Status',

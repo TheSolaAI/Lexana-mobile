@@ -28,6 +28,11 @@ export const useStandardProvider = () => {
   const { data: chatRooms = [] } = useFetchChatRoomsQuery(undefined);
   const dispatch = useAppDispatch();
   const selectedRoomId = useAppSelector(state => state.selectedRoom.selectedRoomId);
+
+  // Processing state management
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStage, setProcessingStage] = useState<'convertingAudio' | 'analyzingMessage' | 'thinking' | null>(null);
+
   // Update selectedRoomId if chatRooms changes and selectedRoomId is not valid
   useEffect(() => {
     // Only set the first room if there's no selected room ID or if the selected room doesn't exist in the current rooms
@@ -146,53 +151,77 @@ export const useStandardProvider = () => {
       }
       return result;
     },
+    onFinish: () => {
+      // Clear processing state when AI finishes responding
+      setIsProcessing(false);
+      setProcessingStage(null);
+    },
     onError: error => {
       console.error('Error in chat:', error);
+      // Clear processing state on error
+      setIsProcessing(false);
+      setProcessingStage(null);
     },
   });
 
   const speechToText = async (audioURI: string) => {
-    const formData = new FormData();
-    formData.append('audio', {
-      uri: audioURI,
-      name: 'audio.m4a',
-      type: 'audio/m4a',
-    });
+    setIsProcessing(true);
+    setProcessingStage('convertingAudio');
+    
+    try {
+      const formData = new FormData();
+      formData.append('audio', {
+        uri: audioURI,
+        name: 'audio.m4a',
+        type: 'audio/m4a',
+      });
 
-    const response = await apiClient.post('main', '/api/speech-to-text', formData, true);
+      const response = await apiClient.post('main', '/api/speech-to-text', formData, true);
 
-    if (!ApiClient.isApiResponse(response)) {
-      toast.error('Failed to convert speech to text');
-      throw new Error('Failed to convert speech to text');
+      if (!ApiClient.isApiResponse(response)) {
+        toast.error('Failed to convert speech to text');
+        throw new Error('Failed to convert speech to text');
+      }
+
+      const newMessage: Message = {
+        id: generateId(),
+        content: (response as ApiResponse<{ text: string }>).data.text,
+        role: 'user',
+        createdAt: new Date(),
+      };
+
+      return newMessage;
+    } finally {
+      setIsProcessing(false);
+      setProcessingStage(null);
     }
-
-    const newMessage: Message = {
-      id: generateId(),
-      content: (response as ApiResponse<{ text: string }>).data.text,
-      role: 'user',
-      createdAt: new Date(),
-    };
-
-    return newMessage;
   };
 
   const getToolSet = async (newMessage: Message, history: Message[]) => {
-    const toolsetResponse = await apiClient.post<ToolSetResponse>(
-      'main',
-      '/api/get-required-toolsets',
-      {
-        walletPublicKey: wallets?.[0].publicKey,
-        message: newMessage,
-        previousMessages: history,
-        currentRoomID: roomId,
-      }
-    );
+    setIsProcessing(true);
+    setProcessingStage('analyzingMessage');
+    
+    try {
+      const toolsetResponse = await apiClient.post<ToolSetResponse>(
+        'main',
+        '/api/get-required-toolsets',
+        {
+          walletPublicKey: wallets?.[0].publicKey,
+          message: newMessage,
+          previousMessages: history,
+          currentRoomID: roomId,
+        }
+      );
 
-    if (ApiClient.isApiResponse(toolsetResponse)) {
-      return toolsetResponse.data;
-    } else {
-      toast.error('Failed to get toolset');
-      throw new Error('Failed to get toolset');
+      if (ApiClient.isApiResponse(toolsetResponse)) {
+        return toolsetResponse.data;
+      } else {
+        toast.error('Failed to get toolset');
+        throw new Error('Failed to get toolset');
+      }
+    } finally {
+      setIsProcessing(false);
+      setProcessingStage(null);
     }
   };
 
@@ -242,6 +271,9 @@ export const useStandardProvider = () => {
    */
   const handleSendMessage = async (text: string, toolsets: string[]) => {
     try {
+      setIsProcessing(true);
+      setProcessingStage('thinking');
+      
       await append(
         {
           role: 'user',
@@ -251,6 +283,9 @@ export const useStandardProvider = () => {
       );
     } catch (error) {
       console.error('Error sending message:', error);
+    } finally {
+      setIsProcessing(false);
+      setProcessingStage(null);
     }
   };
 
@@ -369,5 +404,9 @@ export const useStandardProvider = () => {
     chatRooms,
     isFetching,
     status,
+    isProcessing,
+    setIsProcessing,
+    processingStage,
+    setProcessingStage,
   };
 };

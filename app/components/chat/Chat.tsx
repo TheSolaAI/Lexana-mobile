@@ -23,12 +23,21 @@ import { SNSResolverMessageItem } from './messages/SNSResolverMessageItem';
 import { SwapTokenMessageItem } from './messages/SwapTokenMessageItem';
 // import { SignedTransactionsMessageItem } from './messages/SignedTransactionsMessageItem';
 import { TransferTokenMessageItem } from './messages/TransferTokenMessageItem';
+import { LoadingBubble } from './LoadingBubble';
 
 interface ChatProps {
   /**
    * Array of chat messages to display
    */
   messages: UIMessage[];
+  /**
+   * Whether the system is currently processing a message
+   */
+  isProcessing?: boolean;
+  /**
+   * The current processing stage
+   */
+  processingStage?: 'convertingAudio' | 'analyzingMessage' | 'thinking' | null;
 }
 
 /**
@@ -36,7 +45,7 @@ interface ChatProps {
  * @param {ChatProps} props - The props for the chat component.
  * @returns {JSX.Element} The rendered chat list with header.
  */
-export const Chat: FC<ChatProps> = ({ messages }) => {
+export const Chat: FC<ChatProps> = ({ messages, isProcessing, processingStage }) => {
   const flatListRef = useRef<FlatList>(null);
   const animatedValues = useRef<{ [key: string]: Animated.Value }>({});
   const scrollToBottomOnNextUpdate = useRef<boolean>(true);
@@ -71,6 +80,13 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
       });
     }
   }, [messages, scrollToBottom]);
+
+  // Auto-scroll when processing state changes
+  useEffect(() => {
+    if (isProcessing && scrollToBottomOnNextUpdate.current) {
+      scrollToBottom();
+    }
+  }, [isProcessing, scrollToBottom]);
 
   /**
    * Handles scroll events to manage auto-scrolling behavior
@@ -129,8 +145,8 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
         return <TransferTokenMessageItem props={args.data} />;
       case 'transferSpl':
         return <TransferTokenMessageItem props={args.data} />;
-      // default:
-      //   return <SimpleMessageItem text={JSON.stringify(args.data)} />;
+      default:
+        return null;
     }
   };
 
@@ -190,6 +206,18 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
     );
   };
 
+  /**
+   * Renders the footer component with loading indicator and spacing
+   */
+  const renderFooter = () => (
+    <View style={$footerContainer}>
+      {isProcessing && processingStage && (
+        <LoadingBubble stage={processingStage} />
+      )}
+      <View style={$footerSpacing} />
+    </View>
+  );
+
   return (
     <FlatList
       ref={flatListRef}
@@ -197,7 +225,7 @@ export const Chat: FC<ChatProps> = ({ messages }) => {
       renderItem={renderItem}
       keyExtractor={item => item.id}
       onScroll={onScroll}
-      ListFooterComponent={<View style={$footerSpacing} />}
+      ListFooterComponent={renderFooter}
       scrollEventThrottle={16}
       contentContainerStyle={$flatListContentContainer}
       onContentSizeChange={() => {
@@ -230,6 +258,10 @@ const $assistantWrapperStyle: ViewStyle = {
 const $messagePartsContainer: ViewStyle = {
   flexDirection: 'column',
   backgroundColor: 'transparent',
+};
+
+const $footerContainer: ViewStyle = {
+  alignItems: 'flex-start',
 };
 
 const $footerSpacing: ViewStyle = {

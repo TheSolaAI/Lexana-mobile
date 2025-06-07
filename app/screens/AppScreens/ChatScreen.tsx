@@ -30,7 +30,7 @@ export const ChatScreen: FC<ChatScreenProps> = ({ navigation }) => {
    * Global State
    */
   const { themed, theme } = useAppTheme();
-  const { onAudioMessage, messages, handleTextMessage, isFetching, setMessages } =
+  const { onAudioMessage, messages, handleTextMessage, isFetching, setMessages, isProcessing, processingStage } =
     useStandardProvider();
   const dispatch = useAppDispatch();
   const [createChatRoom] = useCreateChatRoomMutation();
@@ -101,7 +101,7 @@ export const ChatScreen: FC<ChatScreenProps> = ({ navigation }) => {
         <EmptyState onCreateChat={handleCreateNewChat} />
       ) : (
         <>
-          <Chat messages={messages} />
+          <Chat messages={messages} isProcessing={isProcessing} processingStage={processingStage} />
           <InputCard
             onSendMessage={handleTextMessage}
             onAudioRecorded={onAudioMessage}
