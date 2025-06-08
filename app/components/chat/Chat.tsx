@@ -328,6 +328,7 @@ export const Chat: FC<ChatProps> = ({ messages, isProcessing, processingStage })
 const $messageWrapperStyle: ViewStyle = {
   flexDirection: 'row',
   marginBottom: 8,
+  overflow: 'hidden',
 };
 
 const $userWrapperStyle: ViewStyle = {
@@ -336,11 +337,16 @@ const $userWrapperStyle: ViewStyle = {
 
 const $assistantWrapperStyle: ViewStyle = {
   justifyContent: 'flex-start',
+  flex: 1,
+  overflow: 'hidden',
+  maxWidth: '100%',
 };
 
 const $messagePartsContainer: ViewStyle = {
   flexDirection: 'column',
   backgroundColor: 'transparent',
+  flex: 1,
+  overflow: 'hidden',
 };
 
 const $footerContainer: ViewStyle = {

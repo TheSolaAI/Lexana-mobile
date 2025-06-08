@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   FlatList,
   Linking,
-  Alert,
 } from 'react-native';
 import { Text } from '@/components/general';
 import { useAppTheme } from '@/utils/useAppTheme';
@@ -15,6 +14,7 @@ import { BaseBorderedMessageItem } from './base/BaseBorderedMessageItem';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { formatNumber } from '@/utils/formatNumber';
+import { toast } from 'sonner-native';
 
 interface Holder {
   address: string;
@@ -40,17 +40,27 @@ interface TopHoldersMessageItemProps {
 export const TopHoldersMessageItem: FC<TopHoldersMessageItemProps> = memo(({ props }) => {
   const { themed, theme } = useAppTheme();
 
-  // Process and transform the data to match our component needs
+  /**
+   * Process and transform the holder data to match component requirements.
+   * Sorts holders by amount (descending) and limits to top 10 holders.
+   * @returns Array of processed holder data with calculated percentages
+   */
   const processData = () => {
     if (!props.details || !Array.isArray(props.details)) {
       return [];
     }
 
+    // Sort holders by amount in descending order to get the actual top holders
+    const sortedHolders = [...props.details].sort((a, b) => b.amount - a.amount);
+    
+    // Take only the top 10 holders
+    const top10Holders = sortedHolders.slice(0, 10);
+
     // Calculate total supply for percentage calculation
     const totalSupply = props.details.reduce((sum, holder) => sum + holder.amount, 0);
 
     // Transform the data to match our component's expected structure
-    return props.details.map(holder => ({
+    return top10Holders.map(holder => ({
       address: holder.owner,
       amount: holder.amount,
       percentage: totalSupply > 0 ? holder.amount / totalSupply : 0,
@@ -60,12 +70,20 @@ export const TopHoldersMessageItem: FC<TopHoldersMessageItemProps> = memo(({ pro
 
   const processedData = processData();
 
-  // Format percentage
+  /**
+   * Format percentage value for display.
+   * @param percentage - The percentage value (0-1)
+   * @returns Formatted percentage string with 2 decimal places
+   */
   const formatPercentage = (percentage: number) => {
     return `${(percentage * 100).toFixed(2)}%`;
   };
 
-  // Abbreviate address for display
+  /**
+   * Abbreviate long blockchain addresses for better UI display.
+   * @param address - The full blockchain address
+   * @returns Abbreviated address in format: first6...last4
+   */
   const getAbbreviatedAddress = (address: string) => {
     if (!address) return 'Unknown';
     return address.length > 12
@@ -73,18 +91,29 @@ export const TopHoldersMessageItem: FC<TopHoldersMessageItemProps> = memo(({ pro
       : address;
   };
 
-  // Clipboard function
+  /**
+   * Copy text to device clipboard and show confirmation alert.
+   * @param text - The text to copy to clipboard
+   */
   const copyToClipboard = async (text: string) => {
     await Clipboard.setStringAsync(text);
-    Alert.alert('Copied', 'Address copied to clipboard');
+    toast.success('Address copied to clipboard');
   };
 
-  // Open Solscan link
+  /**
+   * Open Solscan explorer page for the given address.
+   * @param address - The blockchain address to view on Solscan
+   */
   const openSolscan = (address: string) => {
     Linking.openURL(`https://solscan.io/account/${address}`);
   };
 
-  // Render each holder row
+  /**
+   * Render individual holder item in the list.
+   * @param item - The holder data to render
+   * @param index - The index position in the list
+   * @returns JSX element for the holder row
+   */
   const renderHolderItem = useCallback(({ item, index }: { item: Holder; index: number }) => (
     <View style={themed($holderItemStyle)}>
       <View style={$numberAndAddressContainer}>
@@ -132,21 +161,11 @@ export const TopHoldersMessageItem: FC<TopHoldersMessageItemProps> = memo(({ pro
     </View>
   ), [themed, theme]);
 
-  const footer = (
-    <TouchableOpacity
-      style={$footerButton}
-      onPress={() => Linking.openURL(`https://solscan.io/token/${props.address}#holders`)}
-    >
-      <Text style={themed($footerButtonTextStyle)}>View All Holders</Text>
-      <Ionicons name="open-outline" size={14} color={theme.colors.primary} />
-    </TouchableOpacity>
-  );
 
   return (
     <BaseBorderedMessageItem
       title="Top Token Holders"
       subtitle={props.name || 'Token Analysis'}
-      footer={footer}
     >
       <View>
         <View style={themed($headerRowStyle)}>
@@ -195,8 +214,9 @@ const $headerTextStyle: ThemedStyle<TextStyle> = theme => ({
 
 const $headerRightSection: ViewStyle = {
   flexDirection: 'row',
-  width: '50%',
+  flex: 1,
   justifyContent: 'space-between',
+  paddingLeft: 8,
 };
 
 const $holderItemStyle: ViewStyle = {
@@ -247,18 +267,20 @@ const $amountAndPercentContainer: ViewStyle = {
   flexDirection: 'row',
   justifyContent: 'space-between',
   paddingLeft: 32,
+  alignItems: 'center',
 };
 
 const $amountTextStyle: ThemedStyle<TextStyle> = theme => ({
   color: theme.colors.text,
   fontSize: 13,
+  flex: 1,
 });
 
 const $percentageTextStyle: ThemedStyle<TextStyle> = theme => ({
   color: theme.colors.text,
   fontSize: 13,
   fontWeight: 'bold',
-  minWidth: 60,
+  minWidth: 55,
   textAlign: 'right',
 });
 
@@ -283,21 +305,9 @@ const $separatorStyle: ThemedStyle<ViewStyle> = theme => ({
 });
 
 const $listStyle: ViewStyle = {
-  maxHeight: 440, // Limit height to show approx 5 items
+  maxHeight: 520, // Optimized for up to 10 items (52px per item)
 };
 
 const $listContentStyle: ViewStyle = {
   paddingVertical: 4,
 };
-
-const $footerButton: ViewStyle = {
-  flexDirection: 'row',
-  alignItems: 'center',
-  gap: 6,
-  alignSelf: 'center',
-};
-
-const $footerButtonTextStyle: ThemedStyle<TextStyle> = theme => ({
-  color: theme.colors.primary,
-  fontSize: 14,
-});

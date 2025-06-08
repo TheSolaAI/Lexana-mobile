@@ -35,7 +35,7 @@ export const BaseBorderedMessageItem: FC<BaseBorderedMessageItemProps> = ({
         <View style={themed($headerStyle)}>
           <View style={$titleContainer}>
             {icon && <View style={$iconContainer}>{icon}</View>}
-            <Text preset="heading" style={themed($titleStyle)}>
+            <Text preset="pageHeading" style={themed($titleStyle)}>
               {title}
             </Text>
           </View>
@@ -61,7 +61,6 @@ export const BaseBorderedMessageItem: FC<BaseBorderedMessageItemProps> = ({
 // Styles
 const $messageWrapperStyle: ViewStyle = {
   marginVertical: 4,
-  width: '100%',
 };
 
 const $messageContainerStyle: ThemedStyle<ViewStyle> = theme => ({

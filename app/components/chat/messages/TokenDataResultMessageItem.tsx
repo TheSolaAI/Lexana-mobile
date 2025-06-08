@@ -16,6 +16,7 @@ import { BaseBorderedMessageItem } from './base/BaseBorderedMessageItem';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { formatNumber } from '@/utils/formatNumber';
+import { toast } from 'sonner-native';
 
 export interface TokenDataResponse {
   address: string;
@@ -68,13 +69,18 @@ interface TokenDataResultMessageItemProps {
   props: TokenDataResponse;
 }
 
+/**
+ * A memoized component that displays the result of a token data query.
+ * It includes details like price, market cap, volume, and links to external resources.
+ * The component is designed to be responsive and visually clean.
+ */
 export const TokenDataResultMessageItem: FC<TokenDataResultMessageItemProps> = memo(({ props }) => {
   const { themed, theme } = useAppTheme();
 
   // Clipboard function
   const copyToClipboard = async (text: string, message = 'Token address copied to clipboard') => {
     await Clipboard.setStringAsync(text);
-    Alert.alert('Copied', message);
+    toast.success(message);
   };
 
   // Open Solscan link
@@ -104,7 +110,7 @@ export const TokenDataResultMessageItem: FC<TokenDataResultMessageItemProps> = m
       </TouchableOpacity>
 
       <TouchableOpacity style={$actionButton} onPress={openSolscan}>
-        <Text style={themed($actionTextStyle)}>View on Solscan</Text>
+        <Text style={themed($actionTextStyle)}>Solscan</Text>
         <Ionicons name="open-outline" size={14} color={theme.colors.primary} />
       </TouchableOpacity>
     </View>
@@ -128,105 +134,89 @@ export const TokenDataResultMessageItem: FC<TokenDataResultMessageItemProps> = m
       onPress={openSolscan}
     >
       <View style={$contentContainer}>
-        {/* Token Address */}
-        <View style={themed($addressBlockStyle)}>
-          <Text preset="small" style={themed($labelStyle)}>
-            Token Address
-          </Text>
-          <View style={$addressContentContainer}>
-            <Text style={themed($addressTextStyle)} numberOfLines={1} ellipsizeMode="middle">
-              {props.address}
+        {/* Price Info Section */}
+        <View style={$priceInfoContainer}>
+          <Text style={themed($priceValueStyle)}>${Number(props.price).toFixed(7)}</Text>
+          <View style={themed($priceChangeContainer)}>
+            {isPricePositive ? (
+              <Ionicons name="trending-up" size={16} color={priceChangeColor} />
+            ) : (
+              <Ionicons name="trending-down" size={16} color={priceChangeColor} />
+            )}
+            <Text style={[{ color: priceChangeColor }, themed($priceChangeTextStyle)]}>
+              {isPricePositive ? '+' : ''}
+              {Number(props.priceChange24hPercent).toFixed(2)}% (24h)
             </Text>
-            <TouchableOpacity
-              onPress={() => copyToClipboard(props.address)}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              style={themed($copyButtonStyle)}
-            >
-              <Ionicons name="copy-outline" size={18} color={theme.colors.textDim} />
-            </TouchableOpacity>
           </View>
         </View>
 
-        {/* Price Info Section */}
-        <View style={$infoRowContainer}>
-          <View style={themed($infoBlockStyle)}>
-            <Text preset="small" style={themed($labelStyle)}>
-              Current Price
-            </Text>
-            <Text style={themed($priceTextStyle)}>${Number(props.price).toFixed(7)}</Text>
-          </View>
+        <View style={themed($dividerStyle)} />
 
-          <View style={themed($infoBlockStyle)}>
-            <Text preset="small" style={themed($labelStyle)}>
-              24h Change
-            </Text>
-            <View style={$priceChangeContainer}>
-              {isPricePositive ? (
-                <Ionicons name="trending-up" size={18} color={priceChangeColor} />
-              ) : (
-                <Ionicons name="trending-down" size={18} color={priceChangeColor} />
-              )}
-              <Text style={[themed($valueTextStyle), { color: priceChangeColor }]}>
-                {isPricePositive ? '+' : ''}
-                {Number(props.priceChange24hPercent).toFixed(2)}%
+        {/* Key Metrics */}
+        <View style={$metricsContainer}>
+          <View style={$metricRow}>
+            <View style={$metricItem}>
+              <Text preset="small" style={themed($labelStyle)}>
+                Market Cap
               </Text>
+              <Text style={themed($valueTextStyle)}>${formatNumber(props.marketCap)}</Text>
+            </View>
+            <View style={$metricItem}>
+              <Text preset="small" style={themed($labelStyle)}>
+                FDV
+              </Text>
+              <Text style={themed($valueTextStyle)}>${formatNumber(props.fdv)}</Text>
+            </View>
+          </View>
+          <View style={$metricRow}>
+            <View style={$metricItem}>
+              <Text preset="small" style={themed($labelStyle)}>
+                Liquidity
+              </Text>
+              <Text style={themed($valueTextStyle)}>${formatNumber(props.liquidity)}</Text>
+            </View>
+            <View style={$metricItem}>
+              <Text preset="small" style={themed($labelStyle)}>
+                Holders
+              </Text>
+              <Text style={themed($valueTextStyle)}>{formatNumber(props.holder)}</Text>
             </View>
           </View>
         </View>
 
-        {/* Market Data Section */}
-        <View style={$infoRowContainer}>
-          <View style={themed($infoBlockStyle)}>
-            <Text preset="small" style={themed($labelStyle)}>
-              Market Cap
-            </Text>
-            <Text style={themed($valueTextStyle)}>
-              ${formatNumber(props.marketCap) || 'Unknown'}
-            </Text>
-          </View>
-
-          <View style={themed($infoBlockStyle)}>
-            <Text preset="small" style={themed($labelStyle)}>
-              Holders
-            </Text>
-            <Text style={themed($valueTextStyle)}>{formatNumber(props.holder) || 'Unknown'}</Text>
-          </View>
-        </View>
+        <View style={themed($dividerStyle)} />
 
         {/* Volume Data */}
-        <Text preset="pageHeading" style={themed($sectionTitleStyle)}>
-          24h Volume
-        </Text>
-        <View style={themed($volumeContainerStyle)}>
-          <View style={$volumeRowStyle}>
-            <View style={$volumeItemStyle}>
-              <Text preset="small" style={themed($volumeLabelStyle)}>
-                Total Volume
+        <View>
+          <Text preset="pageHeading" style={themed($sectionTitleStyle)}>
+            24h Volume
+          </Text>
+          <View style={$volumeMetricsContainer}>
+            <View style={$metricItem}>
+              <Text preset="small" style={themed($labelStyle)}>
+                Total
               </Text>
               <Text style={themed($valueTextStyle)}>
                 ${formatNumber(props.vBuy24hUSD + props.vSell24hUSD)}
               </Text>
             </View>
-
-            <View style={$volumeItemStyle}>
-              <Text preset="small" style={themed($volumeLabelStyle)}>
-                Buy Volume
+            <View style={$metricItem}>
+              <Text preset="small" style={themed($labelStyle)}>
+                Buys
               </Text>
               <Text style={[themed($valueTextStyle), { color: theme.colors.success }]}>
                 ${formatNumber(props.vBuy24hUSD)}
               </Text>
             </View>
-
-            <View style={$volumeItemStyle}>
-              <Text preset="small" style={themed($volumeLabelStyle)}>
-                Sell Volume
+            <View style={$metricItem}>
+              <Text preset="small" style={themed($labelStyle)}>
+                Sells
               </Text>
               <Text style={[themed($valueTextStyle), { color: theme.colors.error }]}>
                 ${formatNumber(props.vSell24hUSD)}
               </Text>
             </View>
           </View>
-
           {/* Buy/Sell Ratio Bar */}
           <View style={$ratioContainerStyle}>
             <View style={$ratioLabelContainer}>
@@ -234,7 +224,7 @@ export const TokenDataResultMessageItem: FC<TokenDataResultMessageItemProps> = m
                 Buy/Sell Ratio:
               </Text>
             </View>
-            <View style={$ratioBarContainerStyle}>
+            <View style={themed($ratioBarContainerStyle)}>
               <View
                 style={[
                   $buyRatioStyle,
@@ -255,28 +245,36 @@ export const TokenDataResultMessageItem: FC<TokenDataResultMessageItemProps> = m
           </View>
         </View>
 
-        {/* Token Details */}
-        {props.decimals !== undefined && (
-          <View style={$infoRowContainer}>
-            <View style={themed($infoBlockStyle)}>
-              <Text preset="small" style={themed($labelStyle)}>
-                Decimals
-              </Text>
-              <Text style={themed($valueTextStyle)}>{props.decimals}</Text>
-            </View>
+        <View style={themed($dividerStyle)} />
 
-            <View style={themed($infoBlockStyle)}>
-              <Text preset="small" style={themed($labelStyle)}>
-                Liquidity
-              </Text>
-              <Text style={themed($valueTextStyle)}>
-                ${formatNumber(props.liquidity) || 'Unknown'}
-              </Text>
-            </View>
+        {/* Token Info */}
+        <View>
+          <Text preset="small" style={themed($labelStyle)}>
+            Token Address
+          </Text>
+          <TouchableOpacity
+            onPress={() => copyToClipboard(props.address)}
+            style={$addressContainer}
+          >
+            <Text style={themed($addressTextStyle)} numberOfLines={1} ellipsizeMode="middle">
+              {props.address}
+            </Text>
+            <Ionicons name="copy-outline" size={18} color={theme.colors.textDim} />
+          </TouchableOpacity>
+        </View>
+        {props.decimals !== undefined && (
+          <View>
+            <Text preset="small" style={themed($labelStyle)}>
+              Decimals
+            </Text>
+            <Text style={themed($valueTextStyle)}>{props.decimals}</Text>
           </View>
         )}
 
         {/* Links and Socials Section */}
+        {(props.extensions?.website ||
+          props.extensions?.twitter ||
+          props.extensions?.discord) && <View style={themed($dividerStyle)} />}
         {(props.extensions?.website || props.extensions?.twitter) && (
           <View style={$socialsContainer}>
             {props.extensions.website && (
@@ -316,71 +314,66 @@ export const TokenDataResultMessageItem: FC<TokenDataResultMessageItemProps> = m
 // Styles
 const $contentContainer: ViewStyle = {
   gap: 16,
+  overflow: 'hidden',
 };
 
-const $infoRowContainer: ViewStyle = {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  gap: 12,
-};
-
-const $addressBlockStyle: ThemedStyle<ViewStyle> = theme => ({
-  backgroundColor: `${theme.colors.surface}30`,
-  padding: 12,
-  borderRadius: 12,
-});
-
-const $addressContentContainer: ViewStyle = {
+const $priceInfoContainer: ViewStyle = {
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
-  marginTop: 4,
-};
-
-const $addressTextStyle: ThemedStyle<TextStyle> = theme => ({
-  color: theme.colors.text,
-  fontFamily: 'monospace',
-  fontSize: 12,
-  flex: 1,
-  marginRight: 8,
-});
-
-const $copyButtonStyle: ThemedStyle<ViewStyle> = theme => ({
-  padding: 4,
-  borderRadius: 12,
-  backgroundColor: `${theme.colors.surface}50`,
-});
-
-const $infoBlockStyle: ThemedStyle<ViewStyle> = theme => ({
-  backgroundColor: `${theme.colors.surface}30`,
-  padding: 12,
-  borderRadius: 12,
-  flex: 1,
-});
-
-const $volumeContainerStyle: ThemedStyle<ViewStyle> = theme => ({
-  backgroundColor: `${theme.colors.surface}30`,
-  padding: 12,
-  borderRadius: 12,
-  gap: 12,
-});
-
-const $volumeRowStyle: ViewStyle = {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
   flexWrap: 'wrap',
-  gap: 12,
+  gap: 8,
+  maxWidth: '100%',
+  overflow: 'hidden',
 };
 
-const $volumeItemStyle: ViewStyle = {
-  flex: 1,
-  minWidth: 80,
-};
+const $priceValueStyle: ThemedStyle<TextStyle> = theme => ({
+  color: theme.colors.text,
+  fontSize: 28,
+  fontWeight: 'bold',
+  flexShrink: 1,
+});
 
-const $priceChangeContainer: ViewStyle = {
+const $priceChangeTextStyle: ThemedStyle<TextStyle> = theme => ({
+  fontSize: 14,
+  fontWeight: '500',
+  flexShrink: 1,
+});
+
+const $priceChangeContainer: ThemedStyle<ViewStyle> = theme => ({
   flexDirection: 'row',
   alignItems: 'center',
   gap: 4,
+  paddingVertical: 4,
+  paddingHorizontal: 8,
+  borderRadius: 12,
+  backgroundColor: `${theme.colors.surface}50`,
+  flexShrink: 1,
+  overflow: 'hidden',
+});
+
+const $dividerStyle: ThemedStyle<ViewStyle> = theme => ({
+  height: 1,
+  backgroundColor: theme.colors.surface,
+  opacity: 0.5,
+});
+
+const $metricsContainer: ViewStyle = {
+  gap: 12,
+  overflow: 'hidden',
+};
+
+const $metricRow: ViewStyle = {
+  flexDirection: 'row',
+  gap: 12,
+  overflow: 'hidden',
+};
+
+const $metricItem: ViewStyle = {
+  flex: 1,
+  gap: 2,
+  minWidth: 0,
+  overflow: 'hidden',
 };
 
 const $labelStyle: ThemedStyle<TextStyle> = theme => ({
@@ -388,46 +381,29 @@ const $labelStyle: ThemedStyle<TextStyle> = theme => ({
   marginBottom: 4,
 });
 
-const $volumeLabelStyle: ThemedStyle<TextStyle> = theme => ({
-  color: theme.colors.textDim,
-  marginBottom: 4,
-  fontSize: 12,
-});
-
 const $valueTextStyle: ThemedStyle<TextStyle> = theme => ({
   color: theme.colors.text,
   fontSize: 16,
-});
-
-const $priceTextStyle: ThemedStyle<TextStyle> = theme => ({
-  color: theme.colors.text,
-  fontSize: 20,
-  fontWeight: 'bold',
+  fontWeight: '500',
+  flexShrink: 1,
 });
 
 const $sectionTitleStyle: ThemedStyle<TextStyle> = theme => ({
   color: theme.colors.text,
-  marginBottom: 4,
+  marginBottom: 8,
+  fontSize: 16,
+  fontWeight: '600',
 });
 
-const $footerContainer: ViewStyle = {
+const $volumeMetricsContainer: ViewStyle = {
   flexDirection: 'row',
-  justifyContent: 'space-between',
+  gap: 12,
+  marginBottom: 12,
+  overflow: 'hidden',
 };
-
-const $actionButton: ViewStyle = {
-  flexDirection: 'row',
-  alignItems: 'center',
-  gap: 4,
-};
-
-const $actionTextStyle: ThemedStyle<TextStyle> = theme => ({
-  color: theme.colors.primary,
-  fontSize: 13,
-});
 
 const $ratioContainerStyle: ViewStyle = {
-  marginTop: 8,
+  marginTop: 4,
 };
 
 const $ratioLabelContainer: ViewStyle = {
@@ -439,22 +415,62 @@ const $ratioLabelStyle: ThemedStyle<TextStyle> = theme => ({
   fontSize: 12,
 });
 
-const $ratioBarContainerStyle: ViewStyle = {
+const $ratioBarContainerStyle: ThemedStyle<ViewStyle> = theme => ({
   flexDirection: 'row',
   height: 8,
   borderRadius: 4,
   overflow: 'hidden',
-};
+  backgroundColor: `${theme.colors.surface}30`,
+});
 
 const $buyRatioStyle: ViewStyle = {
-  backgroundColor: '#22c55e', // green
+  backgroundColor: '#22c55e', // green-500
   height: '100%',
 };
 
 const $sellRatioStyle: ViewStyle = {
-  backgroundColor: '#ef4444', // red
+  backgroundColor: '#ef4444', // red-500
   height: '100%',
 };
+
+const $addressContainer: ViewStyle = {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  gap: 8,
+  maxWidth: '100%',
+  overflow: 'hidden',
+};
+
+const $addressTextStyle: ThemedStyle<TextStyle> = theme => ({
+  color: theme.colors.text,
+  fontFamily: 'monospace',
+  fontSize: 14,
+  flex: 1,
+  minWidth: 0,
+});
+
+const $footerContainer: ViewStyle = {
+  flexDirection: 'row',
+  justifyContent: 'space-around',
+  paddingTop: 8,
+  overflow: 'hidden',
+};
+
+const $actionButton: ViewStyle = {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 4,
+  paddingVertical: 6,
+  paddingHorizontal: 10,
+  borderRadius: 16,
+};
+
+const $actionTextStyle: ThemedStyle<TextStyle> = theme => ({
+  color: theme.colors.primary,
+  fontSize: 13,
+  fontWeight: '600',
+});
 
 const $logoStyle: ImageStyle = {
   width: 32,
@@ -475,6 +491,7 @@ const $socialsContainer: ViewStyle = {
   flexDirection: 'row',
   flexWrap: 'wrap',
   gap: 8,
+  overflow: 'hidden',
 };
 
 const $socialButtonStyle: ThemedStyle<ViewStyle> = theme => ({

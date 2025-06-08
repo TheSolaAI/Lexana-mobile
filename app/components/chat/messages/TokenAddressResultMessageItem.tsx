@@ -1,11 +1,12 @@
 import { FC, memo } from 'react';
-import { View, ViewStyle, TextStyle, TouchableOpacity, Linking, Alert } from 'react-native';
+import { View, ViewStyle, TextStyle, TouchableOpacity, Linking } from 'react-native';
 import { Text } from '@/components/general';
 import { useAppTheme } from '@/utils/useAppTheme';
 import { ThemedStyle } from '@/theme';
 import { BaseBorderedMessageItem } from './base/BaseBorderedMessageItem';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
+import { toast } from 'sonner-native';
 
 /**
  * Interface representing the token address data returned from the system
@@ -42,7 +43,7 @@ export const TokenAddressResultMessageItem: FC<TokenAddressResultMessageItemProp
   // Clipboard function
   const copyToClipboard = async (text: string) => {
     await Clipboard.setStringAsync(text);
-    Alert.alert('Copied', 'Token address copied to clipboard');
+    toast.success('Copied Token Address');
   };
 
   // Open Solscan link

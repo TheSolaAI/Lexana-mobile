@@ -84,7 +84,7 @@ export const BugReportMessageItem: FC<BugReportProps> = ({ props }) => {
           <Text preset="small" style={themed($sectionLabelStyle)}>
             Issue Title
           </Text>
-          <Text preset="heading" style={themed($titleStyle)}>
+          <Text preset="pageHeading" style={themed($titleStyle)}>
             {props.title}
           </Text>
         </View>
