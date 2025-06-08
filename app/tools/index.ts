@@ -4,7 +4,7 @@ import { ToolContext } from '@/types/tool';
 import { createGetTokenDataTool, createTopHoldersTool } from './tokenToolSet';
 import { createGetTrendingNFTsTool, createGetNFTPriceTool } from './nftToolSet';
 import { createTrendingAiProjectsTool } from './aiProjectsToolSet';
-import { createTokenAddressTool } from './commonToolSet';
+import { createTokenAddressTool, createWebSearchTool } from './commonToolSet';
 
 export function createAllTools(context: ToolContext) {
   return {
@@ -19,6 +19,9 @@ export function createAllTools(context: ToolContext) {
 
     // AI Projects tools
     filterTrendingAiProjects: createTrendingAiProjectsTool(),
+
+    // Web Search tools
+    webSearch: createWebSearchTool(context),
   };
 }
 
@@ -29,6 +32,7 @@ export const availableTools = [
   'nft_get_trending',
   'nft_get_price',
   'aiProjects_filterTrendingAiProjectsTool',
+  'web_search',
 ] as const;
 
 export type AvailableToolIds = (typeof availableTools)[number];

@@ -5403,6 +5403,13 @@ cross-fetch@^3.1.5:
   dependencies:
     node-fetch "^2.7.0"
 
+cross-fetch@~4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-4.1.0.tgz#8f69355007ee182e47fa692ecbaa37a52e43c3d2"
+  integrity sha512-uKm5PU+MHTootlWEY+mZ4vvXoCn4fLQxT9dSc1sXVMSFkINTJVN8cAQROpwcKm8bJ/c7rgZVIBWzH5T78sNZZw==
+  dependencies:
+    node-fetch "^2.7.0"
+
 cross-spawn@^6.0.0:
   version "6.0.6"
   resolved "https://registry.npmjs.org/cross-spawn/-/cross-spawn-6.0.6.tgz"
@@ -5803,7 +5810,7 @@ dotenv@^16.4.5:
   resolved "https://registry.npmjs.org/dotenv/-/dotenv-16.5.0.tgz"
   integrity sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==
 
-dotenv@~16.4.5:
+dotenv@~16.4.5, dotenv@~16.4.7:
   version "16.4.7"
   resolved "https://registry.npmjs.org/dotenv/-/dotenv-16.4.7.tgz"
   integrity sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==
@@ -6371,6 +6378,15 @@ eventemitter3@5.0.1, eventemitter3@^5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-5.0.1.tgz#53f5ffd0a492ac800721bb42c66b841de96423c4"
   integrity sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==
+
+exa-js@^1.8.8:
+  version "1.8.8"
+  resolved "https://registry.yarnpkg.com/exa-js/-/exa-js-1.8.8.tgz#f4618d1e8a1ad5bdc259c9ba8a5508a10f11fd6e"
+  integrity sha512-WvrJHX+HFdy16zKe+EDK8Cw5IXiiTC/cNimtLTVTfeayr2t4UlbQqk36hlcf99cinhVBZ47rBKgIJSo7pQSKqQ==
+  dependencies:
+    cross-fetch "~4.1.0"
+    dotenv "~16.4.7"
+    openai "^5.0.1"
 
 exec-async@^2.2.0:
   version "2.2.0"
@@ -9983,6 +9999,11 @@ open@^8.0.4:
     define-lazy-prop "^2.0.0"
     is-docker "^2.1.1"
     is-wsl "^2.2.0"
+
+openai@^5.0.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/openai/-/openai-5.1.1.tgz#b09f43520e1b6321d487e39c3295cbbe11827def"
+  integrity sha512-lgIdLqvpLpz8xPUKcEIV6ml+by74mbSBz8zv/AHHebtLn/WdpH4kdXT3/Q5uUKDHg3vHV/z9+G9wZINRX6rkDg==
 
 optionator@^0.9.3:
   version "0.9.4"
