@@ -48,26 +48,79 @@ interface ChatProps {
 export const Chat: FC<ChatProps> = ({ messages, isProcessing, processingStage }) => {
   const flatListRef = useRef<FlatList>(null);
   const animatedValues = useRef<{ [key: string]: Animated.Value }>({});
-  const scrollToBottomOnNextUpdate = useRef<boolean>(true);
+  const shouldAutoScroll = useRef<boolean>(true);
+  const isUserScrolling = useRef<boolean>(false);
+  const previousMessagesLength = useRef<number>(0);
+  const contentHeight = useRef<number>(0);
+  const layoutHeight = useRef<number>(0);
 
   /**
-   * Scrolls the chat to the bottom with animation
+   * Scrolls the chat to the bottom immediately
    */
   const scrollToBottom = useCallback(() => {
-    if (flatListRef.current) {
-      // Use setTimeout to ensure scrollToEnd is called after the FlatList has had a chance to update.
-      setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 0);
+    if (flatListRef.current && shouldAutoScroll.current) {
+      flatListRef.current.scrollToEnd({ animated: true });
     }
   }, []);
 
-  // Auto-scroll to bottom when new messages are added
-  useEffect(() => {
-    if (messages.length > 0 && scrollToBottomOnNextUpdate.current) {
+  /**
+   * Forces immediate scroll to bottom without checking shouldAutoScroll
+   */
+  const forceScrollToBottom = useCallback(() => {
+    if (flatListRef.current) {
+      // First try immediate scroll without animation
+      flatListRef.current.scrollToEnd({ animated: false });
+      // Then follow with animated scroll for smooth UX
+      setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 50);
+    }
+  }, []);
+
+  /**
+   * Handles content size changes (important for streaming content)
+   */
+  const onContentSizeChange = useCallback((contentWidth: number, newContentHeight: number) => {
+    const heightIncreased = newContentHeight > contentHeight.current;
+    contentHeight.current = newContentHeight;
+    
+    // Auto-scroll when content grows and auto-scroll is enabled
+    if (heightIncreased && shouldAutoScroll.current && !isUserScrolling.current) {
       scrollToBottom();
-      // Create animation values for new messages that don't have them yet
+    }
+  }, [scrollToBottom]);
+
+  /**
+   * Handles layout changes to track visible area
+   */
+  const onLayout = useCallback((event: any) => {
+    layoutHeight.current = event.nativeEvent.layout.height;
+  }, []);
+
+  // Handle message updates with improved logic
+  useEffect(() => {
+    const currentMessagesLength = messages.length;
+    const isNewMessage = currentMessagesLength > previousMessagesLength.current;
+    const isInitialLoad = previousMessagesLength.current === 0 && currentMessagesLength > 0;
+
+    if (isInitialLoad) {
+      // Force scroll to bottom on initial load with delay to ensure rendering
+      shouldAutoScroll.current = true;
+      setTimeout(() => {
+        forceScrollToBottom();
+      }, 100);
+    } else if (isNewMessage && shouldAutoScroll.current) {
+      // Scroll for new messages with shorter delay
+      setTimeout(() => {
+        scrollToBottom();
+      }, 50);
+    }
+
+    // Create animation values for new messages
+    if (currentMessagesLength > 0) {
       messages.forEach(message => {
         if (!animatedValues.current[message.id]) {
-          animatedValues.current[message.id] = new Animated.Value(50);
+          animatedValues.current[message.id] = new Animated.Value(30);
           // Animate the new message
           Animated.spring(animatedValues.current[message.id], {
             toValue: 0,
@@ -78,34 +131,62 @@ export const Chat: FC<ChatProps> = ({ messages, isProcessing, processingStage })
         }
       });
     }
-  }, [messages, scrollToBottom]);
 
-  // Auto-scroll when processing state changes
+    previousMessagesLength.current = currentMessagesLength;
+  }, [messages, scrollToBottom, forceScrollToBottom]);
+
+  // Handle processing state changes (for streaming responses)
   useEffect(() => {
-    if (isProcessing && scrollToBottomOnNextUpdate.current) {
-      scrollToBottom();
+    if (isProcessing && shouldAutoScroll.current && !isUserScrolling.current) {
+      // For streaming, scroll more frequently
+      const interval = setInterval(() => {
+        if (shouldAutoScroll.current && !isUserScrolling.current) {
+          scrollToBottom();
+        }
+      }, 100);
+
+      return () => clearInterval(interval);
     }
   }, [isProcessing, scrollToBottom]);
 
   /**
-   * Disables auto-scrolling when the user starts dragging the list.
+   * Handles the start of user scrolling
    */
-  const onScrollBeginDrag = () => {
-    scrollToBottomOnNextUpdate.current = false;
-  };
+  const onScrollBeginDrag = useCallback(() => {
+    isUserScrolling.current = true;
+    // Don't disable auto-scroll immediately, wait to see where they scroll
+  }, []);
+
+  /**
+   * Handles the end of user scrolling
+   */
+  const onScrollEndDrag = useCallback(() => {
+    // Small delay to allow momentum scrolling to continue
+    setTimeout(() => {
+      isUserScrolling.current = false;
+    }, 200);
+  }, []);
 
   /**
    * Handles scroll events to manage auto-scrolling behavior
    */
-  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const onScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-    const isAtBottom = contentSize.height - contentOffset.y - layoutMeasurement.height < 20;
-
-    // If the user scrolls back to the bottom, re-enable auto-scrolling
-    if (isAtBottom) {
-      scrollToBottomOnNextUpdate.current = true;
+    
+    // Calculate if user is near the bottom
+    const distanceFromBottom = contentSize.height - contentOffset.y - layoutMeasurement.height;
+    const isNearBottom = distanceFromBottom <= 50; // Increased threshold
+    
+    // Update auto-scroll state based on position
+    if (isNearBottom) {
+      shouldAutoScroll.current = true;
+    } else {
+      // Only disable auto-scroll if user is actively scrolling and moved significantly away from bottom
+      if (isUserScrolling.current && distanceFromBottom > 100) {
+        shouldAutoScroll.current = false;
+      }
     }
-  };
+  }, []);
 
   /**
    * Renders tool result components based on tool name and result data
@@ -121,33 +202,33 @@ export const Chat: FC<ChatProps> = ({ messages, isProcessing, processingStage })
 
     switch (toolName) {
       case 'tokenAddressTool':
-        return <TokenAddressResultMessageItem props={args.data} />;
+        return <TokenAddressResultMessageItem props={args.data as any} />;
       case 'getTokenData':
-        return <TokenDataResultMessageItem props={args.data} />;
+        return <TokenDataResultMessageItem props={args.data as any} />;
       case 'bubblemap':
-        return <BubbleMapMessageItem props={args.data} />;
+        return <BubbleMapMessageItem props={args.data as any} />;
       case 'topHolders':
-        return <TopHoldersMessageItem props={args.data} />;
+        return <TopHoldersMessageItem props={args.data as any} />;
       case 'trendingAiProjects':
-        return <AiProjectsMessageItem props={args.data} />;
+        return <AiProjectsMessageItem props={args.data as any} />;
       case 'getLimitOrderTool':
-        return <ShowLimitOrderMessageItem props={args.data} />;
+        return <ShowLimitOrderMessageItem props={args.data as any} />;
       case 'getLuloAssetsTool':
-        return <LuloAssetsMessageItem props={args.data} />;
+        return <LuloAssetsMessageItem props={args.data as any} />;
       case 'getNFTPrice':
-        return <NFTCollectionMessageItem props={args.data} />;
+        return <NFTCollectionMessageItem props={args.data as any} />;
       case 'getTrendingNFTs':
-        return <NFTCollectionMessageItem props={args.data} />;
+        return <NFTCollectionMessageItem props={args.data as any} />;
       case 'resolveSnsNameTool':
-        return <SNSResolverMessageItem props={args.data} />;
+        return <SNSResolverMessageItem props={args.data as any} />;
       case 'swapTokens':
-        return <SwapTokenMessageItem props={args.data} />;
+        return <SwapTokenMessageItem props={args.data as any} />;
       // case 'sign_and_send_tx':
-      //   return <SignedTransactionsMessageItem props={args.data} />;
+      //   return <SignedTransactionsMessageItem props={args.data as any} />;
       case 'transferSol':
-        return <TransferTokenMessageItem props={args.data} />;
+        return <TransferTokenMessageItem props={args.data as any} />;
       case 'transferSpl':
-        return <TransferTokenMessageItem props={args.data} />;
+        return <TransferTokenMessageItem props={args.data as any} />;
       default:
         return null;
     }
@@ -229,9 +310,17 @@ export const Chat: FC<ChatProps> = ({ messages, isProcessing, processingStage })
       keyExtractor={item => item.id}
       onScroll={onScroll}
       onScrollBeginDrag={onScrollBeginDrag}
+      onScrollEndDrag={onScrollEndDrag}
+      onContentSizeChange={onContentSizeChange}
+      onLayout={onLayout}
       ListFooterComponent={renderFooter}
       scrollEventThrottle={16}
       contentContainerStyle={$flatListContentContainer}
+      maintainVisibleContentPosition={{
+        minIndexForVisible: 0,
+        autoscrollToTopThreshold: 10,
+      }}
+      removeClippedSubviews={false}
     />
   );
 };
@@ -259,9 +348,10 @@ const $footerContainer: ViewStyle = {
 };
 
 const $footerSpacing: ViewStyle = {
-  height: 100,
+  height: 80,
 };
 
 const $flatListContentContainer: ViewStyle = {
   paddingHorizontal: 16,
+  paddingBottom: 20,
 };
